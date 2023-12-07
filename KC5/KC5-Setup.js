@@ -127,6 +127,7 @@ const _대체어 = {
 //#endregion KC5-SETTINGS
 const _version = "KC5";
 const _path = "https://arms00.github.io/";
+const _img_path = "https://arms00.github.io/resources/img/";
 //#region Const
     const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
     const timer = ms => new Promise(res => setTimeout(res, ms));
@@ -830,7 +831,8 @@ async function findComplexReference(startB, startC, startV, endB, endC, endV, in
                     event.preventDefault();
                     pvtClk();
                     event.stopPropagation();
-                    location.href = 'file://../KC-labs/res-hi/' + link.getAttribute('href');                
+                    //location.href = 'file://../KC-labs/res-hi/' + link.getAttribute('href');                
+                    location.href = _img_path + link.getAttribute('href');
                 });
                 return;
             }
@@ -930,13 +932,15 @@ async function findComplexReference(startB, startC, startV, endB, endC, endV, in
                     if (img.hasAttribute('src')) 
                     {                    
                         let src = img.getAttribute('src');                        
-                        let file = location.href + 'KC-labs/resources/img/' + src;
+                        //let file = location.href + 'KC-labs/resources/img/' + src;
+                        let file = _img_path + src;
                         img.setAttribute('href', src);
                         img.addEventListener('click', (e) => {                            
                             e.preventDefault();
                             e.stopPropagation();
                             pvtClk();
-                            location.href = 'file://../KC-labs/res-hi/' + src;
+                            //location.href = 'file://../KC-labs/res-hi/' + src;
+                            location.href = _img_path + src;
                         });
                         img.setAttribute('src', file);
                     }                
