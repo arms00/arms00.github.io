@@ -1,7 +1,5 @@
 //#region KC5-SETTINGS
 // Description: KC5의 설정값을 정의합니다
-const _version = "KC5";
-const _path = "https://arms00.github.io/";
 const _SETTING_ = {
     
     "콘텐츠좌우정렬":{
@@ -127,7 +125,8 @@ const _대체어 = {
     //"<e>" : "</small><e>",
 };
 //#endregion KC5-SETTINGS
-
+const _version = "KC5";
+const _path = "https://arms00.github.io/";
 //#region Const
     const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
     const timer = ms => new Promise(res => setTimeout(res, ms));
