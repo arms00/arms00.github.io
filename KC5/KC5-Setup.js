@@ -126,12 +126,6 @@ const _대체어 = {
 };
 //#endregion KC5-SETTINGS
 
-<<<<<<< HEAD
-=======
-const _version = "KC5";
-const _path = "https://arms00.github.io/";
-
->>>>>>> 8e5b12befbe3a5245232bda833bb429734de57a9
 //#region Const
     const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
     const timer = ms => new Promise(res => setTimeout(res, ms));
