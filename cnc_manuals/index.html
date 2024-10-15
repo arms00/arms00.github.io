@@ -4,6 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CNC Manuals and Tutorials</title>
+    <script>
+        async function loadManuals() {
+            const response = await fetch('https://api.github.com/repos/arms00/arms00.github.io/contents/cnc_manuals');
+            const files = await response.json();
+            const list = document.getElementById('manuals-list');
+
+            files.forEach(file => {
+                if (file.type === 'file') {
+                    const listItem = document.createElement('li');
+                    const link = document.createElement('a');
+                    link.href = file.download_url;
+                    link.textContent = file.name;
+                    listItem.appendChild(link);
+                    list.appendChild(listItem);
+                }
+            });
+        }
+
+        window.onload = loadManuals;
+    </script>
 </head>
 <body>
     <header>
@@ -12,12 +32,8 @@
     </header>
 
     <nav>
-        <ul>
-            <li><a href="./cnc_manuals/intro.html">Introduction to CNC</a></li>
-            <li><a href="./cnc_manuals/milling.html">Milling Machine Guide</a></li>
-            <li><a href="./cnc_manuals/lathe.html">Lathe Machine Setup</a></li>
-            <li><a href="./cnc_manuals/tool_setup.html">Tool Setup Instructions</a></li>
-            <li><a href="./cnc_manuals/simulator_vs_real.html">Simulator vs Real CNC Machine Differences</a></li>
+        <ul id="manuals-list">
+            <!-- Files will be loaded here dynamically -->
         </ul>
     </nav>
 
