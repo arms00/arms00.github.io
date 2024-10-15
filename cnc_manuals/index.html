@@ -10,7 +10,7 @@
             const files = await response.json();
             const list = document.getElementById('manuals-list');
 
-            files.forEach(file => {
+            for (const file of files) {
                 if (file.type === 'file') {
                     const listItem = document.createElement('li');
                     const link = document.createElement('a');
@@ -18,8 +18,33 @@
                     link.textContent = file.name;
                     listItem.appendChild(link);
                     list.appendChild(listItem);
+                } else if (file.type === 'dir') {
+                    await loadDirectory(file.path, list);
                 }
-            });
+            }
+        }
+
+        async function loadDirectory(path, parentElement) {
+            const response = await fetch(`https://api.github.com/repos/arms00/arms00.github.io/contents/${path}`);
+            const files = await response.json();
+            const subList = document.createElement('ul');
+            const listItem = document.createElement('li');
+            listItem.textContent = path.split('/').pop();
+            listItem.appendChild(subList);
+            parentElement.appendChild(listItem);
+
+            for (const file of files) {
+                if (file.type === 'file') {
+                    const subListItem = document.createElement('li');
+                    const link = document.createElement('a');
+                    link.href = file.download_url;
+                    link.textContent = file.name;
+                    subListItem.appendChild(link);
+                    subList.appendChild(subListItem);
+                } else if (file.type === 'dir') {
+                    await loadDirectory(file.path, subList);
+                }
+            }
         }
 
         window.onload = loadManuals;
