@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Character Customization</title>
+    <body>
+        <div id="avatarCustom-content">
+            <div id="avatarUrl"></div>
+            <div class="frame-container" style="position: relative;">
+                <iframe id="frame" class="frame" allow="camera *; microphone *; clipboard-write" hidden></iframe>
+                <div id="frame-overlay" class="overlay"></div>
+                <div class="settings-overlay" onclick="quitAvatarCustom()"><svg width="65%" height="65%" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 6.875V5.312a1.563 1.563 0 0 0-1.563-1.562h-7.5a1.562 1.562 0 0 0-1.562 1.562v9.375a1.562 1.562 0 0 0 1.563 1.563h7.5a1.562 1.562 0 0 0 1.562-1.563v-1.562" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M16 6.875 19.125 10 16 13.125" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M8.46 10h10.665" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+                <span id="sw-switch" class="block-overlay-1">
+                    <!-- <svg width="75%" height="75%" viewBox="0 0 650 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g id="남자" transform="translate(0, 0)" style="display: none;">
+                            <g opacity="0.3" fill="#101010">
+                                <circle cx="130.95011" cy="46.58577" r="46.54521"/>
+                                <path d="M124.50539,388.15534V549.98933C124.26193,579.39154,80.494976,579.39154,80.108304,549.98933V388.15534H22.821751L84.404788,171.89962H74.379644L38.57554,295.0651C29.524278,322.30474,-7.3109962,311.27714,1.3392857,282.17574L41.43986,148.98509C46.051436,133.68965,65.32836,106.68061,98.726432,106.02037H128.80188H163.17384C195.6095,106.68061,214.96663,133.91881,220.46041,148.98509L260.56101,282.17574C268.69571,311.1339,232.15259,323.02082,223.32473,295.0651L187.52063,171.89962H176.06331L239.07855,388.15534H180.3598V549.98933C180.8181,579.39154,137.22302,579.2483,137.39487,549.98933V388.15534H124.50539z"/>
+                            </g>                            
+                            <g fill="#4199f1">
+                                <circle cx="511.90545" cy="46.58577" r="46.54521"/>
+                                <path d="M462.49589,106.02037C426.70613,106.02037,403.77713,137.00793,403.77713,167.60313V310.81886C403.44773,338.80318,443.74313,338.80318,443.87777,310.81886V179.06038H453.90289V542.82853C453.28133,580.80938,506.95025,579.72094,506.89297,542.82853V330.86906H515.48597V542.82853C516.18773,579.72094,570.13733,580.80938,569.90817,542.82853V179.06038H579.93333V310.81886C579.46073,339.01802,619.54701,339.01802,620.03389,310.81886V167.60313C619.46109,137.00793,595.67281,106.56889,559.88305,106.02037H462.49589z"/>
+                            </g>
+                            <rect fill="#a0a0a0" x="297.79132" y="5.7684445" width="32.996765" height="562.84003"/>
+                        </g>
+                        <g id="여자">                            
+                            <g fill="#f13981">
+                                <circle cx="130.95011" cy="46.58577" r="46.54521"/>
+                                <path d="M124.50539,388.15534V549.98933C124.26193,579.39154,80.494976,579.39154,80.108304,549.98933V388.15534H22.821751L84.404788,171.89962H74.379644L38.57554,295.0651C29.524278,322.30474,-7.3109962,311.27714,1.3392857,282.17574L41.43986,148.98509C46.051436,133.68965,65.32836,106.68061,98.726432,106.02037H128.80188H163.17384C195.6095,106.68061,214.96663,133.91881,220.46041,148.98509L260.56101,282.17574C268.69571,311.1339,232.15259,323.02082,223.32473,295.0651L187.52063,171.89962H176.06331L239.07855,388.15534H180.3598V549.98933C180.8181,579.39154,137.22302,579.2483,137.39487,549.98933V388.15534H124.50539z"/>
+                            </g>                            
+                            <g opacity="0.3" fill="#101010">
+                                <circle cx="511.90545" cy="46.58577" r="46.54521"/>
+                                <path d="M462.49589,106.02037C426.70613,106.02037,403.77713,137.00793,403.77713,167.60313V310.81886C403.44773,338.80318,443.74313,338.80318,443.87777,310.81886V179.06038H453.90289V542.82853C453.28133,580.80938,506.95025,579.72094,506.89297,542.82853V330.86906H515.48597V542.82853C516.18773,579.72094,570.13733,580.80938,569.90817,542.82853V179.06038H579.93333V310.81886C579.46073,339.01802,619.54701,339.01802,620.03389,310.81886V167.60313C619.46109,137.00793,595.67281,106.56889,559.88305,106.02037H462.49589z"/>
+                            </g>                            
+                            <rect fill="#a0a0a0" x="297.79132" y="5.7684445" width="32.996765" height="562.84003"/>
+                        </g>
+                      </svg> -->
+                </span> <span class="block-overlay-2"></span>
+            </div>
+            <div id="avatarModal" class="modal">
+                <div class="modal-content">
+                    <span id="modalClose" class="close-button">&times;</span>
+                    <canvas id="modalCanvas"></canvas>
+                    <button id="exportButton" class="export-button">Download</button>
+                </div>
+            </div>            
+        </div>
+    </body>
+    <style>
+        /* 스타일 */
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans,
+                Droid Sans, Helvetica Neue, sans-serif;
+            padding: 0;
+            font-size: 14px;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #avatarCustom-content {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: top;
+        }
+
+        .frame-container {
+            width: 100%;
+            height: 100%;
+            min-height: 905px;            
+            container-type: inline-size;
+            margin: 0;
+            padding: 0;
+            border: none;            
+            position: relative;
+        }
+
+        .frame-container .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1001;
+            display: none;
+        }
+
+        .frame {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;            
+            border: none;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1005;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            position: relative;
+            width: 70%; /*800px;*/
+            height: 70%; /*600px;*/
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 2; /* 위에 표시되도록 설정 */
+            display: flex; /* 추가 */
+            flex-direction: column; /* 추가 */
+            overflow: hidden; /* 추가 */
+        }
+
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 30px;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+        }
+
+        .close-button:hover {
+            color: #000;
+        }
+
+        #modalCanvas {
+            width: 100% !important; /* important 추가 */
+            height: 100% !important; /* important 추가 */
+            display: block; /* 추가 */
+            border: none;
+            flex-grow: 1; /* 추가 */
+        }
+
+        .export-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            position: absolute;
+            bottom: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .export-button:hover {
+            background-color: #45a049;
+        }
+
+        .loading-spinner {
+            border: 10px solid #f3f3f3; /* Light grey */
+            border-top: 10px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .block-overlay-1 {
+            position: absolute;
+            top: 100px; /* 설정 버튼의 y축 위치에 맞게 조정 */
+            right: 15px; /* 설정 버튼의 x축 위치에 맞게 조정 */
+            width: 80px; /* 설정 버튼의 너비 */
+            height: 100px; /* 설정 버튼의 높이 */
+            background-color: rgba(246, 246, 246, 0);/*rgba(180,180,180,0);*/
+            /*border-radius: 30%;*/
+            z-index: 1000; /* 버튼 위에 표시되도록 설정 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;            
+            cursor: pointer; 
+        }
+
+        .block-overlay-2 {
+            position: absolute;
+            top: 780px; /* 설정 버튼의 y축 위치에 맞게 조정 */
+            right: 15px; /* 설정 버튼의 x축 위치에 맞게 조정 */
+            width: 80px; /* 설정 버튼의 너비 */
+            height: 100px; /* 설정 버튼의 높이 */
+            background-color: rgba(246, 246, 246, 0);
+            z-index: 1000; /* 버튼 위에 표시되도록 설정 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;            
+            cursor: default; /*pointer;*/            
+        }
+
+        /* 설정 버튼 오버레이 */
+        .settings-overlay {
+            position: absolute;
+            top: 10px; /* 설정 버튼의 y축 위치에 맞게 조정 */
+            left: 20px; /* 설정 버튼의 x축 위치에 맞게 조정 */
+            width: 75px; /* 설정 버튼의 너비 */
+            height: 70px; /* 설정 버튼의 높이 */
+            background-color: rgba(220, 100, 30, 1);
+            border-radius: 40%;
+            box-shadow: 0 2px 1px rgba(0, 0, 0, 0.3);
+            z-index: 1002; /* 버튼 위에 표시되도록 설정 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;            
+        }
+
+        .settings-overlay:hover {
+            background-color: rgba(255, 180, 50, 1); /* Slightly brighter orange */
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+            /* 미디어 쿼리 */
+            @media (max-width: 1216px) {
+                .frame-container {
+                    min-height: 760px;
+                }
+            }
+
+            @media (max-width: 1040px) {
+                .frame-container {
+                    min-height: 550px;
+                }
+            }
+
+            @container (max-width: 1199px) {
+                .settings-overlay {
+                    top: 9px;
+                    left: 20px;
+                    width: 55px;
+                    height: 55px;
+                }
+
+                .block-overlay-1 {
+                    top: 95px;
+                    right: 20px;
+                    width: 60px;
+                    height: 60px;
+                }
+
+                .block-overlay-2 {
+                    top: 665px;
+                    right: 20px;
+                    width: 60px;
+                    height: 80px;
+                }
+            }
+
+            @container (max-width: 1023px) {
+                .settings-overlay {
+                    top: 7px;
+                    left: 15px;
+                    width: 36px;
+                    height: 36px;
+                }
+
+                .block-overlay-1 {
+                    top: 64px;
+                    right: 8px;
+                    width: 47px;
+                    height: 47px;
+                }
+
+                .block-overlay-2 {
+                    top: 475px;
+                    right: 8px;
+                    width: 47px;
+                    height: 65px;
+                }
+            }
+
+            /* @media (max-aspect-ratio: 1.025) {
+                .block-overlay-1 {
+                    top: auto;
+                    bottom: 15px;
+                    left: max(2px, calc(50% - 220px));
+                    width: 62px;
+                    height: 45px;
+                }
+
+                .block-overlay-2 {
+                    top: auto;
+                    bottom: 15px;
+                    left: calc(50% + 170px);
+                    width: 62px;
+                    height: 45px;
+                }                
+            } */
+
+            @media (max-aspect-ratio: 1.0165) {
+                .block-overlay-1 {
+                    top: auto;
+                    bottom: 7px;                    
+                    left: max(20px, calc(50% - 218px));
+                    width: 50px;
+                    height: 50px;
+                    /*background-color: rgba(128, 128, 128, 0.5);*/
+                }
+
+                .block-overlay-2 {
+                    top: auto;
+                    bottom: 7px;
+                    left: calc(50% + 167px);
+                    width: 50px;
+                    height: 50px;
+                    /*background-color: rgba(128, 128, 128, 0.5);*/
+                }                
+            }
+
+            @media (max-aspect-ratio: 1.0165) and (min-width: 1041px) {
+                .block-overlay-1 {
+                    top: auto;
+                    bottom: 10px;
+                    left: max(2px, calc(50% - 287px));
+                    width: 80px;
+                    height: 60px;
+                    /*background-color: rgba(0, 255, 0, 0.5);*/
+                }
+
+                .block-overlay-2 {
+                    top: auto;
+                    bottom: 10px;
+                    left: calc(50% + 225px);
+                    width: 60px;
+                    height: 60px;
+                    /*background-color: rgba(0, 255, 0, 0.5);*/
+                }                
+            }
+
+            @media (max-aspect-ratio: 1.0165) and (min-width: 1217px) {
+                .block-overlay-1 {
+                    top: auto;
+                    bottom: 20px;
+                    left: max(2px, calc(50% - 355px));
+                    width: 90px;
+                    height: 70px;
+                    /*background-color: rgba(246, 0, 0, 0.5);*/
+                }
+
+                .block-overlay-2 {
+                    top: auto;
+                    bottom: 20px;
+                    left: calc(50% + 285px);
+                    width: 70px;
+                    height: 70px;
+                    /*background-color: rgba(246, 0, 0, 0.5);*/
+                }                
+            }
+    </style>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+
+<body>    
+    <!-- 데이터 태그 추가 -->
+    <data id="avatarGLBUrlData" value=""></data>
+    <data id="modelJSONData" value=""></data>
+    <data id="avatarModalModelData" value=""></data>
+    
+    <script>
+        const avatarCustomWindow = document.getElementById('avatarCustom-content');
+        closeButton = document.querySelector('.close-button');        
+
+        function quitAvatarCustom() {
+            avatarCustomWindow.style.display = 'none';
+        }        
+
+        // 일반 스크립트에서 exportGLB 함수 호출 및 반환값 처리
+        const exportButton = document.getElementById('exportButton');
+        exportButton.addEventListener('click', async () => {
+            if (window.exportGLB) {
+                try {
+                    const result = await window.exportGLB();
+                    console.log('Exported GLB Model:', result);                    
+                } catch (error) {
+                    console.error('Export failed:', error);
+                }
+            } else {
+                console.error('exportGLB 함수가 정의되지 않았습니다.');
+            }
+        });
+
+        function openModal() {                        
+            // Create and display the loading spinner            
+            const spinner = document.createElement('div');
+            spinner.className = 'loading-spinner';
+            modal.querySelector('.modal-content').appendChild(spinner);
+            modal.style.display = 'flex';
+
+            loadAvatarModal(avatarGLBUrl+'?lod=0').then(() => {
+                loadAllAnimations(characterGender, true);
+            }).finally(() => {
+                // Remove the loading spinner after loading is complete
+                spinner.remove();
+                document.getElementById('exportButton').style.display = 'inline-block';
+                document.getElementById('modalClose').style.display = 'inline-block';
+
+                // avatarModalModel을 문자열화하여 데이터 태그에 저장
+                const serializedModel = serializeAvatarModalModel(avatarModalModel);
+                document.getElementById('avatarModalModelData').setAttribute('value', serializedModel);
+                //avatarModalModel = deserializeAvatarModalModel(serializedModel); //test decode
+            });                      
+            initModalScene();
+            animateModal();
+
+            // 데이터 태그에 값 설정
+            document.getElementById('avatarGLBUrlData').setAttribute('value', avatarGLBUrl);
+            document.getElementById('modelJSONData').setAttribute('value', JSON.stringify(modelJSON));
+        }
+
+        /**
+         * avatarModalModel을 JSON 문자열로 변환하는 함수
+         * @param {THREE.Object3D} model - THREE.js Object3D 모델
+         * @returns {string} - JSON 문자열
+         */
+        function serializeAvatarModalModel(model) {
+            if (!model) return '';
+
+            const exporter = new THREE.GLTFExporter();
+            let serialized = '';
+
+            exporter.parse(model, function (result) {
+                serialized = JSON.stringify(result, null, 2);
+            }, { binary: false });
+
+            return serialized;
+        }
+
+        // deserializeAvatarModalModel 함수 추가
+        function deserializeAvatarModalModel(serializedModel) {
+            const loader = new THREE.GLTFLoader();
+            let model = null;
+
+            loader.parse(serializedModel, '', function (gltf) {
+                model = gltf.scene;
+                // 필요한 추가 설정
+            }, function (error) {
+                console.error('모델 역직렬화 중 오류 발생:', error);
+            });
+
+            return model;
+        }
+
+        // 모듈 스크립트의 exportGLB 함수를 전역 객체에 할당
+        window.exportGLB = exportGLB;
+
+        window.addEventListener('exportGLBEvent', () => {
+            exportGLB();
+        });
+
+        window.addEventListener('getModelJSONEvent', () => {
+            GetModelJSON();
+        });
+        
+        window.addEventListener('getModelGLBEvent', () => {
+            GetModelGLB();
+        });
+        
+        window.addEventListener('getAvatarGLBUrlEvent', () => {
+            GetAvatarGLBUrl();
+        });
+
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
+
+        import animations from 'https://arms00.github.io/customAnimations.js';
+        const { 
+            animationFiles_M_Idle_Base64,
+            animationFiles_F_Idle_Base64,
+            animationFiles_M_Common_Base64,
+            animationFiles_F_Common_Base64,
+            animationFiles_M_Extend_Base64,
+            animationFiles_F_Extend_Base64 
+        } = animations;
+
+        let avatarGLBUrl = '';
+        let modalScene, modalCamera, modalRenderer, modalControls, modalMixer, modalClock;
+        let avatarModalModel;
+        let modelJSON = null;
+        let animationClips = [];
+        let validAnimations = [];
+        let actions = {}; // 애니메이션 액션들을 저장할 객체
+        let characterGender = 'M'; // 기본 성별 설정        
+        let selectedAvatarId = 'new';
+        // let previousAvatarId = null;
+        let language = 'kr'; // or 'en'
+
+        const subdomain = 'school-metaverse';
+        const frame = document.getElementById('frame');
+        const frameOverlay = document.getElementById('frame-overlay');
+        const avatarID = document.getElementById('avatarUrl');
+
+        const closeButton = document.querySelector('.modal-content>.close-button');
+        
+        window.addEventListener('message', subscribe);
+        document.addEventListener('message', subscribe);
+
+        function displayIframe() {
+            document.getElementById('exportButton').style.display = 'none';
+            document.getElementById('modalClose').style.display = 'none';            
+
+            // if (selectedAvatarId === 'new') {
+            //     const maleId = 'male';
+            //     const femaleId = 'female';
+            //     const genderSwitch = document.getElementById('sw-switch');
+
+            //     // 랜덤으로 성별 아이디 선택
+            //     characterGender = Math.random() < 0.5 ? maleId : femaleId;
+                
+            //     // 선택된 아이디에 따라 텍스트 변경
+            //     if (characterGender === maleId) {
+            //         genderSwitch.textContent = '남자';
+            //     } else {
+            //         genderSwitch.textContent = '여자';
+            //     }
+            //     frame.src = `https://${subdomain}.readyplayer.me/avatar?gender=${characterGender}&clearchache`;
+            // }
+            // else
+            // {
+            //     frame.src = `https://${subdomain}.readyplayer.me/${language}/avatar?frameApi&id=${selectedAvatarId}`;
+            // }
+            
+            //frame.src = `https://${subdomain}.readyplayer.me/${language}/avatar?frameApi&id=${selectedAvatarId}&quickStart=true&gender=male&quickStart=true`;
+            frame.src = `https://${subdomain}.readyplayer.me/${language}/avatar?frameApi&id=${selectedAvatarId}&lang=${language}`;
+
+            console.log('Frame URL:', frame.src);
+            document.getElementById('frame').hidden = false;            
+        }
+        displayIframe();
+                
+        const modal = document.getElementById('avatarModal');        
+        const swSwitch = document.getElementById('sw-switch');
+
+        swSwitch.addEventListener('click', function(event) {            
+            console.log('Switch button clicked.');
+            selectedAvatarId = 'new';
+            document.getElementById('avatarGLBUrlData').value = '';
+            document.getElementById('modelJSONData').value = '';
+            document.getElementById('avatarModalModelData').value = '';
+            console.log('Subscription created.');
+            const blockOverlay1 = document.querySelector('.block-overlay-1');
+            blockOverlay1.innerHTML = "";
+            //blockOverlay1.style.backgroundColor = "rgba(180, 180, 180, 0)";            
+            const blockOverlay2 = document.querySelector('.block-overlay-2');
+            setTimeout(() => {                
+                blockOverlay1.style.backgroundColor = "rgba(246, 246, 246, 0)";
+                blockOverlay2.style.backgroundColor = "rgba(246, 246, 246, 0)";            
+            }, 250);            
+            displayIframe();
+        });
+
+        closeButton.addEventListener('click', function(event) {
+            console.log('Close button clicked.');
+            modal.style.display = 'none';
+            document.getElementById('frame-overlay').style.display = 'none';
+            animationClips = [];
+            validAnimations = [];
+            actions = {};    
+            modelJSON = null;               
+            avatarGLBUrl = '';
+            document.getElementById('avatarGLBUrlData').value = '';
+            document.getElementById('modelJSONData').value = '';
+            document.getElementById('avatarModalModelData').value = '';
+            if (avatarModalModel) {
+                modalScene.remove(avatarModalModel);
+                avatarModalModel = null;
+            }
+            if (modalMixer) {
+                modalMixer.uncacheRoot(avatarModalModel);
+                modalMixer = null;
+            }                 
+        });
+
+        function subscribe(event) {
+            const json = parse(event);
+            if (json?.source !== 'readyplayerme') {
+                return;
+            }
+
+            if (json.eventName === 'v1.frame.ready') {                                
+                console.log('Frame is ready.');
+                frame.contentWindow.postMessage(
+                    JSON.stringify({
+                        target: 'readyplayerme',
+                        type: 'subscribe',
+                        eventName: 'v1.**'
+                    }),
+                    '*'
+                );
+            }
+
+            if (json.eventName === 'v1.subscription.created') {                
+                console.log('Subscription created.');
+                const blockOverlay1 = document.querySelector('.block-overlay-1');
+                const blockOverlay2 = document.querySelector('.block-overlay-2');
+                setTimeout(() => {                    
+                    blockOverlay1.style.backgroundColor = "rgba(246, 246, 246, 1)";
+                    blockOverlay1.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="svg-icon" style="width: 70%;height: 70%;vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 1024 1024" version="1.1"> <path d="M921.6 585.728c0 226.304-184.32 409.6-409.6 409.6s-409.6-182.272-409.6-409.6c0-78.848 21.504-152.576 62.464-215.04l133.12 76.8c-25.6 39.936-39.936 87.04-39.936 138.24 0 142.336 114.688 254.976 254.976 254.976 142.336 0 257.024-114.688 257.024-254.976 0-118.784-79.872-219.136-189.44-247.808v131.072L196.608 248.832 577.536 28.672v151.552C772.096 214.016 921.6 381.952 921.6 585.728z" fill="#3ADAEA"/> </svg>`
+                    blockOverlay2.style.backgroundColor = "rgba(246, 246, 246, 1)";
+                }, 1000);                
+            }
+
+            if (json.eventName === 'v1.subscription.deleted') {
+                console.log('Subscription deleted.');                
+            }
+
+            if (json.eventName === 'v1.user.set') {
+                console.log(`User with id ${json.data.id} set: ${JSON.stringify(json)}`);                
+            }
+
+            if (json.eventName === 'v1.user.updated') {
+                console.log(`User with id ${json.data.id} updated: ${JSON.stringify(json)}`);
+            }
+
+            if (json.eventName === 'v1.user.logout') {
+                console.log(`User with id ${json.data.id} logged out: ${JSON.stringify(json)}`);                
+            }
+
+            if (json.eventName === 'v1.user.authorized') {
+                console.log(`User with id ${json.data.id} authorized: ${JSON.stringify(json)}`);                
+            }
+            
+            console.log(json);            
+
+            if (json.eventName === 'v1.avatar.exported') {
+                modal.style.display = 'flex';
+                frameOverlay.style.display = 'flex';
+                avatarGLBUrl = json.data.url;
+
+                // .glb URL을 .json으로 변경
+                const jsonUrl = avatarGLBUrl.replace(/\.glb$/, '.json');
+
+                // JSON 데이터 가져오기
+                fetch(jsonUrl)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('JSON 파일을 불러오는 데 실패했습니다.');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log(data);
+                        selectedAvatarId = data.id;
+                        displayIframe();
+                        characterGender = data.outfitGender; // JSON 구조에 따라 적절히 수정
+                        modelJSON = data;
+                        console.log('캐릭터 성별:', characterGender);
+                        openModal();
+                    })
+                    .catch(error => {
+                        console.error('JSON 데이터를 가져오는 중 오류 발생:', error);
+                        // 기본 애니메이션 로드
+                        openModal();                        
+                    });
+            }
+
+            if (json.eventName === 'v1.user.set') {
+                console.log(`User with id ${json.data.id} set: ${JSON.stringify(json)}`);
+            }
+        }
+
+        function parse(event) {
+            try {
+                return JSON.parse(event.data);
+            } catch (error) {
+                return null;
+            }
+        }
+
+        function openModal() {                        
+            // Create and display the loading spinner            
+            const spinner = document.createElement('div');
+            spinner.className = 'loading-spinner';
+            modal.querySelector('.modal-content').appendChild(spinner);
+            modal.style.display = 'flex';
+
+            loadAvatarModal(avatarGLBUrl+'?lod=0').then(() => {
+                loadAllAnimations(characterGender, true);
+            }).finally(() => {
+                // Remove the loading spinner after loading is complete
+                spinner.remove();                
+                document.getElementById('exportButton').style.display = 'inline-block';
+                document.getElementById('modalClose').style.display = 'inline-block';                                
+                serializeAvatarModalModel(avatarModalModel);
+            });                      
+            initModalScene();
+            animateModal();
+
+            // 데이터 태그에 값 설정
+            document.getElementById('avatarGLBUrlData').setAttribute('value', avatarGLBUrl);
+            document.getElementById('modelJSONData').setAttribute('value', JSON.stringify(modelJSON));
+        }
+
+        /**
+         * avatarModalModel을 JSON 문자열로 변환하는 함수
+         * @param {THREE.Object3D} model - THREE.js Object3D 모델
+         * @returns {string} - JSON 문자열
+         */
+         function serializeAvatarModalModel(model) {
+            if (!model) return '';
+
+            console.log('Serializing avatar modal model...');
+            const exporter = new GLTFExporter();
+            let serialized = '';
+
+            exporter.parse(model, function (result) {
+                serialized = JSON.stringify(result, null, 2);                
+                document.getElementById('avatarModalModelData').value = serialized;
+            }, { binary: false });
+        }
+
+        function initModalScene() {
+            const canvas = document.getElementById('modalCanvas');
+            modalRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+            modalRenderer.setSize(canvas.clientWidth, canvas.clientHeight);
+            modalRenderer.setPixelRatio(window.devicePixelRatio);
+
+            modalScene = new THREE.Scene();
+            modalScene.background = new THREE.Color(0xf0f0f5); // 부드러운 파스텔 배경으로 변경
+
+            modalCamera = new THREE.PerspectiveCamera(40, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+            modalCamera.position.set(0, 2, 4);
+
+            modalControls = new OrbitControls(modalCamera, modalRenderer.domElement);
+            modalControls.enablePan = false;
+            modalControls.minDistance = 1.5;
+            modalControls.maxDistance = 5;
+            modalControls.maxPolarAngle = Math.PI / 2;
+            modalControls.minPolarAngle = 0;
+            modalControls.rotateSpeed = 0.5;
+            modalControls.zoomSpeed = 0.6;
+            modalControls.target.set(0, 0.75, 0);
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.4); // 밝기 감소
+            modalScene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xe5e5e5, 0.7); // 부드러운 색상
+            directionalLight.position.set(5, 5, 7.5);
+            directionalLight.castShadow = false;
+            modalScene.add(directionalLight);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.54);
+            dirLight.position.set(-8, 12, 8);
+            dirLight.castShadow = true;            
+            modalScene.add(dirLight);
+
+            const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.61);
+            hemiLight.position.set(0, 50, 0);
+            modalScene.add(hemiLight);
+            modalRenderer.toneMapping = THREE.ACESFilmicToneMapping;
+            modalRenderer.toneMappingExposure = 1.7;
+
+            modalClock = new THREE.Clock();
+            window.addEventListener('resize', onModalWindowResize, false);
+        }
+
+        function onModalWindowResize() {
+            const canvas = document.getElementById('modalCanvas');
+            modalCamera.aspect = canvas.clientWidth / canvas.clientHeight;
+            modalCamera.updateProjectionMatrix();
+            modalRenderer.setSize(canvas.clientWidth, canvas.clientHeight);
+        }
+
+        function animateModal() {
+            requestAnimationFrame(animateModal);
+            const delta = modalClock.getDelta();
+            if (modalMixer) modalMixer.update(delta);
+            modalControls.update();
+            modalRenderer.render(modalScene, modalCamera);
+        }
+
+        async function loadAvatarModal(url) {
+            const loader = new GLTFLoader();
+            return new Promise((resolve, reject) => {
+                loader.load(
+                    url,
+                    function(gltf) {
+                        if (avatarModalModel) {
+                            modalScene.remove(avatarModalModel);
+                        }
+                        avatarModalModel = gltf.scene;
+                        modalScene.add(avatarModalModel);
+
+                        // modalMixer를 아바타 모델 로드 후 애니메이션 유무와 상관없이 생성
+                        modalMixer = new THREE.AnimationMixer(avatarModalModel);
+
+                        // 아바타 GLB 내부에 애니메이션이 있다면 재생 (선택사항)
+                        if (gltf.animations && gltf.animations.length > 0) {
+                            gltf.animations.forEach((clip) => {
+                                modalMixer.clipAction(clip).play();
+                            });
+                        }
+
+                        console.log('Avatar loaded into modal.');
+                        resolve();
+                    },
+                    undefined,
+                    function(error) {
+                        console.error('An error occurred while loading the avatar into modal:', error);
+                        reject(error);
+                    }
+                );
+            });
+        }
+
+        // loadAllAnimations() 호출 시점에는 이미 모델 본 이름이 변경되어 있으므로,
+        // 여기서 필터링이 정상적으로 동작하고 Idle 애니메이션이 일치하는 본을 찾을 수 있음.
+        async function loadAllAnimations(gender, excludeIdle = false) {
+            let commonAnimations, extendAnimations, idleAnimation;
+
+            if (gender.toLowerCase().startsWith('m')) {
+                idleAnimation = animationFiles_M_Idle_Base64;
+                commonAnimations = animationFiles_M_Common_Base64;
+                extendAnimations = animationFiles_M_Extend_Base64;
+            } else if (gender.toLowerCase().startsWith('f')) {
+                idleAnimation = animationFiles_F_Idle_Base64;
+                commonAnimations = animationFiles_F_Common_Base64;
+                extendAnimations = animationFiles_F_Extend_Base64;
+            } else {
+                console.warn('알 수 없는 성별입니다. 기본 애니메이션을 로드합니다.');
+                idleAnimation = animationFiles_M_Idle_Base64; // 기본 Idle 애니메이션
+                commonAnimations = animationFiles_M_Common_Base64; // 기본값 설정
+                extendAnimations = animationFiles_M_Extend_Base64;
+            }
+
+            // 기본 Idle 애니메이션 로드
+            try {
+                const blob = base64ToBlob(idleAnimation[0].data, 'model/gltf-binary');
+                const url = URL.createObjectURL(blob);
+
+                const gltf = await new GLTFLoader().loadAsync(url);
+                if (gltf.animations) {
+                    gltf.animations[0].name = 'Idle';
+                    animationClips.push(gltf.animations[0]);
+                }
+
+                URL.revokeObjectURL(url);
+                console.log('Idle Animation Loaded');
+            } catch (error) {
+                console.error('Error loading idle animation:', error);
+            }
+            if (modalMixer && animationClips.length > 0) {
+                const idleClip = animationClips.find(clip => clip.name === 'Idle');
+                if (idleClip) {
+                    const idleAction = modalMixer.clipAction(idleClip);
+                    idleAction.play();
+                }
+            }
+
+            // 공통 애니메이션 로드
+            for (const anim of commonAnimations) {
+                if (excludeIdle && anim.name.toLowerCase().includes('idle')) {
+                    continue; // Idle 애니메이션 제외
+                }                
+                try {
+                    const blob = base64ToBlob(anim.data, 'model/gltf-binary');
+                    const url = URL.createObjectURL(blob);
+
+                    const gltf = await new GLTFLoader().loadAsync(url);
+                    if (gltf.animations && gltf.animations.length > 0) {
+                        gltf.animations.forEach((clip) => {
+                            clip.name = anim.name;
+                            animationClips.push(clip);
+                        });
+                    }
+
+                    URL.revokeObjectURL(url);
+                    console.log('Common Animations Loaded');
+                } catch (error) {
+                    console.error(`Error loading animation from ${anim.name}:`, error);
+                }
+            }
+
+            // 추가 애니메이션 로드
+            for (const anim of extendAnimations) {
+                if (excludeIdle && anim.name.toLowerCase().includes('idle')) {
+                    continue; // Idle 애니메이션 제외
+                }
+                try {
+                    const blob = base64ToBlob(anim.data, 'model/gltf-binary');
+                    const url = URL.createObjectURL(blob);
+
+                    const gltf = await new GLTFLoader().loadAsync(url);
+                    if (gltf.animations && gltf.animations.length > 0) {
+                        gltf.animations.forEach((clip) => {
+                            clip.name = anim.name;
+                            animationClips.push(clip);
+                        });
+                    }
+
+                    URL.revokeObjectURL(url);
+                    console.log('Extend Animations Loaded');
+                } catch (error) {
+                    console.error(`Error loading animation from ${anim.name}:`, error);
+                }
+            }
+
+            if (avatarModalModel) {
+                const boneNames = getBoneNames(avatarModalModel);
+                validAnimations = filterValidAnimations(animationClips, boneNames);
+                console.log('Valid Animations:', validAnimations.map(clip => clip.name));
+            }
+        }
+
+        function base64ToBlob(base64, mime) {
+            const byteCharacters = atob(base64.split(',')[1]);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            return new Blob([byteArray], { type: mime });
+        }
+
+        function getBoneNames(model) {
+            const boneNames = new Set();
+            model.traverse((node) => {
+                if (node.isBone) {
+                    boneNames.add(node.name);
+                }
+            });
+            return boneNames;
+        }
+
+        function filterValidAnimations(animations, boneNames) {
+            const filteredClips = [];
+
+            animations.forEach((clip) => {
+                const filteredTracks = clip.tracks.filter((track) => {
+                    const boneName = track.name.split('.')[0];
+                    return boneNames.has(boneName);
+                });
+
+                if (filteredTracks.length > 0) {
+                    const filteredClip = new THREE.AnimationClip(clip.name, clip.duration, filteredTracks);
+                    filteredClips.push(filteredClip);
+                } else {
+                    console.warn(`Animation "${clip.name}" has no valid tracks and was skipped.`);
+                }
+            });
+
+            return filteredClips;
+        }
+
+        async function exportGLB() {
+            if (!avatarModalModel) {
+                alert('No avatar loaded to export.');
+                throw new Error('No avatar loaded to export.');
+            }
+
+            // 필터링 로직은 그대로 유지
+            console.log('노드 이름을 변경합니다...');
+            avatarModalModel.name = 'AvatarRoot';
+
+            avatarModalModel.traverse((node) => {
+                if (node.name === 'Wolf3D_Body') node.name = 'Hand';
+                else if (node.name === 'Wolf3D_Hair') node.name = 'Hair';
+                else if (node.name === 'Wolf3D_Head') node.name = 'Head';
+                else if (node.name === 'Wolf3D_Outfit_Bottom') node.name = 'Leg';
+                else if (node.name === 'Wolf3D_Outfit_Footwear') node.name = 'Foot';
+                else if (node.name === 'Wolf3D_Outfit_Top') node.name = 'Body';
+                else if (node.name.startsWith('Wolf3D_')) {
+                    node.name = node.name.replace('Wolf3D_', '');
+                }
+            });
+
+            console.log('본 이름을 수집합니다...');
+            const boneNames = new Set();
+            avatarModalModel.traverse((node) => {
+                if (node.isBone) {
+                    boneNames.add(node.name);
+                }
+            });
+            console.log('수집된 본 이름:', Array.from(boneNames));
+
+            console.log('애니메이션 클립을 필터링하고 트랙 이름을 업데이트합니다...');
+            const filteredAnimations = animationClips.map(originalClip => {
+                const clip = originalClip.clone();
+                const filteredTracks = clip.tracks.filter(track => {
+                    const boneName = track.name.split('.')[0];
+                    return boneNames.has(boneName);
+                }).map(track => {
+                    const parts = track.name.split('.');
+                    if (parts.length > 1) {
+                        const boneName = parts[0];
+                        const newBoneName = boneName.startsWith('Wolf3D_') ? boneName.replace('Wolf3D_', '') : boneName;
+                        parts[0] = newBoneName;
+                        const newTrack = track.clone();
+                        newTrack.name = parts.join('.');
+                        return newTrack;
+                    }
+                    return track;
+                });
+
+                if (filteredTracks.length > 0) {
+                    return new THREE.AnimationClip(clip.name, clip.duration, filteredTracks);
+                }
+                return null;
+            }).filter(clip => clip !== null);
+
+            const exporter = new GLTFExporter();
+            // parse 메서드 사용 - 콜백 방식
+            return new Promise((resolve, reject) => {
+                exporter.parse(
+                    avatarModalModel,
+                    (result) => {
+                        console.log('GLB 익스포트가 완료되었습니다.');
+                        let output;
+                        if (result instanceof ArrayBuffer) {
+                            output = result;
+                        } else {
+                            const blob = new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' });
+                            output = blob;
+                        }
+
+                        const blob = new Blob([output], { type: 'application/octet-stream' });
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = 'avatar.glb';
+                        link.click();
+                        URL.revokeObjectURL(url);
+                        
+                        resolve(modelJSON);
+                    },
+                    {
+                        binary: true,
+                        onlyVisible: false,
+                        animations: filteredAnimations
+                    }
+                );
+            });
+        }
+
+        function GetModelJSON() {
+            return modelJSON;
+        }
+
+        function GetAvatarGLBUrl() {
+            return avatarGLBUrl;
+        }
+
+        function GetModelGLB() {
+            return avatarModalModel;
+        }
+
+        // 모듈 스크립트의 exportGLB 함수를 전역 객체에 할당
+        window.exportGLB = exportGLB;
+
+        window.addEventListener('exportGLBEvent', () => {
+            exportGLB();
+        });
+
+        window.addEventListener('getModelJSONEvent', () => {
+            GetModelJSON();
+        });
+        
+        window.addEventListener('getModelGLBEvent', () => {
+            GetModelGLB();
+        });
+        
+        window.addEventListener('getAvatarGLBUrlEvent', () => {
+            GetAvatarGLBUrl();
+        });
+
+    </script>
+</body>                    
+</html>
+
