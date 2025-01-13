@@ -177,8 +177,8 @@ import * as THREE from 'three';
             setTimeout(() => {                
                 blockOverlay1.style.backgroundColor = "rgba(246, 246, 246, 0)";
                 blockOverlay2.style.backgroundColor = "rgba(246, 246, 246, 0)";            
-            }, 250);            
-            displayIframe();
+            }, 250);                        
+            start();
         });
 
         closeButton.addEventListener('click', function(event) {
