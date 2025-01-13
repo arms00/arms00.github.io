@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Character Customization</title>
+    <link rel="stylesheet" href="https://arms00.github.io/avatar-custom.css" />
+</head>
+<body>    
+    <script>
+        document.body.innerHTML = `
+        <div id="avatarCustom-content">
+            <div id="avatarUrl"></div>
+            <div class="frame-container" style="position: relative;">
+                <iframe id="frame" class="frame" allow="camera *; microphone *; clipboard-write" hidden></iframe>
+                <div id="frame-overlay" class="overlay"></div>
+                <div class="settings-overlay" onclick="quitAvatarCustom()"><svg width="65%" height="65%" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 6.875V5.312a1.563 1.563 0 0 0-1.563-1.562h-7.5a1.562 1.562 0 0 0-1.562 1.562v9.375a1.562 1.562 0 0 0 1.563 1.563h7.5a1.562 1.562 0 0 0 1.562-1.563v-1.562" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M16 6.875 19.125 10 16 13.125" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M8.46 10h10.665" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+                <span id="sw-switch" class="block-overlay-1">
+                </span> <span class="block-overlay-2"></span>
+            </div>
+            <div id="avatarModal" class="modal">
+                <div class="modal-content">
+                    <span id="modalClose" class="close-button">&times;</span>
+                    <canvas id="modalCanvas"></canvas>
+                    <button id="exportButton" class="export-button">Download</button>
+                </div>
+            </div>            
+        </div>
+        `;        
+    </script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/jsm/"
+            }
+        }
+    </script>
+    <script type="module" src="https://arms00.github.io/avatar-custom.js">        
+    </script>
+
+    <!-- 데이터 태그 추가 -->
+    <data id="avatarGLBUrlData" value=""></data>
+    <data id="modelJSONData" value=""></data>
+    <data id="avatarModalModelData" value=""></data>
+    
+    <script>        
+        const avatarCustomWindow = document.getElementById('avatarCustom-content');
+        closeButton = document.querySelector('.close-button');        
+
+        function quitAvatarCustom() {
+            avatarCustomWindow.style.display = 'none';
+        }        
+
+        // 일반 스크립트에서 exportGLB 함수 호출 및 반환값 처리
+        const exportButton = document.getElementById('exportButton');
+        exportButton.addEventListener('click', async () => {
+            if (window.exportGLB) {
+                try {
+                    const result = await window.exportGLB();
+                    console.log('Exported GLB Model:', result);                    
+                } catch (error) {
+                    console.error('Export failed:', error);
+                }
+            } else {
+                console.error('exportGLB 함수가 정의되지 않았습니다.');
+            }
+        });
+
+        function openModal() {                        
+            // Create and display the loading spinner            
+            const spinner = document.createElement('div');
+            spinner.className = 'loading-spinner';
+            modal.querySelector('.modal-content').appendChild(spinner);
+            modal.style.display = 'flex';
+
+            loadAvatarModal(avatarGLBUrl+'?lod=0').then(() => {
+                loadAllAnimations(characterGender, true);
+            }).finally(() => {
+                // Remove the loading spinner after loading is complete
+                spinner.remove();
+                document.getElementById('exportButton').style.display = 'inline-block';
+                document.getElementById('modalClose').style.display = 'inline-block';
+
+                // avatarModalModel을 문자열화하여 데이터 태그에 저장
+                const serializedModel = serializeAvatarModalModel(avatarModalModel);
+                document.getElementById('avatarModalModelData').setAttribute('value', serializedModel);
+                //avatarModalModel = deserializeAvatarModalModel(serializedModel); //test decode
+            });                      
+            initModalScene();
+            animateModal();
+
+            // 데이터 태그에 값 설정
+            document.getElementById('avatarGLBUrlData').setAttribute('value', avatarGLBUrl);
+            document.getElementById('modelJSONData').setAttribute('value', JSON.stringify(modelJSON));
+        }
+
+        // avatarModalModel을 JSON 문자열로 변환하는 함수
+        // @param {THREE.Object3D} model - THREE.js Object3D 모델
+        // @returns {string} - JSON 문자열
+
+        function serializeAvatarModalModel(model) {
+            if (!model) return '';
+
+            const exporter = new THREE.GLTFExporter();
+            let serialized = '';
+
+            exporter.parse(model, function (result) {
+                serialized = JSON.stringify(result, null, 2);
+            }, { binary: false });
+
+            return serialized;
+        }
+
+        // deserializeAvatarModalModel 함수 추가
+        function deserializeAvatarModalModel(serializedModel) {
+            const loader = new THREE.GLTFLoader();
+            let model = null;
+
+            loader.parse(serializedModel, '', function (gltf) {
+                model = gltf.scene;
+                // 필요한 추가 설정
+            }, function (error) {
+                console.error('모델 역직렬화 중 오류 발생:', error);
+            });
+
+            return model;
+        }
+
+        // 모듈 스크립트의 exportGLB 함수를 전역 객체에 할당
+        window.exportGLB = exportGLB;
+
+        window.addEventListener('exportGLBEvent', () => {
+            exportGLB();
+        });
+
+        window.addEventListener('getModelJSONEvent', () => {
+            GetModelJSON();
+        });
+        
+        window.addEventListener('getModelGLBEvent', () => {
+            GetModelGLB();
+        });
+        
+        window.addEventListener('getAvatarGLBUrlEvent', () => {
+            GetAvatarGLBUrl();
+        });        
+    </script>
+</body>                    
+</html>
+
