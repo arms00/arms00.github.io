@@ -274,6 +274,7 @@ html, body {
 
     @media (max-aspect-ratio: 1.0165) {
         .frame-container {
+            display: flex;
             min-width: 470px;
         }
         
@@ -334,4 +335,10 @@ html, body {
             height: 70px;
             /*background-color: rgba(246, 0, 0, 0.5);*/
         }                
+    }
+
+    .frame-container {                
+            margin: 0 auto; /* 중앙 정렬 */
+            max-width: 100vw; /* 뷰포트 너비 제한 */
+            box-sizing: border-box; /* 패딩과 보더 포함 */                
     }
