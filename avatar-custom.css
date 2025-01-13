@@ -1,0 +1,333 @@
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans,
+        Droid Sans, Helvetica Neue, sans-serif;
+    padding: 0;
+    font-size: 14px;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#avatarCustom-content {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: top;
+}
+
+.frame-container {
+    width: 100%;
+    height: 100%;
+    min-height: 905px;            
+    container-type: inline-size;
+    margin: 0;
+    padding: 0;
+    border: none;            
+    position: relative;
+}
+
+.frame-container .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1001;
+    display: none;
+}
+
+.frame {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;            
+    border: none;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1005;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 15px;
+    position: relative;
+    width: 70%; /*800px;*/
+    height: 70%; /*600px;*/
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    z-index: 2; /* 위에 표시되도록 설정 */
+    display: flex; /* 추가 */
+    flex-direction: column; /* 추가 */
+    overflow: hidden; /* 추가 */
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 30px;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+}
+
+.close-button:hover {
+    color: #000;
+}
+
+#modalCanvas {
+    width: 100% !important; /* important 추가 */
+    height: 100% !important; /* important 추가 */
+    display: block; /* 추가 */
+    border: none;
+    flex-grow: 1; /* 추가 */
+}
+
+.export-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    position: absolute;
+    bottom: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.export-button:hover {
+    background-color: #45a049;
+}
+
+.loading-spinner {
+    border: 10px solid #f3f3f3; /* Light grey */
+    border-top: 10px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.block-overlay-1 {
+    position: absolute;
+    top: 100px; /* 설정 버튼의 y축 위치에 맞게 조정 */
+    right: 15px; /* 설정 버튼의 x축 위치에 맞게 조정 */
+    width: 80px; /* 설정 버튼의 너비 */
+    height: 100px; /* 설정 버튼의 높이 */
+    background-color: rgba(246, 246, 246, 0);/*rgba(180,180,180,0);*/
+    /*border-radius: 30%;*/
+    z-index: 1000; /* 버튼 위에 표시되도록 설정 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;            
+    cursor: pointer; 
+}
+
+.block-overlay-2 {
+    position: absolute;
+    top: 780px; /* 설정 버튼의 y축 위치에 맞게 조정 */
+    right: 15px; /* 설정 버튼의 x축 위치에 맞게 조정 */
+    width: 80px; /* 설정 버튼의 너비 */
+    height: 100px; /* 설정 버튼의 높이 */
+    background-color: rgba(246, 246, 246, 0);
+    z-index: 1000; /* 버튼 위에 표시되도록 설정 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;            
+    cursor: default; /*pointer;*/            
+}
+
+/* 설정 버튼 오버레이 */
+.settings-overlay {
+    position: absolute;
+    top: 10px; /* 설정 버튼의 y축 위치에 맞게 조정 */
+    left: 20px; /* 설정 버튼의 x축 위치에 맞게 조정 */
+    width: 75px; /* 설정 버튼의 너비 */
+    height: 70px; /* 설정 버튼의 높이 */
+    background-color: rgba(220, 100, 30, 1);
+    border-radius: 40%;
+    box-shadow: 0 2px 1px rgba(0, 0, 0, 0.3);
+    z-index: 1002; /* 버튼 위에 표시되도록 설정 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;            
+}
+
+.settings-overlay:hover {
+    background-color: rgba(255, 180, 50, 1); /* Slightly brighter orange */
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+    /* 미디어 쿼리 */
+    @media (max-width: 1216px) {
+        .frame-container {
+            min-height: 760px;
+        }
+    }
+
+    @media (max-width: 1040px) {
+        .frame-container {
+            min-height: 550px;
+        }
+    }
+
+    @container (max-width: 1199px) {
+        .settings-overlay {
+            top: 9px;
+            left: 20px;
+            width: 55px;
+            height: 55px;
+        }
+
+        .block-overlay-1 {
+            top: 95px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+        }
+
+        .block-overlay-2 {
+            top: 665px;
+            right: 20px;
+            width: 60px;
+            height: 80px;
+        }
+    }
+
+    @container (max-width: 1023px) {
+        .settings-overlay {
+            top: 7px;
+            left: 15px;
+            width: 36px;
+            height: 36px;
+        }
+
+        .block-overlay-1 {
+            top: 64px;
+            right: 8px;
+            width: 47px;
+            height: 47px;
+        }
+
+        .block-overlay-2 {
+            top: 475px;
+            right: 8px;
+            width: 47px;
+            height: 65px;
+        }
+    }
+
+    /* @media (max-aspect-ratio: 1.025) {
+        .block-overlay-1 {
+            top: auto;
+            bottom: 15px;
+            left: max(2px, calc(50% - 220px));
+            width: 62px;
+            height: 45px;
+        }
+
+        .block-overlay-2 {
+            top: auto;
+            bottom: 15px;
+            left: calc(50% + 170px);
+            width: 62px;
+            height: 45px;
+        }                
+    } */
+
+    @media (max-aspect-ratio: 1.0165) {
+        .block-overlay-1 {
+            top: auto;
+            bottom: 7px;                    
+            left: max(20px, calc(50% - 218px));
+            width: 50px;
+            height: 50px;
+            /*background-color: rgba(128, 128, 128, 0.5);*/
+        }
+
+        .block-overlay-2 {
+            top: auto;
+            bottom: 7px;
+            left: calc(50% + 167px);
+            width: 50px;
+            height: 50px;
+            /*background-color: rgba(128, 128, 128, 0.5);*/
+        }                
+    }
+
+    @media (max-aspect-ratio: 1.0165) and (min-width: 1041px) {
+        .block-overlay-1 {
+            top: auto;
+            bottom: 10px;
+            left: max(2px, calc(50% - 287px));
+            width: 80px;
+            height: 60px;
+            /*background-color: rgba(0, 255, 0, 0.5);*/
+        }
+
+        .block-overlay-2 {
+            top: auto;
+            bottom: 10px;
+            left: calc(50% + 225px);
+            width: 60px;
+            height: 60px;
+            /*background-color: rgba(0, 255, 0, 0.5);*/
+        }                
+    }
+
+    @media (max-aspect-ratio: 1.0165) and (min-width: 1217px) {
+        .block-overlay-1 {
+            top: auto;
+            bottom: 20px;
+            left: max(2px, calc(50% - 355px));
+            width: 90px;
+            height: 70px;
+            /*background-color: rgba(246, 0, 0, 0.5);*/
+        }
+
+        .block-overlay-2 {
+            top: auto;
+            bottom: 20px;
+            left: calc(50% + 285px);
+            width: 70px;
+            height: 70px;
+            /*background-color: rgba(246, 0, 0, 0.5);*/
+        }                
+    }
