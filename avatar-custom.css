@@ -276,7 +276,7 @@ html, body {
         .block-overlay-1 {
             top: auto;
             bottom: 7px;                    
-            left: max(20px, calc(50% - 218px));
+            left: max(7px, calc(50% - 218px));
             width: 50px;
             height: 50px;
             /*background-color: rgba(128, 128, 128, 0.5);*/
