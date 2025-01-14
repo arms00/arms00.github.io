@@ -12,6 +12,8 @@
                 <iframe id="frame" class="frame" allow="camera *; microphone *; clipboard-write" hidden></iframe>
                 <div id="frame-overlay" class="overlay"></div>
                 <div class="settings-overlay" onclick="quitAvatarCustom()"><svg width="65%" height="65%" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 6.875V5.312a1.563 1.563 0 0 0-1.563-1.562h-7.5a1.562 1.562 0 0 0-1.562 1.562v9.375a1.562 1.562 0 0 0 1.563 1.563h7.5a1.562 1.562 0 0 0 1.562-1.563v-1.562" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M16 6.875 19.125 10 16 13.125" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M8.46 10h10.665" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+                <!-- <div id="export-overlay"></div> -->
+                </script>
                 <span id="sw-switch" class="block-overlay-1">
                     <!-- <svg width="75%" height="75%" viewBox="0 0 650 600" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <g id="남자" transform="translate(0, 0)" style="display: none;">
@@ -46,7 +48,7 @@
                     <button id="exportButton" class="export-button">Download</button>
                 </div>
             </div>            
-        </div>
+        </div>        
     </body>
     <style>
         /* 스타일 */
@@ -82,9 +84,9 @@
             height: 100%;
             min-height: 905px;            
             container-type: inline-size;
-            margin: 0;
-            padding: 0;
-            border: none;            
+            margin: 0 auto; /* 중앙 정렬 */
+            max-width: 100vw; /* 뷰포트 너비 제한 */
+            box-sizing: border-box; /* 패딩과 보더 포함 */
             position: relative;
         }
 
@@ -102,9 +104,9 @@
         .frame {
             width: 100%;
             height: 100%;
-            margin: 0;
+            margin: 0 auto;
             padding: 0;            
-            border: none;
+            border: none;            
         }
 
         .modal {
@@ -242,6 +244,25 @@
             cursor: pointer;            
         }
 
+        #export-overlay {
+            position: absolute;
+            top: 10px; /* 설정 버튼의 y축 위치에 맞게 조정 */
+            right: 30px; /* 설정 버튼의 x축 위치에 맞게 조정 */
+            width: 100px; /* 설정 버튼의 너비 */
+            height: 65px; /* 설정 버튼의 높이 */
+            background-color: rgba(220, 100, 30, 0.5);
+            border-radius: 25%;
+            box-shadow: 0 2px 1px rgba(0, 0, 0, 0.3);
+            z-index: 1002; /* 버튼 위에 표시되도록 설정 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            pointer-events: none;
+        }
+
         .settings-overlay:hover {
             background-color: rgba(255, 180, 50, 1); /* Slightly brighter orange */
             box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
@@ -325,14 +346,16 @@
             } */
 
             @media (max-aspect-ratio: 1.0165) {
+
                 .frame-container {
                     display: flex;
-                    min-width: 470px;
-                }
-                
+                    min-width: 470px;                    
+                }                
+
                 .block-overlay-1 {
                     top: auto;
                     bottom: 7px;                    
+                    /* left: max(20px, calc(50% - 218px)); */
                     left: max(7px, calc(50% - 218px));
                     width: 50px;
                     height: 50px;
@@ -405,7 +428,7 @@
     </script>
 </head>
 
-<body>    
+<body>
     <!-- 데이터 태그 추가 -->
     <data id="avatarGLBUrlData" value=""></data>
     <data id="modelJSONData" value=""></data>
@@ -416,6 +439,16 @@
         closeButton = document.querySelector('.close-button');        
 
         function quitAvatarCustom() {
+            try {
+                window.close();                
+            } catch (error) {
+                console.error('Avatar Customization window close error:', error);
+            }
+            try {
+                window.open('','_self').close();                
+            } catch (error) {
+                console.error('Avatar Customization window close error:', error);
+            }            
             avatarCustomWindow.style.display = 'none';
         }        
 
@@ -433,34 +466,6 @@
                 console.error('exportGLB 함수가 정의되지 않았습니다.');
             }
         });
-
-        function openModal() {                        
-            // Create and display the loading spinner            
-            const spinner = document.createElement('div');
-            spinner.className = 'loading-spinner';
-            modal.querySelector('.modal-content').appendChild(spinner);
-            modal.style.display = 'flex';
-
-            loadAvatarModal(avatarGLBUrl+'?lod=0').then(() => {
-                loadAllAnimations(characterGender, true);
-            }).finally(() => {
-                // Remove the loading spinner after loading is complete
-                spinner.remove();
-                document.getElementById('exportButton').style.display = 'inline-block';
-                document.getElementById('modalClose').style.display = 'inline-block';
-
-                // avatarModalModel을 문자열화하여 데이터 태그에 저장
-                const serializedModel = serializeAvatarModalModel(avatarModalModel);
-                document.getElementById('avatarModalModelData').setAttribute('value', serializedModel);
-                //avatarModalModel = deserializeAvatarModalModel(serializedModel); //test decode
-            });                      
-            initModalScene();
-            animateModal();
-
-            // 데이터 태그에 값 설정
-            document.getElementById('avatarGLBUrlData').setAttribute('value', avatarGLBUrl);
-            document.getElementById('modelJSONData').setAttribute('value', JSON.stringify(modelJSON));
-        }
 
         /**
          * avatarModalModel을 JSON 문자열로 변환하는 함수
@@ -516,7 +521,7 @@
 
     </script>
 
-    <script type="module">
+    <script type="module">        
         import * as THREE from 'three';
         import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -555,8 +560,7 @@
 
         const closeButton = document.querySelector('.modal-content>.close-button');
         
-        window.addEventListener('message', subscribe);
-        document.addEventListener('message', subscribe);
+        window.addEventListener('message', subscribe);        
 
         async function start() {
             const frameContainer = document.querySelector('.frame-container');
@@ -581,12 +585,14 @@
             // Randomly select one template from filtered list
             const randomTemplate = genderTemplates[Math.floor(Math.random() * genderTemplates.length)];
             // Use this template's ID
+            console.log('Random template id:', randomTemplate.id);
             characterGender = gender.toUpperCase().charAt(0); // Set 'M' or 'F'
             const draftAvatar = await createDraftAvatar(subdomain, 'fullbody-xr', token, randomTemplate.id);
             selectedAvatarId = draftAvatar.data.id;
             await saveDraftAvatar(token, selectedAvatarId);
             displayIframe();
             spinner.remove();
+            createLoadingSpiiner();
         }
 
         start();
@@ -695,19 +701,23 @@
             setTimeout(() => {                
                 blockOverlay1.style.backgroundColor = "rgba(246, 246, 246, 0)";
                 blockOverlay2.style.backgroundColor = "rgba(246, 246, 246, 0)";            
-            }, 250);            
-            location.reload();
+            }, 250);        
+            start();    
+            //displayIframe();
         });
 
         closeButton.addEventListener('click', function(event) {
             console.log('Close button clicked.');
             modal.style.display = 'none';
+            document.getElementById('exportButton').style.display = 'none';
+            document.getElementById('modalClose').style.display = 'none';
+            createLoadingSpiiner();
             document.getElementById('frame-overlay').style.display = 'none';
             animationClips = [];
             validAnimations = [];
             actions = {};    
             modelJSON = null;               
-            avatarGLBUrl = '';
+            avatarGLBUrl = '';            
             document.getElementById('avatarGLBUrlData').value = '';
             document.getElementById('modelJSONData').value = '';
             document.getElementById('avatarModalModelData').value = '';
@@ -716,9 +726,14 @@
                 avatarModalModel = null;
             }
             if (modalMixer) {
-                modalMixer.uncacheRoot(avatarModalModel);
+                try{
+                    modalMixer.uncacheRoot(avatarModalModel);
+                }                
+                catch (error) {
+                    console.error('모델 캐시 제거 중 오류 발생:', error);
+                }
                 modalMixer = null;
-            }                 
+            }                          
         });
 
         function subscribe(event) {
@@ -747,7 +762,7 @@
                     blockOverlay1.style.backgroundColor = "rgba(246, 246, 246, 1)";
                     blockOverlay1.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="svg-icon" style="width: 70%;height: 70%;vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 1024 1024" version="1.1"> <path d="M921.6 585.728c0 226.304-184.32 409.6-409.6 409.6s-409.6-182.272-409.6-409.6c0-78.848 21.504-152.576 62.464-215.04l133.12 76.8c-25.6 39.936-39.936 87.04-39.936 138.24 0 142.336 114.688 254.976 254.976 254.976 142.336 0 257.024-114.688 257.024-254.976 0-118.784-79.872-219.136-189.44-247.808v131.072L196.608 248.832 577.536 28.672v151.552C772.096 214.016 921.6 381.952 921.6 585.728z" fill="#3ADAEA"/> </svg>`
                     blockOverlay2.style.backgroundColor = "rgba(246, 246, 246, 1)";
-                }, 1000);                
+                }, 2000);                
             }
 
             if (json.eventName === 'v1.subscription.deleted') {
@@ -818,21 +833,27 @@
             }
         }
 
-        function openModal() {                        
+        function createLoadingSpiiner() {
             // Create and display the loading spinner            
             const spinner = document.createElement('div');
             spinner.className = 'loading-spinner';
+            spinner.id = 'loadingSpinner';
             modal.querySelector('.modal-content').appendChild(spinner);
-            modal.style.display = 'flex';
+        }
 
+        function openModal() {                               
+            modal.style.display = 'flex';                 
             loadAvatarModal(avatarGLBUrl).then(() => {
                 loadAllAnimations(characterGender, true);
-            }).finally(() => {
-                // Remove the loading spinner after loading is complete
-                spinner.remove();                
+            }).finally(() => {                
                 document.getElementById('exportButton').style.display = 'inline-block';
                 document.getElementById('modalClose').style.display = 'inline-block';                                
                 serializeAvatarModalModel(avatarModalModel);
+                // Remove the loading spinner after loading is complete                
+                if (document.getElementById('loadingSpinner')) 
+                {                    
+                    document.getElementById('loadingSpinner').remove();
+                }
             });                      
             initModalScene();
             animateModal();
