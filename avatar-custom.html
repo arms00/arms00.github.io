@@ -78,34 +78,6 @@
             }
         });
 
-        function openModal() {                        
-            // Create and display the loading spinner            
-            const spinner = document.createElement('div');
-            spinner.className = 'loading-spinner';
-            modal.querySelector('.modal-content').appendChild(spinner);
-            modal.style.display = 'flex';
-
-            loadAvatarModal(avatarGLBUrl+'?lod=0').then(() => {
-                loadAllAnimations(characterGender, true);
-            }).finally(() => {
-                // Remove the loading spinner after loading is complete
-                spinner.remove();
-                document.getElementById('exportButton').style.display = 'inline-block';
-                document.getElementById('modalClose').style.display = 'inline-block';
-
-                // avatarModalModel을 문자열화하여 데이터 태그에 저장
-                const serializedModel = serializeAvatarModalModel(avatarModalModel);
-                document.getElementById('avatarModalModelData').setAttribute('value', serializedModel);
-                //avatarModalModel = deserializeAvatarModalModel(serializedModel); //test decode
-            });                      
-            initModalScene();
-            animateModal();
-
-            // 데이터 태그에 값 설정
-            document.getElementById('avatarGLBUrlData').setAttribute('value', avatarGLBUrl);
-            document.getElementById('modelJSONData').setAttribute('value', JSON.stringify(modelJSON));
-        }
-
         // avatarModalModel을 JSON 문자열로 변환하는 함수
         // @param {THREE.Object3D} model - THREE.js Object3D 모델
         // @returns {string} - JSON 문자열
