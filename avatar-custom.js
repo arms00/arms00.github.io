@@ -36,8 +36,7 @@ import * as THREE from 'three';
 
         const closeButton = document.querySelector('.modal-content>.close-button');
         
-        window.addEventListener('message', subscribe);
-        document.addEventListener('message', subscribe);
+        window.addEventListener('message', subscribe);        
 
         async function start() {
             const frameContainer = document.querySelector('.frame-container');
