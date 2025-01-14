@@ -68,6 +68,7 @@ import * as THREE from 'three';
             await saveDraftAvatar(token, selectedAvatarId);
             displayIframe();
             spinner.remove();
+            createLoadingSpiiner();
         }
 
         start();
@@ -184,12 +185,15 @@ import * as THREE from 'three';
         closeButton.addEventListener('click', function(event) {
             console.log('Close button clicked.');
             modal.style.display = 'none';
+            document.getElementById('exportButton').style.display = 'none';
+            document.getElementById('modalClose').style.display = 'none';
+            createLoadingSpiiner();
             document.getElementById('frame-overlay').style.display = 'none';
             animationClips = [];
             validAnimations = [];
             actions = {};    
             modelJSON = null;               
-            avatarGLBUrl = '';
+            avatarGLBUrl = '';            
             document.getElementById('avatarGLBUrlData').value = '';
             document.getElementById('modelJSONData').value = '';
             document.getElementById('avatarModalModelData').value = '';
@@ -198,9 +202,14 @@ import * as THREE from 'three';
                 avatarModalModel = null;
             }
             if (modalMixer) {
-                modalMixer.uncacheRoot(avatarModalModel);
+                try{
+                    modalMixer.uncacheRoot(avatarModalModel);
+                }                
+                catch (error) {
+                    console.error('모델 캐시 제거 중 오류 발생:', error);
+                }
                 modalMixer = null;
-            }                 
+            }                          
         });
 
         function subscribe(event) {
@@ -300,11 +309,15 @@ import * as THREE from 'three';
             }
         }
 
-        function openModal() {                        
+        function createLoadingSpiiner() {
             // Create and display the loading spinner            
             const spinner = document.createElement('div');
             spinner.className = 'loading-spinner';
+            spinner.id = 'loadingSpinner';
             modal.querySelector('.modal-content').appendChild(spinner);
+        }
+
+        function openModal() {            
             modal.style.display = 'flex';
 
             loadAvatarModal(avatarGLBUrl).then(() => {
@@ -313,7 +326,12 @@ import * as THREE from 'three';
                 // Remove the loading spinner after loading is complete
                 spinner.remove();                
                 document.getElementById('exportButton').style.display = 'inline-block';
-                document.getElementById('modalClose').style.display = 'inline-block';                                
+                document.getElementById('modalClose').style.display = 'inline-block';
+                // Remove the loading spinner after loading is complete
+                if (document.getElementById('loadingSpinner')) 
+                {                    
+                    document.getElementById('loadingSpinner').remove();
+                }
                 serializeAvatarModalModel(avatarModalModel);
             });                      
             initModalScene();
