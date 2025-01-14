@@ -320,7 +320,7 @@ import * as THREE from 'three';
         function openModal() {            
             modal.style.display = 'flex';
 
-            loadAvatarModal(avatarGLBUrl).then(() => {
+            loadAvatarModal(avatarGLBUrl+'?lod=0').then(() => {
                 loadAllAnimations(characterGender, true);
             }).finally(() => {
                 // Remove the loading spinner after loading is complete
