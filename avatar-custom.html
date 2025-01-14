@@ -50,7 +50,17 @@
         closeButton = document.querySelector('.close-button');        
 
         function quitAvatarCustom() {
-            avatarCustomWindow.style.display = 'none';
+            try {
+                window.close();                
+            } catch (error) {
+                console.error('Avatar Customization window close error:', error);
+            }
+            try {
+                window.open('','_self').close();                
+            } catch (error) {
+                console.error('Avatar Customization window close error:', error);
+            }            
+            avatarCustomWindow.style.display = 'none';            
         }        
 
         // 일반 스크립트에서 exportGLB 함수 호출 및 반환값 처리
