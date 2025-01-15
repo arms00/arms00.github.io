@@ -1,3 +1,9 @@
+const frameContainer = document.querySelector('.frame-container');
+frameContainer.style.setProperty('--width-in-pixels', window.innerWidth);
+window.addEventListener('resize', function() {
+    frameContainer.style.setProperty('--width-in-pixels', window.innerWidth);           ;
+});
+
 import * as THREE from 'three';
         import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
