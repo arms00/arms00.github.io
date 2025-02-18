@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>김제청소년바이오생명센터터 갤러리</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .gallery-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .gallery-item:hover {
+            transform: translateY(-5px);
+        }
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+        .banner {
+            grid-column: 1 / -1;
+        }
+        .banner img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="gallery-container">
+        <div class="gallery-grid">
+            <div class="banner">
+                <img src="https://arms00.github.io/jbmeta/김제 국립청소년바이오생명센터/KakaoTalk_20250121_090654754.jpg" alt="사진1">
+            </div>
+            <div class="gallery-item">
+                <img src="https://arms00.github.io/jbmeta/김제 국립청소년바이오생명센터/KakaoTalk_20250121_090537824_04.jpg" alt="사진2">
+            </div>
+            <div class="gallery-item">
+                <img src="https://arms00.github.io/jbmeta/김제 국립청소년바이오생명센터/KakaoTalk_20250121_090537824_06.jpg" alt="사진3">
+            </div>
+            <div class="gallery-item">
+                <img src="https://arms00.github.io/jbmeta/김제 국립청소년바이오생명센터/KakaoTalk_20250121_090654754_01.jpg" alt="사진4">
+            </div>
+            <div class="gallery-item">
+                <img src="https://arms00.github.io/jbmeta/김제 국립청소년바이오생명센터/KakaoTalk_20250121_090654754_02.jpg" alt="사진5">
+            </div>
+            <div class="gallery-item">
+                <img src="https://arms00.github.io/jbmeta/김제 국립청소년바이오생명센터/KakaoTalk_20250121_115321700_01.jpg" alt="사진6">
+            </div>
+            <div class="gallery-item">
+                <img src="https://arms00.github.io/jbmeta/김제 국립청소년바이오생명센터/KakaoTalk_20250121_125535276.jpg" alt="사진7">
+            </div>
+            <div class="gallery-item">
+                <img src="https://arms00.github.io/jbmeta/김제 국립청소년바이오생명센터/KakaoTalk_20250121_125535276_01.jpg" alt="사진8">
+            </div>
+            <div class="gallery-item">
+                <img src="https://arms00.github.io/jbmeta/김제 국립청소년바이오생명센터/KakaoTalk_20250121_125535276_02.jpg" alt="사진9">
+            </div>
+            <div class="gallery-item">
+                <img src="https://arms00.github.io/jbmeta/김제 국립청소년바이오생명센터/KakaoTalk_20250121_130214455_05.jpg" alt="사진10">
+            </div>
+        </div>
+    </div>
+</body>
+</html>
