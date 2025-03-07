@@ -947,6 +947,7 @@ html, body {
     
     /* 버튼을 전체 너비로 확장 */
     .ai-chat-input-container button {
+      display: none !important;
       width: 100% !important;
       max-width: 100% !important;
       margin-top: 3px !important;
