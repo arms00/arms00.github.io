@@ -836,6 +836,17 @@ html, body {
           border-radius: 0 !important;
           background-color: rgba(255, 255, 255, 0.3);
       }
+
+      .ai-message, .user-message {
+        padding: 8px !important;
+        margin-bottom: 6px !important;
+        font-size: 14px !important;
+      }
+      
+      /* 필요 없는 여백 제거 */
+      .ai-chat-messages > div:first-child {
+          margin-top: 3px !important;
+      }
       
       /* 헤더 크기 축소 */
       .ai-chat-header {
