@@ -1,0 +1,192 @@
+[
+    {
+        "id": "9781803",
+        "name": "eye-01",                
+        "color": {
+            "red": 76,
+            "blue": 61,            
+            "green": 66
+        },        
+        "eyeStyle": "black"        
+    },
+    {
+        "id": "9781796",
+        "name": "eye-02",                
+        "color": {
+            "red": 94,
+            "blue": 67,            
+            "green": 75
+        },        
+        "eyeStyle": "brown"
+    },
+    {
+        "id": "9781871",
+        "name": "eye-03",                
+        "color": {
+            "red": 105,
+            "blue": 107,            
+            "green": 104
+        },        
+        "eyeStyle": "blue"        
+    },
+    {
+        "id": "9782077",
+        "name": "eye-04",                
+        "color": {
+            "red": 79,
+            "blue": 88,            
+            "green": 90
+        },        
+        "eyeStyle": "은은한 청녹색 눈동자"
+    },
+    {
+        "id": "9782134",
+        "name": "eye-05",                
+        "color": {
+            "red": 103,
+            "blue": 144,            
+            "green": 140
+        },        
+        "eyeStyle": "은은한 청색 눈동자" 
+    },
+    {
+        "id": "9782276",
+        "name": "eye-06",        
+        "color": {
+            "red": 93,
+            "blue": 62,            
+            "green": 97
+        },        
+        "eyeStyle": "green"        
+    },
+    {
+        "id": "9782278",
+        "name": "eye-07",                
+        "color": {
+            "red": 99,
+            "blue": 95,            
+            "green": 80
+        },        
+        "eyeStyle": "gray"        
+    },
+    {
+        "id": "9782286",
+        "name": "eye-08",                
+        "color": {
+            "red": 166,
+            "blue": 169,            
+            "green": 170
+        },        
+        "eyeStyle": "밝은 회색(은색) 눈동자"
+    },
+    {
+        "id": "46962269",
+        "name": "eye-09",                
+        "color": {
+            "red": 197,
+            "blue": 26,            
+            "green": 24
+        },        
+        "eyeStyle": "붉은 눈동자의 검은 소용돌이 문양 홍채"
+    },
+    {
+        "id": "46962316",
+        "name": "eye-10",                
+        "color": {
+            "red": 221,
+            "blue": 28,            
+            "green": 93
+        },        
+        "eyeStyle": "황혼빛(주황색) 눈동자"
+    },
+    {
+        "id": "46962501",
+        "name": "eye-11",                
+        "color": {
+            "red": 212,
+            "blue": 29,            
+            "green": 162
+        },        
+        "eyeStyle": "밝은 황록색 눈동자"
+    },
+    {
+        "id": "46962511",
+        "name": "eye-12",                
+        "color": {
+            "red": 160,
+            "blue": 67,            
+            "green": 197
+        },
+        "eyeStyle": "초록색 파충류의 눈동자, 검은 세로형 동공"
+    },
+    {
+        "id": "46962524",
+        "name": "eye-13",                
+        "color": {
+            "red": 224,
+            "blue": 233,
+            "green": 233
+        },        
+        "eyeStyle": "밝은 은회색 눈동자에 희미한 도트가 일정 간격으로 배열된 눈동자, 흰색 안구로 인해 눈동자가 희미해서 없는 것처럼 보임"
+    },
+    {
+        "id": "46962634",
+        "name": "eye-14",                
+        "color": {
+            "red": 0,
+            "blue": 215,            
+            "green": 133
+        },        
+        "eyebrowStyle": "검은색 안구에 파란색 눈동자, 눈동자는 마치 로봇의 눈처럼 보임"
+    },
+    {
+        "id": "46962648",
+        "name": "eye-15",
+        "color": {
+            "red": 0,
+            "blue": 0,            
+            "green": 0
+        },        
+        "eyebrowStyle": "검은색 안구에 완전히 까만 커다란 눈동자"
+    },
+    {
+        "id": "46962657",
+        "name": "eye-16",                
+        "color": {
+            "red": 242,
+            "blue": 222,            
+            "green": 28
+        },        
+        "eyeStyle": "오로라를 연상시키는 보라색과 옅은 초록색이 섞인 눈동자"
+    },
+    {
+        "id": "56993869",
+        "name": "eye-17",
+        "color": {
+            "red": 27,
+            "blue": 255,            
+            "green": 159
+        },        
+        "eyeStyle": "푸른 안구에 신비로운 깊은 하늘색 눈동자"
+    },
+    {
+        "id": "85030136",
+        "name": "eye-18",                
+        "color": {
+            "red": 134,
+            "blue": 51,            
+            "green": 131
+        },        
+        "eyeStyle": "hazel"        
+    },
+    {
+        "id": "85030617",
+        "name": "eye-19",                
+        "color": {
+            "red": 162,
+            "blue": 55,            
+            "green": 109
+        },        
+        "eyeStyle": "amber"
+    }
+]

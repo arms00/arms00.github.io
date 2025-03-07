@@ -1,0 +1,1145 @@
+[
+    {
+        "id": "9247423",
+        "name": "eyebrow-01",
+        "description": "깔끔하고 단정한 인상을 주는, 약간 각진 형태의 눈썹입니다. 또렷하고 선명한 느낌을 강조하며, 중간 두께로 자연스러운 연출이 가능합니다.",
+        "keywords": ["단정한", "깔끔한", "각진", "중간 두께", "자연스러운"],
+        "shape": {
+          "form": "약간 각진 형태",
+          "arch": "낮은 아치",
+          "thickness": "중간",
+          "angle": "약간 기울어짐"
+        },
+        "vector_features": {
+          "thickness": 0.6,
+          "arch_height": 0.3,
+          "arch_angle": 0.4,
+          "curve": 0.2
+        },
+        "style": {
+          "masculine": 0.6,
+          "feminine": 0.4,
+          "natural": 0.7,
+          "modern": 0.5,
+          "classic": 0.6
+        },
+        "tags": {
+          "mood": ["단정", "깔끔", "자연스러움"],
+          "occasion": ["일상", "비즈니스"],
+          "age": ["모든 연령대"],
+          "personality": ["신뢰감 주는", "정돈된"]
+        },
+        "additional_details": {
+          "similar_eyebrows": ["직선형 눈썹", "부드러운 아치형 눈썹"],
+          "best_face_shapes": ["계란형", "사각형", "둥근형"]
+        }
+      },
+      {
+        "id": "9247435",
+        "name": "eyebrow-02",
+        "description": {
+          "text": "자연스럽게 숱이 적당한 아치형 눈썹입니다. 부드러운 인상을 주며, 남녀 모두에게 잘 어울립니다.",
+          "keywords": ["자연스러운", "적당한 숱", "아치형", "부드러운 인상", "젠더리스"]
+        },
+        "shape": {
+          "arch_height": 0.6,
+          "arch_angle": 0.4,
+          "thickness": 0.5,
+          "curve": 0.7,
+          "straightness": 0.3
+        },
+        "style": {
+          "masculine": 0.5,
+          "feminine": 0.5,
+          "modern": 0.6,
+          "classic": 0.7
+        },
+        "tags": {
+          "mood": ["차분한", "깔끔한", "세련된", "균형잡힌"],
+          "occasion": ["일상", "캐주얼", "세미 정장"],
+          "age": ["모든 연령대"],
+          "face_shape": ["모든 얼굴형"]
+        },        
+        "notes": "기본적인 형태의 눈썹으로 다양한 스타일과 매치하기 쉽습니다."
+      },
+      {
+        "id": "9247439",
+        "name": "eyebrow-03",
+        "shape": {
+          "description": "약간 치켜 올라간 각진 형태의 눈썹입니다. 세련되고 자신감 있는 인상을 줍니다.",
+          "keywords": ["각진", "치켜 올라간", "세련된", "자신감 있는", "깔끔한"]
+        },
+        "vector_features": {
+          "thickness": 0.6,
+          "arch_height": 0.7,
+          "arch_angle": 0.8,
+          "curve": 0.2
+        },
+        "style": {
+          "masculine": 0.6,
+          "feminine": 0.4,
+          "modern": 0.9
+        },
+        "tags": {
+          "mood": ["세련된", "시크", "도회적인"],
+          "occasion": ["일상", "비즈니스"],
+          "age": ["20대", "30대", "40대"]
+        },
+        "additional_details": {
+          "expression": ["진지한", "결단력 있는"],
+          "similarStyles": ["갈매기 눈썹", "아치형 눈썹"]
+        }
+      },
+      {
+        "id": "9247440",
+        "name": "eyebrow-04",
+        "description": "굵고 각진 형태의 눈썹으로, 강렬하고 인상적인 느낌을 줍니다. 비교적 짙은 색상으로 존재감을 드러내며, 남성적인 매력을 강조할 수 있습니다.",
+        "keywords": ["굵은", "각진", "강렬한", "인상적인", "짙은", "남성적인"],
+        "shape": {
+          "form": "각진 형태",
+          "arch": "낮은 아치 또는 직선에 가까움",
+          "thickness": "굵은",
+          "angle": "약간 기울어짐"
+        },
+        "vector_features": {
+          "thickness": 0.8,
+          "arch_height": 0.2,
+          "arch_angle": 0.3,
+          "curve": 0.1
+        },
+        "style": {
+          "masculine": 0.8,
+          "feminine": 0.2,
+          "natural": 0.4,
+          "modern": 0.6,
+          "classic": 0.3
+        },
+        "tags": {
+          "mood": ["강렬함", "남성다움", "뚜렷함"],
+          "occasion": ["일상", "개성 강조"],
+          "age": ["20대", "30대", "40대"],
+          "personality": ["주관이 뚜렷한", "개성적인", "강한 인상"]
+        },
+        "additional_details": {
+          "similar_eyebrows": ["직선형 눈썹", "짙은 눈썹"],
+          "best_face_shapes": ["사각형", "각진 얼굴형", "긴 얼굴형"],
+          "avoid_face_shapes": ["둥근 얼굴형 (강한 인상을 줄 수 있음)"]
+        }        
+      },
+      {
+        "id": "9247442",
+        "name": "eyebrow-05",
+        "description": "두께감 있고 직선에 가까운 형태의 눈썹입니다. 차분하고 안정적인 인상을 주며, 자연스러운 연출에 적합합니다. 약간 도톰한 느낌이 부드러움을 더합니다.",
+        "keywords": ["두께감 있는", "직선형", "차분한", "안정적인", "자연스러운", "도톰한"],
+        "shape": {
+          "form": "직선에 가까운 형태",
+          "arch": "거의 없음 (매우 낮은 아치)",
+          "thickness": "두꺼운",
+          "angle": "수평"
+        },
+        "vector_features": {
+          "thickness": 0.8,
+          "arch_height": 0.1,
+          "arch_angle": 0.2,
+          "curve": 0.1
+        },
+        "style": {
+          "masculine": 0.7,
+          "feminine": 0.3,
+          "natural": 0.8,
+          "modern": 0.4,
+          "classic": 0.7
+        },
+        "tags": {
+          "mood": ["차분함", "안정감", "자연스러움", "편안함"],
+          "occasion": ["일상", "캐주얼"],
+          "age": ["모든 연령대"],
+          "personality": ["신뢰감 주는", "편안한", "온화한"]
+        },
+        "additional_details": {
+          "similar_eyebrows": ["일자 눈썹", "두꺼운 눈썹"],
+          "best_face_shapes": ["긴 얼굴형", "계란형", "다이아몬드형"]
+        },        
+        "notes": "자연스러운 분위기를 연출하고 싶을 때 좋은 선택입니다. 진한 화장보다는 옅은 화장에 잘 어울립니다."
+      },
+      {
+        "id": "9247445",
+        "name": "eyebrow-06",
+        "description": "짙고 숱이 많은, 남성적인 인상을 강조하는 눈썹입니다. 직선에 가까운 형태로 강렬하고 뚜렷한 느낌을 주며, 얼굴의 윤곽을 더욱 선명하게 만들어줍니다.  약간 뻗어 나가는 듯한 형태가 특징입니다.",
+        "keywords": ["남성적인", "짙은", "숱 많은", "직선형", "강렬한", "뚜렷한", "윤곽 강조"],
+        "shape": {
+          "form": "거의 직선에 가까운 형태",
+          "arch": "거의 없음",
+          "thickness": "두꺼움",
+          "angle": "약간 바깥쪽으로 뻗어나감"
+        },
+        "vector_features": {
+          "thickness": 0.8,
+          "arch_height": 0.1,
+          "arch_angle": 0.2,
+          "curve": 0.1
+        },
+        "style": {
+          "masculine": 0.9,
+          "feminine": 0.1,
+          "natural": 0.6,
+          "modern": 0.4,
+          "classic": 0.3
+        },
+        "tags": {
+          "mood": ["강렬함", "카리스마", "남성적"],
+          "occasion": ["일상", "액티브", "개성 강조"],
+          "age": ["20대", "30대", "40대"],
+          "personality": ["강인한", "개성있는", "주도적인"]
+        },
+        "additional_details": {
+          "similar_eyebrows": ["두꺼운 일자 눈썹", "살짝 뻗어나가는 눈썹"],
+          "best_face_shapes": ["사각형", "역삼각형", "각진 얼굴형"],
+          "makeup_tips": ["눈썹 결을 살려 연출", "눈썹 마스카라로 고정"]
+        }
+      },
+      {
+        "id": "9247443",
+        "name": "eyebrow-07",
+        "description": "두껍고 짙은, 비교적 직선 형태의 눈썹입니다. 강인하고 또렷한 인상을 주며, 약간은 남성적인 느낌을 강조합니다. 젊고 트렌디한 스타일과 잘 어울립니다.",
+        "keywords": ["두꺼운", "짙은", "직선형", "강인한", "또렷한", "남성적인", "젊은", "트렌디"],
+        "shape": {
+          "form": "직선 형태",
+          "arch": "거의 없음 (직선)",
+          "thickness": "두꺼움",
+          "angle": "수평 (거의 기울어지지 않음)"
+        },
+        "vector_features": {
+          "thickness": 0.8,
+          "arch_height": 0.1,
+          "arch_angle": 0.2,
+          "curve": 0.1
+        },
+        "style": {
+          "masculine": 0.8,
+          "feminine": 0.2,
+          "natural": 0.4,
+          "modern": 0.7,
+          "classic": 0.3
+        },
+        "tags": {
+          "mood": ["강렬한", "개성적인", "힙스터"],
+          "occasion": ["캐주얼", "파티", "힙한 스타일"],
+          "age": ["10대", "20대", "30대"],
+          "personality": ["자신감 넘치는", "개성 강한", "반항적인"]
+        },
+        "additional_details": {
+          "similar_eyebrows": ["일자 눈썹", "각진 눈썹 (더 각진 형태)"],
+          "best_face_shapes": ["긴 얼굴형", "역삼각형 얼굴형", "각진 얼굴형"]
+        }
+      },
+      {
+        "id": "16858292",
+        "name": "eyebrow-08",
+        "description": "직선에 가까운 얇은 눈썹입니다. 깔끔하고 차분한 인상을 주며, 미니멀하거나 모던한 스타일에 잘 어울립니다. 약간은 날카로운 느낌을 줄 수 있습니다.",
+        "keywords": ["직선", "얇은", "깔끔한", "차분한", "미니멀", "모던", "날카로운"],
+        "shape": {
+          "form": "직선 형태",
+          "arch": "거의 없음 (낮은 아치)",
+          "thickness": "얇음",
+          "angle": "수평에 가까움"
+        },
+        "vector_features": {
+          "thickness": 0.3,
+          "arch_height": 0.1,
+          "arch_angle": 0.2,
+          "curve": 0.1
+        },
+        "style": {
+          "masculine": 0.5,
+          "feminine": 0.3,
+          "natural": 0.4,
+          "modern": 0.8,
+          "classic": 0.2
+        },
+        "tags": {
+          "mood": ["깔끔", "차분", "세련됨", "시크"],
+          "occasion": ["일상", "비즈니스", "포멀"],
+          "age": ["20대", "30대"],
+          "personality": ["지적인", "냉철한", "도시적인"]
+        },
+        "additional_details": {
+          "similar_eyebrows": ["일자 눈썹", "얇은 아치형 눈썹"],
+          "best_face_shapes": ["긴 얼굴형", "계란형", "각진 얼굴형"]
+        }
+      },
+      {
+        "id": "41302420",
+        "name": "eyebrow-09",
+        "description": "뚜렷하고 강렬한 인상을 주는 각진 형태의 눈썹입니다. 두껍고 짙은 색상으로 남성적인 느낌을 강조하며, 눈썹 산이 높아 강한 개성을 표현합니다.",
+        "keywords": ["각진", "두꺼운", "짙은", "남성적인", "강렬한", "눈썹 산이 높은", "개성있는"],
+        "shape": {
+          "form": "각진 형태",
+          "arch": "높은 아치",
+          "thickness": "두꺼움",
+          "angle": "상승형 (눈썹 산이 높음)"
+        },
+        "vector_features": {
+          "thickness": 0.8,
+          "arch_height": 0.7,
+          "arch_angle": 0.8,
+          "curve": 0.3
+        },
+        "style": {
+          "masculine": 0.8,
+          "feminine": 0.2,
+          "natural": 0.4,
+          "modern": 0.6,
+          "classic": 0.3,
+          "bold": 0.9
+        },
+        "tags": {
+          "mood": ["강렬한", "카리스마", "남성적인", "뚜렷한", "시크한"],
+          "occasion": ["일상", "개인적인 스타일 강조", "특별한 날"],
+          "age": ["20대", "30대", "40대"],
+          "personality": ["자신감 있는", "개성 강한", "리더십 있는"]
+        },
+        "additional_details": {
+          "similar_eyebrows": ["각진 갈매기 눈썹", "진한 눈썹", "뚜렷한 눈썹"],
+          "best_face_shapes": ["각진 얼굴형", "다이아몬드형 얼굴형", "사각형 얼굴형"]
+        }
+      },
+      {
+        "id": "41302445",
+        "name": "eyebrow-10",
+        "description": "짙고 각진 형태의 눈썹으로, 강렬하고 또렷한 인상을 줍니다. 눈썹 앞머리가 두껍고 숱이 많아 남성적인 느낌을 주며, 살짝 올라간 각도가 세련됨을 더합니다.",
+        "keywords": ["짙은", "각진", "강렬한", "또렷한", "남성적인", "세련된", "두꺼운"],
+        "shape": {
+          "form": "각진 형태",
+          "arch": "낮은 아치, 살짝 올라감",
+          "thickness": "두꺼움",
+          "angle": "약간 위로 향함"
+        },
+        "vector_features": {
+          "thickness": 0.8,
+          "arch_height": 0.4,
+          "arch_angle": 0.6,
+          "curve": 0.3
+        },
+        "style": {
+          "masculine": 0.8,
+          "feminine": 0.2,
+          "natural": 0.6,
+          "modern": 0.7,
+          "classic": 0.5
+        },
+        "tags": {
+          "mood": ["강렬함", "세련됨", "또렷함", "남성적"],
+          "occasion": ["일상", "비즈니스", "캐주얼"],
+          "age": ["20대", "30대", "40대"],
+          "personality": ["카리스마 있는", "자신감 있는"]
+        },
+        "additional_details": {
+          "similar_eyebrows": ["갈매기 눈썹", "두꺼운 일자 눈썹"],
+          "best_face_shapes": ["각진 얼굴형", "계란형 얼굴형", "마름모형 얼굴형"]
+        }
+      },
+      {
+        "id": "41302595",
+        "name": "eyebrow-11",
+        "description": "날렵하고 아치형으로 솟은 얇은 눈썹입니다. 여성스럽고 세련된 인상을 주며, 강렬한 포인트를 더합니다. 눈꼬리쪽이 얇아지면서 시크한 느낌을 강조합니다.",
+        "keywords": ["얇은", "아치형", "여성스러운", "세련된", "강렬한", "시크", "눈꼬리 강조"],
+        "shape": {
+          "form": "아치형",
+          "arch": "높은 아치",
+          "thickness": "얇은",
+          "angle": "상승형"
+        },
+        "vector_features": {
+          "thickness": 0.3,
+          "arch_height": 0.8,
+          "arch_angle": 0.7,
+          "curve": 0.6
+        },
+        "style": {
+          "masculine": 0.2,
+          "feminine": 0.8,
+          "natural": 0.4,
+          "modern": 0.7,
+          "classic": 0.3
+        },
+        "tags": {
+          "mood": ["세련됨", "시크함", "도도함", "화려함"],
+          "occasion": ["파티", "특별한 날", "패션", "일상(세련된 스타일)"],
+          "age": ["20대", "30대", "40대"],
+          "personality": ["자신감 있는", "개성 있는", "트렌디한"]
+        },
+        "additional_details": {
+          "similar_eyebrows": ["갈매기 눈썹", "얇은 일자 눈썹 (각도 변화)", "고양이상 눈매 강조 눈썹"],
+          "best_face_shapes": ["둥근형", "하트형", "역삼각형"],
+          "considerations": ["눈 사이 간격이 좁은 경우 답답해 보일 수 있음", "진한 메이크업과 잘 어울림"]
+        }
+      },
+      {
+        "id": "41302993",
+        "name": "eyebrow-12",
+        "description": "얇고 완만한 아치형 눈썹입니다. 부드럽고 여성스러운 인상을 주며, 자연스러운 표현에 적합합니다. 가늘고 긴 형태가 특징입니다.",
+        "keywords": ["얇은", "아치형", "부드러운", "여성스러운", "자연스러운", "가늘고 긴"],
+        "shape": {
+          "form": "완만한 아치 형태",
+          "arch": "낮은 아치",
+          "thickness": "얇음",
+          "angle": "거의 없음"
+        },
+        "vector_features": {
+          "thickness": 0.2,
+          "arch_height": 0.4,
+          "arch_angle": 0.2,
+          "curve": 0.6
+        },
+        "style": {
+          "masculine": 0.2,
+          "feminine": 0.8,
+          "natural": 0.8,
+          "modern": 0.4,
+          "classic": 0.5
+        },
+        "tags": {
+          "mood": ["부드러움", "여성스러움", "자연스러움", "차분함"],
+          "occasion": ["일상", "캐주얼"],
+          "age": ["모든 연령대"],
+          "personality": ["온화한", "섬세한", "친근한"]
+        },
+        "additional_details": {
+          "similar_eyebrows": ["직선에 가까운 눈썹", "두께감 있는 아치형 눈썹"],
+          "best_face_shapes": ["긴 얼굴형", "사각형 얼굴형", "계란형"]
+        }
+      },
+      {
+        "id": "41303173",
+        "name": "eyebrow-13",
+        "description": "완만하게 뻗은, 얇고 깔끔한 형태의 눈썹입니다. 차분하고 지적인 인상을 주며, 젠더리스한 느낌으로 남녀 모두에게 어울립니다.",
+        "keywords": ["얇은", "일자형", "차분한", "지적인", "젠더리스", "깔끔한", "완만한"],
+        "shape": {
+          "form": "일자형에 가까운 완만한 곡선",
+          "arch": "낮은 아치 또는 아예 없음",
+          "thickness": "얇음",
+          "angle": "수평에 가까움"
+        },
+        "vector_features": {
+          "thickness": 0.3,
+          "arch_height": 0.1,
+          "arch_angle": 0.1,
+          "curve": 0.3
+        },
+        "style": {
+          "masculine": 0.5,
+          "feminine": 0.5,
+          "natural": 0.8,
+          "modern": 0.6,
+          "classic": 0.4
+        },
+        "tags": {
+          "mood": ["차분", "지적", "단정", "심플"],
+          "occasion": ["일상", "캐주얼", "세미 정장"],
+          "age": ["모든 연령대"],
+          "personality": ["온화한", "이성적인", "신뢰감 주는"]
+        },
+        "additional_details": {
+          "similar_eyebrows": ["직선형 눈썹", "얇은 아치형 눈썹"],
+          "best_face_shapes": ["긴 얼굴형", "계란형", "역삼각형"]
+        }
+      },
+      {
+        "id": "41303205",
+        "name": "eyebrow-14",
+        "description": "둥글고 완만한 아치 형태의 여성스러운 눈썹입니다. 부드럽고 온화한 인상을 주며, 얇은 두께로 자연스럽게 연출됩니다.",
+        "keywords": ["둥근", "아치형", "여성스러운", "부드러운", "얇은", "자연스러운"],
+        "shape": {
+          "form": "둥근 아치 형태",
+          "arch": "높은 아치",
+          "thickness": "얇은",
+          "angle": "수평"
+        },
+        "vector_features": {
+          "thickness": 0.3,
+          "arch_height": 0.7,
+          "arch_angle": 0.2,
+          "curve": 0.8
+        },
+        "style": {
+          "masculine": 0.2,
+          "feminine": 0.8,
+          "natural": 0.6,
+          "modern": 0.4,
+          "classic": 0.5
+        },
+        "tags": {
+          "mood": ["온화한", "부드러운", "자연스러움", "여성스러운"],
+          "occasion": ["일상", "데이트", "캐주얼"],
+          "age": ["10대", "20대", "30대"],
+          "personality": ["친근한", "상냥한"]
+        },
+        "additional_details": {
+          "similar_eyebrows": ["아치형 눈썹", "얇은 눈썹"],
+          "best_face_shapes": ["각진형", "긴 얼굴형", "다이아몬드형"]
+        },
+        "recommendations": [
+          {
+            "reason": "좀 더 또렷한 인상을 원한다면",
+            "asset": {
+              "id": "추천 에셋 ID 1",
+              "name": "좀 더 두꺼운 아치형 눈썹",
+              "description": "두께를 약간 늘려 또렷하고 세련된 느낌을 더할 수 있습니다."
+            }
+          },
+          {
+            "reason": "보다 중성적인 느낌을 원한다면",
+            "asset": {
+              "id": "추천 에셋 ID 2",
+              "name": "직선에 가까운 눈썹",
+              "description": "아치를 줄이고 직선적인 형태로 바꿔 중성적인 매력을 연출할 수 있습니다."
+            }
+          }
+        ]
+      },
+      {
+        "id": "41303221",
+        "name": "eyebrow-15",
+        "description": "부드러운 곡선 형태의 얇은 눈썹입니다. 여성스럽고 섬세한 인상을 주며, 자연스러운 아름다움을 표현합니다.",
+        "keywords": ["얇은", "곡선형", "여성스러운", "섬세한", "자연스러운"],
+        "shape": {
+          "form": "부드러운 곡선",
+          "arch": "낮은 아치",
+          "thickness": "얇음",
+          "angle": "수평"
+        },
+        "vector_features": {
+          "thickness": 0.3,
+          "arch_height": 0.2,
+          "arch_angle": 0.1,
+          "curve": 0.7
+        },
+        "style": {
+          "masculine": 0.3,
+          "feminine": 0.8,
+          "natural": 0.7,
+          "modern": 0.4,
+          "classic": 0.5
+        },
+        "tags": {
+          "mood": ["청순", "여리여리", "차분함"],
+          "occasion": ["일상", "데이트"],
+          "age": ["10대", "20대", "30대"],
+          "personality": ["친근한", "온화한"]
+        },
+        "additional_details": {
+          "similar_eyebrows": ["일자 눈썹", "둥근 아치형 눈썹"],
+          "best_face_shapes": ["계란형", "둥근형", "하트형"]
+        }
+      },
+    {
+        "id": "41303226",
+        "name": "eyebrow-16",
+        "description": "부드러운 곡선 형태의 얇은 눈썹입니다. 순하고 온화한 인상을 주며, 여성스러운 스타일이나 자연스러운 룩에 잘 어울립니다.",
+        "keywords": ["얇은", "곡선", "순한", "온화한", "여성스러운", "자연스러운"],
+        "shape": {
+            "form": "곡선 형태",
+            "arch": "낮은 아치",
+            "thickness": "얇은",
+            "angle": "완만한 기울기"
+        },
+        "vector_features": {
+            "thickness": 0.3,
+            "arch_height": 0.2,
+            "arch_angle": 0.3,
+            "curve": 0.8
+        },
+        "style": {
+            "masculine": 0.2,
+            "feminine": 0.8,
+            "natural": 0.7,
+            "modern": 0.4,
+            "classic": 0.5
+        },
+        "tags": {
+            "mood": ["온화함", "부드러움", "순수함", "자연스러움"],
+            "occasion": ["일상", "캐주얼", "데이트"],
+            "age": ["10대", "20대", "30대"],
+            "personality": ["친근한", "상냥한", "수수한"]
+        },
+        "additional_details": {
+            "similar_eyebrows": ["일자 눈썹", "둥근 아치형 눈썹"],
+            "best_face_shapes": ["계란형", "둥근형", "하트형"],
+            "note": "눈썹 숱이 적은 사람에게 적합하며, 메이크업으로 숱을 보충하여 연출 가능"
+        }
+    },
+    {
+        "id": "41303240",
+        "name": "eyebrow-17",
+        "description": "여성스럽고 곧은 형태의 두꺼운 눈썹입니다. 어려 보이는 인상을 주며, 깔끔하고 정돈된 느낌을 줍니다. 남성적인 얼굴에도 중성적인 느낌을 더할 수 있습니다.",
+        "keywords": ["여성스러운", "곧은", "두꺼운", "어려보이는", "깔끔한", "정돈된", "중성적인"],
+        "shape": {
+          "form": "곧은 형태",
+          "arch": "거의 없음 (직선)",
+          "thickness": "두꺼운 편",
+          "angle": "거의 수평"
+        },
+        "vector_features": {
+          "thickness": 0.8,
+          "arch_height": 0.1,
+          "arch_angle": 0.1,
+          "curve": 0.1
+        },
+        "style": {
+          "masculine": 0.4,
+          "feminine": 0.6,
+          "natural": 0.5,
+          "modern": 0.6,
+          "classic": 0.4
+        },
+        "tags": {
+          "mood": ["단정", "깔끔", "현대적인", "중성적인"],
+          "occasion": ["일상", "캐주얼", "세미 정장"],
+          "age": ["모든 연령대"],
+          "personality": ["차분한", "신뢰감 주는", "정돈된"]
+        },
+        "additional_details": {
+          "similar_eyebrows": ["직선형 눈썹", "일자 눈썹"],
+          "best_face_shapes": ["긴 얼굴형", "계란형", "역삼각형"]
+        }
+    },
+    {
+        "id": "41303267",
+        "name": "eyebrow-18",
+        "description": "직선에 가까운 형태의 두껍고 짙은 눈썹입니다. 남성적인 느낌을 강조하며, 강렬하고 뚜렷한 인상을 줍니다. 자연스러운 질감을 살려 과하지 않은 연출이 가능합니다.",
+        "keywords": ["직선형", "두꺼운", "짙은", "남성적인", "강렬한", "뚜렷한", "자연스러운 질감"],
+        "shape": {
+          "form": "직선에 가까운 형태",
+          "arch": "낮은 아치",
+          "thickness": "두꺼움",
+          "angle": "거의 수평"
+        },
+        "vector_features": {
+          "thickness": 0.8,
+          "arch_height": 0.1,
+          "arch_angle": 0.2,
+          "curve": 0.1
+        },
+        "style": {
+          "masculine": 0.8,
+          "feminine": 0.2,
+          "natural": 0.6,
+          "modern": 0.4,
+          "classic": 0.3
+        },
+        "tags": {
+          "mood": ["강렬함", "남성다움", "신뢰감", "자연스러움"],
+          "occasion": ["일상", "캐주얼", "세미 정장"],
+          "age": ["모든 연령대 (특히 20-40대)", "남성"],
+          "personality": ["강직한", "듬직한", "진솔한"]
+        },
+        "additional_details": {
+          "similar_eyebrows": ["수평적인 눈썹", "짙은 눈썹"],
+          "best_face_shapes": ["사각형", "타원형", "역삼각형"]
+        }
+    },
+    {
+        "id": "41303269",
+        "name": "eyebrow-19",
+        "description": "얇고 직선적인 형태의 눈썹입니다. 여성스러운 느낌을 주며, 미니멀하고 모던한 스타일을 연출하기에 적합합니다. 눈썹 산이 거의 없어 순하고 차분한 인상을 더합니다.",
+        "keywords": ["얇은", "직선형", "여성스러운", "미니멀", "모던", "순한", "차분한"],
+        "shape": {
+          "form": "직선 형태",
+          "arch": "거의 없음",
+          "thickness": "얇음",
+          "angle": "거의 수평"
+        },
+        "vector_features": {
+          "thickness": 0.3,
+          "arch_height": 0.1,
+          "arch_angle": 0.1,
+          "curve": 0.1
+        },
+        "style": {
+          "masculine": 0.2,
+          "feminine": 0.8,
+          "natural": 0.5,
+          "modern": 0.7,
+          "classic": 0.4
+        },
+        "tags": {
+          "mood": ["순수", "차분함", "여성스러움", "미니멀리즘"],
+          "occasion": ["일상", "캐주얼", "세미 정장"],
+          "age": ["10대", "20대", "30대"],
+          "personality": ["온화한", "내성적인", "세련된"]
+        },
+        "additional_details": {
+          "similar_eyebrows": ["일자 눈썹", "얇은 아치형 눈썹"],
+          "best_face_shapes": ["긴 얼굴형", "계란형", "역삼각형"]
+        }
+      },
+      {
+        "id": "41303279",
+        "name": "eyebrow-20",
+        "description": "얇고 직선에 가까운 형태의 눈썹입니다. 남성적인 느낌을 주며, 뚜렷한 이목구비를 강조합니다. 얼굴에 각진 인상을 더하고, 시크하고 모던한 스타일 연출에 적합합니다.",
+        "keywords": ["얇은", "직선", "남성적인", "뚜렷한", "각진", "시크", "모던"],
+        "shape": {
+          "form": "직선에 가까운 형태",
+          "arch": "거의 없음 (매우 낮은 아치)",
+          "thickness": "얇음",
+          "angle": "약간 기울어짐"
+        },
+        "vector_features": {
+          "thickness": 0.3,
+          "arch_height": 0.1,
+          "arch_angle": 0.2,
+          "curve": 0.1
+        },
+        "style": {
+          "masculine": 0.8,
+          "feminine": 0.2,
+          "natural": 0.4,
+          "modern": 0.7,
+          "classic": 0.3
+        },
+        "tags": {
+          "mood": ["시크", "모던", "남성적", "강렬한"],
+          "occasion": ["일상", "캐주얼", "세미 정장"],
+          "age": ["20대", "30대", "40대"],
+          "personality": ["자신감 있는", "세련된", "개성 있는"]
+        },
+        "additional_details": {
+          "similar_eyebrows": ["일자 눈썹", "두꺼운 직선형 눈썹"],
+          "best_face_shapes": ["둥근형", "하트형", "계란형"]
+        }
+      },
+      {
+        "id": "41307941",
+        "name": "eyebrow-21",
+        "description": "두껍고 숱이 많은 아치형 눈썹입니다. 남성적인 느낌을 강조하며, 강렬하고 또렷한 인상을 줍니다. 약간은 다듬어지지 않은 듯한 자연스러움이 특징입니다.",
+        "keywords": ["두꺼운", "숱 많은", "아치형", "남성적인", "강렬한", "또렷한", "자연스러운", "개성적인"],
+        "shape": {
+          "form": "아치형",
+          "arch": "높은 아치",
+          "thickness": "두꺼움",
+          "angle": "약간 기울어짐",
+          "density": "높음"
+        },
+        "vector_features": {
+          "thickness": 0.8,
+          "arch_height": 0.7,
+          "arch_angle": 0.5,
+          "curve": 0.6,
+          "taper": 0.3
+        },
+        "style": {
+          "masculine": 0.8,
+          "feminine": 0.2,
+          "natural": 0.6,
+          "modern": 0.4,
+          "classic": 0.3,
+          "bold": 0.7
+        },
+        "tags": {
+          "mood": ["강렬함", "남성적", "개성", "자신감"],
+          "occasion": ["일상", "개인적인 스타일 강조"],
+          "age": ["20대", "30대", "40대"],
+          "personality": ["강한 인상", "자유로운", "독립적인"]
+        },
+        "additional_details": {
+          "similar_eyebrows": ["갈매기 눈썹", "정돈되지 않은 눈썹"],
+          "best_face_shapes": ["각진형", "마름모형", "계란형"],
+          "considerations": ["강한 인상을 줄 수 있으므로, 전체적인 스타일과의 조화를 고려해야 합니다."]
+        }
+    },
+    {
+        "id": "41307942",
+        "name": "eyebrow-22",
+        "description": "정돈된 결이 돋보이는, 두꺼운 아치형 눈썹입니다. 남성적인 느낌을 주며, 강렬하고 입체적인 인상을 연출합니다. 각진 느낌이 있어 또렷한 인상을 강조합니다.",
+        "keywords": ["두꺼운", "아치형", "남성적인", "강렬한", "입체적인", "각진", "결이 살아있는"],
+        "shape": {
+          "form": "두꺼운 아치형",
+          "arch": "낮은 아치",
+          "thickness": "두꺼움",
+          "angle": "약간 기울어짐",
+          "definition": "정돈된 결"
+        },
+        "vector_features": {
+          "thickness": 0.8,
+          "arch_height": 0.4,
+          "arch_angle": 0.3,
+          "curve": 0.5
+        },
+        "style": {
+          "masculine": 0.8,
+          "feminine": 0.2,
+          "natural": 0.5,
+          "modern": 0.6,
+          "classic": 0.4
+        },
+        "tags": {
+          "mood": ["강렬함", "입체감", "남성적", "또렷함", "세련됨"],
+          "occasion": ["일상", "세미 정장", "특별한 날"],
+          "age": ["20대", "30대", "40대"],
+          "personality": ["자신감 있는", "강한", "세련된"]
+        },
+        "additional_details": {
+          "similar_eyebrows": ["두꺼운 일자 눈썹", "갈매기 눈썹"],
+          "best_face_shapes": ["각진 얼굴형", "계란형", "역삼각형"]
+        }
+    },
+    {
+        "id": "41308054",
+        "name": "eyebrow-23",
+        "description": "독특한 텍스처 패턴이 돋보이는 각진 형태의 눈썹입니다. 과감하고 개성 강한 인상을 주며, 현대적이고 스타일리시한 연출에 적합합니다. 남성적인 느낌이 강합니다.",
+        "keywords": ["각진", "패턴", "텍스처", "과감한", "개성", "남성적인", "현대적인", "스타일리시"],
+        "shape": {
+          "form": "각진 형태, 독특한 텍스처 패턴",
+          "arch": "높은 아치",
+          "thickness": "중간",
+          "angle": "높게 기울어짐"
+        },
+        "vector_features": {
+          "thickness": 0.7,
+          "arch_height": 0.8,
+          "arch_angle": 0.9,
+          "curve": 0.3
+        },
+        "style": {
+          "masculine": 0.8,
+          "feminine": 0.2,
+          "natural": 0.3,
+          "modern": 0.9,
+          "classic": 0.1
+        },
+        "tags": {
+          "mood": ["강렬한", "개성적인", "세련된"],
+          "occasion": ["파티", "클럽", "힙스터 스타일"],
+          "age": ["20대", "30대"],
+          "personality": ["자신감 넘치는", "독창적인", "트렌디한"]
+        },
+        "additional_details": {
+          "similar_eyebrows": ["날카로운 각도의 눈썹", "기하학적인 패턴의 눈썹"],
+          "best_face_shapes": ["역삼각형", "각진 얼굴형"]
+        }
+    },
+    {
+        "id": "41308068",
+        "name": "eyebrow-24",
+        "description": "얇고 살짝 아치형을 이루는 남성적인 눈썹입니다. 깔끔하게 정돈된 느낌을 주며, 자연스러운 인상을 연출합니다.",
+        "keywords": ["얇은", "아치형", "남성적인", "깔끔한", "정돈된", "자연스러운"],
+        "shape": {
+          "form": "살짝 아치형",
+          "arch": "낮은 아치",
+          "thickness": "얇은",
+          "angle": "수평"
+        },
+        "vector_features": {
+          "thickness": 0.3,
+          "arch_height": 0.4,
+          "arch_angle": 0.3,
+          "curve": 0.4
+        },
+        "style": {
+          "masculine": 0.8,
+          "feminine": 0.2,
+          "natural": 0.7,
+          "modern": 0.5,
+          "classic": 0.6
+        },
+        "tags": {
+          "mood": ["깔끔", "자연스러움", "단정함"],
+          "occasion": ["일상", "세미 정장"],
+          "age": ["모든 연령대"],
+          "personality": ["신뢰감 주는", "정돈된", "차분한"]
+        },
+        "additional_details": {
+          "similar_eyebrows": ["직선형 눈썹", "두꺼운 남성형 눈썹"],
+          "best_face_shapes": ["계란형", "긴 얼굴형", "다이아몬드형"]
+        }
+    },
+    {
+        "id": "41308114",
+        "name": "eyebrow-25",
+        "description": "두껍고 뚜렷한 남성적인 인상을 주는 눈썹입니다. 각이 져있지만, 전체적으로 부드러운 곡선을 유지하여 강렬함과 함께 자연스러움을 표현합니다.",
+        "keywords": ["두꺼운", "남성적인", "각진", "부드러운 곡선", "뚜렷한"],
+        "shape": {
+          "form": "각진 형태, 부드러운 곡선",
+          "arch": "낮은 아치",
+          "thickness": "두꺼움",
+          "angle": "약간 올라감"
+        },
+        "vector_features": {
+          "thickness": 0.8,
+          "arch_height": 0.2,
+          "arch_angle": 0.3,
+          "curve": 0.5
+        },
+        "style": {
+          "masculine": 0.8,
+          "feminine": 0.2,
+          "natural": 0.6,
+          "modern": 0.4,
+          "classic": 0.5
+        },
+        "tags": {
+          "mood": ["강렬함", "자신감", "남성적"],
+          "occasion": ["일상", "세미 정장"],
+          "age": ["모든 연령대"],
+          "personality": ["강인한", "신뢰감 있는"]
+        },
+        "additional_details": {
+          "similar_eyebrows": ["두꺼운 일자 눈썹", "살짝 각진 아치형 눈썹"],
+          "best_face_shapes": ["계란형", "사각형", "역삼각형"]
+        }
+    },
+    {
+        "id": "41308122",
+        "name": "eyebrow-26",
+        "description": "두껍고 둥근 형태의 남성적인 눈썹입니다. 굵은 숱과 뚜렷한 윤곽으로 강렬하고 남성적인 인상을 주며, 전체적으로 부드러운 곡선이 자연스러움을 더합니다.",
+        "keywords": ["두꺼운", "둥근", "남성적인", "굵은 숱", "뚜렷한 윤곽", "강렬한", "자연스러운"],
+        "shape": {
+          "form": "둥근 형태",
+          "arch": "낮은 아치",
+          "thickness": "두꺼움",
+          "angle": "거의 수평"
+        },
+        "vector_features": {
+          "thickness": 0.8,
+          "arch_height": 0.2,
+          "arch_angle": 0.1,
+          "curve": 0.5
+        },
+        "style": {
+          "masculine": 0.9,
+          "feminine": 0.1,
+          "natural": 0.7,
+          "modern": 0.4,
+          "classic": 0.5
+        },
+        "tags": {
+          "mood": ["강렬한", "남성적인", "자연스러움", "부드러움"],
+          "occasion": ["일상", "캐주얼"],
+          "age": ["10대 후반", "20대", "30대"],
+          "personality": ["활발한", "친근한", "자신감 있는"]
+        },
+        "additional_details": {
+          "similar_eyebrows": ["일자 눈썹", "두꺼운 아치형 눈썹"],
+          "best_face_shapes": ["사각형", "다이아몬드형", "계란형"]
+        }
+    },
+    {
+        "id": "41308134",
+        "name": "eyebrow-27",
+        "description": "개성 강하고 독특한 느낌을 주는 보라색 눈썹입니다. 얇고 높게 솟은 아치 형태로, 톡톡 튀는 스타일을 연출합니다.  파스텔톤 피부와 잘 어울리며, 미래지향적인 분위기를 더합니다.",
+        "keywords": ["보라색", "개성", "독특한", "얇은", "높은 아치", "미래지향적", "톡톡 튀는"],
+        "shape": {
+          "form": "얇고 높은 아치",
+          "arch": "높은 아치",
+          "thickness": "얇은",
+          "angle": "높게 솟음"
+        },
+        "vector_features": {
+          "thickness": 0.3,
+          "arch_height": 0.8,
+          "arch_angle": 0.7,
+          "curve": 0.4
+        },
+        "style": {
+          "masculine": 0.4,
+          "feminine": 0.6,
+          "natural": 0.2,
+          "modern": 0.9,
+          "classic": 0.1,
+          "futuristic": 0.8
+        },
+        "tags": {
+          "mood": ["개성", "독특함", "세련됨", "톡톡 튐", "미래지향적"],
+          "occasion": ["파티", "코스프레", "특별한 날"],
+          "age": ["10대", "20대", "30대"],
+          "personality": ["창의적인", "대담한", "독립적인"]
+        },
+        "additional_details": {
+          "similar_eyebrows": ["색깔 있는 눈썹", "얇은 아치형 눈썹"],
+          "best_face_shapes": ["계란형", "긴 얼굴형", "각진 얼굴형"],
+          "recommended_styles": ["미래지향적인 스타일", "힙스터 스타일"]
+        }
+    },
+    {
+        "id": "41308137",
+        "name": "eyebrow-28",
+        "description": "낮은 아치와 적당한 숱을 가진, 남성적인 느낌이 강한 눈썹입니다. 직선에 가까운 형태로, 강인하고 시크한 인상을 연출합니다.",
+        "keywords": ["남성적인", "낮은 아치", "직선", "강인한", "시크한", "적당한 숱", "깔끔한"],
+        "shape": {
+          "form": "직선에 가까운 형태",
+          "arch": "매우 낮은 아치",
+          "thickness": "중간",
+          "angle": "약간 기울어짐"
+        },
+        "vector_features": {
+          "thickness": 0.6,
+          "arch_height": 0.1,
+          "arch_angle": 0.2,
+          "curve": 0.1
+        },
+        "style": {
+          "masculine": 0.8,
+          "feminine": 0.2,
+          "natural": 0.5,
+          "modern": 0.6,
+          "classic": 0.4
+        },
+        "tags": {
+          "mood": ["강렬한", "시크", "남성적", "모던"],
+          "occasion": ["일상", "세미 정장", "캐주얼"],
+          "age": ["20대", "30대", "40대"],
+          "personality": ["강인한", "냉철한", "세련된"]
+        },
+        "additional_details": {
+          "similar_eyebrows": ["직선형 눈썹", "매우 낮은 아치형 눈썹"],
+          "best_face_shapes": ["사각형", "각진 얼굴형", "계란형"]
+        }
+    },
+    {
+        "id": "41308143",
+        "name": "eyebrow-29",
+        "description": "두껍고 직선적인 형태의 남성적인 눈썹입니다. 숱이 많고 각이 져 있어 강하고 뚜렷한 인상을 줍니다. 눈썹 앞머리가 굵고 숱이 많으며, 꼬리 부분은 얇아지는 스타일입니다.",
+        "keywords": ["두꺼운", "직선적인", "남성적인", "각진", "숱 많은", "강한", "뚜렷한", "bold"],
+        "shape": {
+          "form": "직선 형태",
+          "arch": "낮은 아치 또는 없음",
+          "thickness": "두꺼움",
+          "angle": "거의 수평",
+          "start_thickness": "두꺼움",
+          "end_thickness": "얇아짐"
+        },
+        "vector_features": {
+          "thickness": 0.8,
+          "arch_height": 0.1,
+          "arch_angle": 0.2,
+          "curve": 0.1,
+          "straightness": 0.9
+        },
+        "style": {
+          "masculine": 0.9,
+          "feminine": 0.1,
+          "natural": 0.6,
+          "modern": 0.4,
+          "classic": 0.5,
+          "edgy": 0.7
+        },
+        "tags": {
+          "mood": ["강렬한", "뚜렷한", "단호한", "시크한"],
+          "occasion": ["일상", "비즈니스", "캐주얼"],
+          "age": ["20대", "30대", "40대"],
+          "personality": ["자신감 있는", "강한", "개성 있는"],
+          "gender": ["남성"]
+        },
+        "additional_details": {
+          "similar_eyebrows": ["일자 눈썹", "두꺼운 눈썹"],
+          "best_face_shapes": ["사각형", "다이아몬드형", "타원형"],
+          "suggested_styles": ["깔끔한 헤어스타일", "세미 캐주얼 복장"]
+        }
+    },
+    {
+        "id": "41308182",
+        "name": "eyebrow-30",
+        "description": "정돈된 느낌을 주는 남성적인 직선 형태의 눈썹입니다. 굵고 낮은 아치로 강렬한 인상을 연출하며, 섬세한 텍스처 표현이 특징입니다.",
+        "keywords": ["남성적인", "직선", "굵은", "낮은 아치", "정돈된", "섬세한 텍스처"],
+        "shape": {
+          "form": "직선 형태",
+          "arch": "낮은 아치",
+          "thickness": "굵은",
+          "angle": "수평"
+        },
+        "vector_features": {
+          "thickness": 0.8,
+          "arch_height": 0.2,
+          "arch_angle": 0.1,
+          "curve": 0.1
+        },
+        "style": {
+          "masculine": 0.9,
+          "feminine": 0.1,
+          "natural": 0.6,
+          "modern": 0.4,
+          "classic": 0.5
+        },
+        "tags": {
+          "mood": ["강렬한", "진지한", "정돈된"],
+          "occasion": ["일상", "비즈니스"],
+          "age": ["모든 연령대"],
+          "personality": ["신뢰감 주는", "강인한"]
+        },
+        "additional_details": {
+          "similar_eyebrows": ["두꺼운 일자 눈썹", "남성적인 형태의 눈썹"],
+          "best_face_shapes": ["사각형", "역삼각형", "각진 얼굴형"]
+        }
+    },
+    {
+        "id": "41308185",
+        "name": "eyebrow-31",
+        "description": "남성적이고 깔끔한 인상을 주는 얇고 직선적인 눈썹입니다. 또렷한 윤곽과 간결한 형태로, 현대적이면서도 시크한 느낌을 연출합니다.",
+        "keywords": ["남성적인", "깔끔한", "얇은", "직선적인", "현대적인", "시크한", "또렷한 윤곽"],
+        "shape": {
+          "form": "직선 형태",
+          "arch": "거의 없음 (직선)",
+          "thickness": "얇음",
+          "angle": "약간 위로 향함"
+        },
+        "vector_features": {
+          "thickness": 0.3,
+          "arch_height": 0.1,
+          "arch_angle": 0.3,
+          "curve": 0.1
+        },
+        "style": {
+          "masculine": 0.8,
+          "feminine": 0.2,
+          "natural": 0.4,
+          "modern": 0.7,
+          "classic": 0.3
+        },
+        "tags": {
+          "mood": ["시크", "세련됨", "깔끔함", "현대적"],
+          "occasion": ["일상", "비즈니스", "세미 정장"],
+          "age": ["20대", "30대", "40대"],
+          "personality": ["자신감 있는", "도회적인", "이성적인"]
+        },
+        "additional_details": {
+          "similar_eyebrows": ["일자 눈썹", "숱 적은 눈썹"],
+          "best_face_shapes": ["계란형", "긴 얼굴형", "각진 얼굴형"]
+        }
+    },
+    {
+        "id": "41308196",
+        "name": "eyebrow-32",
+        "description": "얇고 곧게 뻗은 남성적인 느낌의 눈썹입니다. 눈썹 숱이 적고 라인이 강조되어 깔끔하고 세련된 인상을 줍니다. 눈썹 산이 거의 없어 부드러운 느낌을 주기도 합니다.",
+        "keywords": ["얇은", "직선", "남성적인", "깔끔한", "세련된", "부드러운", "낮은 눈썹산"],
+        "shape": {
+          "form": "직선 형태",
+          "arch": "거의 없음",
+          "thickness": "얇음",
+          "angle": "거의 수평"
+        },
+        "vector_features": {
+          "thickness": 0.3,
+          "arch_height": 0.1,
+          "arch_angle": 0.1,
+          "curve": 0.1
+        },
+        "style": {
+          "masculine": 0.8,
+          "feminine": 0.2,
+          "natural": 0.4,
+          "modern": 0.7,
+          "classic": 0.3
+        },
+        "tags": {
+          "mood": ["깔끔함", "세련됨", "차분함", "도시적"],
+          "occasion": ["일상", "비즈니스", "캐주얼"],
+          "age": ["20대", "30대", "40대"],
+          "personality": ["진지한", "신뢰감 주는", "세련된"]
+        },
+        "additional_details": {
+          "similar_eyebrows": ["일자 눈썹", "얇은 아치형 눈썹"],
+          "best_face_shapes": ["계란형", "긴 얼굴형", "다이아몬드형"]
+        }
+    }
+]

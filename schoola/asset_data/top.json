@@ -1,0 +1,998 @@
+[
+  {
+    "id" 	: "145857239",		
+    "name": "puffy-orange-jacket",
+    "shape": {
+      "description": "두꺼운 패딩 재킷으로 따뜻하고 부푼 디자인",
+      "keywords": ["두꺼운", "패딩", "부푼", "짧은"]
+    },
+    "color": {
+      "name": "주황색",
+      "hex": "#FF8C00",
+      "tone": "warm"
+    },
+    "style": {
+      "formal": 0.1,
+      "casual": 0.9,
+      "sporty": 0.7
+    },
+    "tags": {
+      "mood": ["스포티", "편안한", "세련된"],
+      "occasion": ["일상적인", "야외 활동"],
+      "age": ["젊은", "중년"]
+    }
+  },
+  {
+    "id": "146142423",
+    "name": "jacket-sport-01",
+    "shape": {
+      "description": "스포티하고 세련된 디자인의 자켓",
+      "keywords": ["스포티", "세련된", "편안한"]
+    },
+    "color": {
+      "name": "검정색, 흰색, 금색",
+      "hex": ["#000000", "#FFFFFF", "#FFD700"],
+      "tone": "neutral"
+    },
+    "style": {
+      "formal": 0.1,
+      "casual": 0.9,
+      "sporty": 0.8
+    },
+    "tags": {
+      "mood": ["스포티한", "세련된", "편안한"],
+      "occasion": ["일상적인", "스포츠", "캐주얼"],
+      "age": ["젊은", "중년"]
+    }
+  },
+  {
+    "id": "145857239",
+    "name": "top-tshirt-01",
+    "shape": {
+      "description": "기본적인 티셔츠 디자인으로, 심플하고 클래식한 느낌을 줍니다.",
+      "keywords": ["심플", "클래식", "기본"]
+    },
+    "color": {
+      "name": "흰색",
+      "hex": "#FFFFFF",
+      "tone": "neutral"
+    },
+    "style": {
+      "formal": 0.1,
+      "casual": 0.9,
+      "sporty": 0.4
+    },
+    "tags": {
+      "mood": ["심플한", "클래식한"],
+      "occasion": ["일상적인", "캐주얼"],
+      "age": ["모든 연령"]
+    }
+  },
+  {
+    "id": "146120675",
+    "name": "jacket-puffed-04",
+    "shape": {
+      "description": "두꺼운 패딩 재킷으로, 따뜻하고 편안한 느낌을 줍니다. 후드가 달려 있어 추운 날씨에 유용합니다.",
+      "keywords": ["두꺼운", "패딩", "후드", "편안한"]
+    },
+    "color": {
+      "name": "진한 파란색",
+      "hex": "#2E4A75",
+      "tone": "cool"
+    },
+    "style": {
+      "formal": 0.1,
+      "casual": 0.9,
+      "sporty": 0.7
+    },
+    "tags": {
+      "mood": ["편안한", "따뜻한", "스포티한"],
+      "occasion": ["일상적인", "야외 활동"],
+      "age": ["젊은", "중년"]
+    },
+    "additional_details": {
+      "patterns": ["패치 디자인", "캐릭터 패치"],
+      "material": "합성 소재",
+      "season": ["겨울", "가을"]
+    }
+  },
+  {
+    "id": "146120116",
+    "name": "hoodie-01",
+    "shape": {
+      "description": "편안하고 세련된 후드티로, 기본적인 디자인에 후드가 달려 있어 캐주얼한 느낌을 줍니다.",
+      "keywords": ["편안한", "세련된", "후드", "기본적인"]
+    },
+    "color": {
+      "name": "노란색",
+      "hex": "#FFD700",
+      "tone": "warm"
+    },
+    "style": {
+      "formal": 0.1,
+      "casual": 0.9,
+      "sporty": 0.6
+    },
+    "tags": {
+      "mood": ["편안한", "세련된", "캐주얼한"],
+      "occasion": ["일상적인", "레저", "스포츠"],
+      "age": ["젊은", "중년"]
+    },
+    "additional_details": {
+      "patterns": ["단색"],
+      "material": "면 소재",
+      "season": ["봄", "가을", "겨울"]
+    }
+  },
+  {
+    "id": "146120326",
+    "name": "jacket-puffed-05-painted",
+    "shape": {
+      "description": "밝고 활기찬 색상의 패딩 재킷으로, 독특한 페인트 스플래시 디자인이 특징입니다. 후드가 달려 있어 스타일리시하면서도 실용적입니다.",
+      "keywords": ["두꺼운", "패딩", "후드", "페인트 스플래시", "활기찬"]
+    },
+    "color": {
+      "name": "다색", 
+      "comment": "다색이므로 특정 색상 없음",
+      "tone": "neutral"
+    },
+    "style": {
+      "formal": 0.1,
+      "casual": 0.9,
+      "sporty": 0.8
+    },
+    "tags": {
+      "mood": ["활기찬", "스타일리시", "독특한"],
+      "occasion": ["일상적인", "야외 활동", "캐주얼"],
+      "age": ["젊은", "중년"]
+    },
+    "additional_details": {
+      "patterns": ["페인트 스플래시", "멀티컬러"],
+      "material": "합성 소재",
+      "season": ["겨울", "가을"]
+    }
+  },
+  {
+    "id": "146130059",
+    "name": "jacket-occasionwear-01",
+    "shape": {
+      "description": "고급스러운 느낌의 니트 재킷으로, 세련된 디자인과 부드러운 소재가 특징입니다. 캐주얼한 스타일에서 세미 포멀한 자리에서도 잘 어울립니다.",
+      "keywords": ["고급스러운", "니트", "세련된", "부드러운"]
+    },
+    "color": {
+      "name": "베이지색",
+      "hex": "#C2B280",
+      "tone": "neutral"
+    },
+    "style": {
+      "formal": 0.5,
+      "casual": 0.7,
+      "sporty": 0.2
+    },
+    "tags": {
+      "mood": ["세련된", "고급스러운", "부드러운"],
+      "occasion": ["일상적인", "세미 포멀", "데이트"],
+      "age": ["젊은", "중년"]
+    },
+    "additional_details": {
+      "material": "니트 소재",
+      "season": ["가을", "겨울", "봄"]
+    }
+  },
+  {
+    "id": "145064511",
+    "name": "jacket-occassionwear-02",
+    "shape": {
+      "description": "스포티하면서도 세련된 디자인의 재킷으로, 다양한 스타일링에 어울립니다. 밝은 색상과 독특한 패턴이 돋보입니다.",
+      "keywords": ["스포티", "세련된", "밝은 색상", "패턴"]
+    },
+    "color": {
+      "name": "빨간색과 회색 조합",
+      "hex": ["#FF0000", "#808080"],
+      "tone": "neutral"
+    },
+    "style": {
+      "formal": 0.3,
+      "casual": 0.8,
+      "sporty": 0.7
+    },
+    "tags": {
+      "mood": ["세련된", "스포티한", "밝은"],
+      "occasion": ["일상적인", "스포츠", "캐주얼"],
+      "age": ["젊은", "중년"]
+    },
+    "additional_details": {
+      "patterns": ["색상 블록", "대비 디자인"],
+      "material": "합성 소재",
+      "season": ["봄", "가을", "겨울"]
+    }
+  },
+  {
+    "id": "146130138",
+    "name": "jacket-puffed-02",
+    "shape": {
+      "description": "둥글고 부푼 디자인의 패딩 재킷으로, 빛나는 무지개 색상의 광택이 특징입니다. 후드가 달려 있어 추운 날씨에 유용하며, 현대적이고 세련된 느낌을 줍니다.",
+      "keywords": ["둥글고 부푼", "후드", "광택", "현대적", "세련된"]
+    },
+    "color": {
+      "name": "무지개 색상",
+      "hex": "#FFFFFF", 
+      "comment": "은색 베이스의 무지개 광택",
+      "tone": "neutral"
+    },
+    "style": {
+      "formal": 0.1,
+      "casual": 0.8,
+      "sporty": 0.7
+    },
+    "tags": {
+      "mood": ["세련된", "현대적", "눈에 띄는"],
+      "occasion": ["일상적인", "야외 활동", "패션"],
+      "age": ["젊은", "중년"]
+    },
+    "additional_details": {
+      "patterns": ["무지개 광택"],
+      "material": "합성 소재",
+      "season": ["겨울", "가을"]
+    }
+  },
+  {
+    "id": "kwhVa1YNStiAN8B7oceBpg",
+    "name": "sweater-01-longslv-hoodiecoll-pocket-strings-navysmile",
+    "shape": {
+      "description": "긴 소매에 후드가 달린 편안한 스웨터로, 주머니와 스트링이 있어 실용적이고 스타일리시합니다.",
+      "keywords": ["긴 소매", "후드", "주머니", "스트링", "편안한"]
+    },
+    "color": {
+      "name": "네이비 블루",
+      "hex": "#000080",
+      "tone": "cool"
+    },
+    "style": {
+      "formal": 0.1,
+      "casual": 0.9,
+      "sporty": 0.6
+    },
+    "tags": {
+      "mood": ["편안한", "스타일리시한", "실용적인"],
+      "occasion": ["일상적인", "캐주얼", "스포츠"],
+      "age": ["젊은", "중년"]
+    },
+    "additional_details": {
+      "patterns": ["캐릭터 패치", "로고 디자인"],
+      "material": "면 소재",
+      "season": ["가을", "겨울"]
+    }
+  },
+  {
+    "id": "q7ZcFrNFQkGIZd97tTguHA",
+    "name": "long-sleeve-hoodie-pale-mint",
+    "shape": {
+      "description": "넉넉한 후드와 주머니가 달린 긴 소매 스웨터로, 편안하고 세련된 느낌을 줍니다. 밝고 부드러운 색상이 특징입니다.",
+      "keywords": ["넉넉한", "후드", "주머니", "편안한", "세련된"]
+    },
+    "color": {
+      "name": "연한 민트색",
+      "hex": "#A8E6CE",
+      "tone": "cool"
+    },
+    "style": {
+      "formal": 0.1,
+      "casual": 0.9,
+      "sporty": 0.6
+    },
+    "tags": {
+      "mood": ["편안한", "세련된", "부드러운"],
+      "occasion": ["일상적인", "캐주얼", "스포츠"],
+      "age": ["젊은", "중년"]
+    },
+    "additional_details": {
+      "patterns": ["단색"],
+      "material": "면 소재",
+      "season": ["봄", "가을"]
+    }
+  },
+  {
+    "id": "148386958",
+    "name": "jacket-puffed-03",
+    "shape": {
+      "description": "두꺼운 패딩 재킷으로, 따뜻하고 편안한 느낌을 줍니다. 후드가 달려 있어 추운 날씨에 유용합니다.",
+      "keywords": ["두꺼운", "패딩", "후드", "편안한", "카모플라주"]
+    },
+    "color": {
+      "name": "카모플라주",
+      "hex": "#808080",
+      "comment": "카모플라주 패턴",
+      "tone": "neutral"
+    },
+    "style": {
+      "formal": 0.1,
+      "casual": 0.9,
+      "sporty": 0.8
+    },
+    "tags": {
+      "mood": ["편안한", "따뜻한", "스포티한"],
+      "occasion": ["일상적인", "야외 활동"],
+      "age": ["젊은", "중년"]
+    },
+    "additional_details": {
+      "patterns": ["카모플라주"],
+      "material": "합성 소재",
+      "season": ["겨울", "가을"]
+    }
+  },
+  {
+    "id": "wajbjMhsQO-Wy2VXOoPCQQ",
+    "name": "sweater-01-longslv-roundcoll-teddybrown",
+    "shape": {
+      "description": "둥근 목과 긴 소매를 가진 부드러운 스웨터로, 아늑하고 편안한 느낌을 줍니다.",
+      "keywords": ["둥근 목", "긴 소매", "부드러운", "아늑한"]
+    },
+    "color": {
+      "name": "테디 브라운",
+      "hex": "#8B5A2B",
+      "tone": "warm"
+    },
+    "style": {
+      "formal": 0.1,
+      "casual": 0.9,
+      "sporty": 0.3
+    },
+    "tags": {
+      "mood": ["아늑한", "편안한", "부드러운"],
+      "occasion": ["일상적인", "캐주얼"],
+      "age": ["젊은", "중년"]
+    },
+    "additional_details": {
+      "material": "부드러운 니트 소재",
+      "season": ["가을", "겨울"]
+    }
+  },
+  {
+    "id": "tjfdXbNjQAubq1R8TNc6iw",
+    "name": "sweater-01-longslv-roundcoll-darkgrey",
+    "shape": {
+      "description": "둥근 목과 긴 소매를 가진 편안하고 세련된 스웨터입니다. 부드러운 디자인으로 다양한 스타일에 잘 어울립니다.",
+      "keywords": ["둥근 목", "긴 소매", "편안한", "세련된"]
+    },
+    "color": {
+      "name": "진한 회색",
+      "hex": "#4A4A4A",
+      "tone": "neutral"
+    },
+    "style": {
+      "formal": 0.3,
+      "casual": 0.8,
+      "sporty": 0.4
+    },
+    "tags": {
+      "mood": ["편안한", "세련된", "부드러운"],
+      "occasion": ["일상적인", "캐주얼"],
+      "age": ["젊은", "중년"]
+    },
+    "additional_details": {
+      "material": "면 소재",
+      "season": ["가을", "겨울"]
+    }
+  },
+  {
+    "id": "2l5H3ls1THm2wWiHVT8FYQ",
+    "name": "floral-hoodie",
+    "shape": {
+      "description": "꽃무늬가 특징인 후드 집업으로, 밝고 활기찬 느낌을 줍니다. 주머니와 후드 스트링이 달려 있어 실용적이면서도 스타일리시합니다.",
+      "keywords": ["꽃무늬", "후드", "주머니", "스트링", "활기찬"]
+    },
+    "color": {
+      "name": "다채로운 꽃무늬",
+      "hex": "#A3E063",
+      "comment": "다채로운 꽃무늬로 다양한 색상이 포함됨",
+      "tone": "neutral"
+    },
+    "style": {
+      "formal": 0.1,
+      "casual": 0.9,
+      "sporty": 0.5
+    },
+    "tags": {
+      "mood": ["밝은", "활기찬", "자연스러운"],
+      "occasion": ["일상적인", "캐주얼", "야외 활동"],
+      "age": ["젊은", "중년"]
+    },
+    "additional_details": {
+      "patterns": ["꽃무늬", "자연 디자인"],
+      "material": "면 소재",
+      "season": ["봄", "가을"]
+    }
+  },
+  {
+    "id": "7c_nGqaQQ96FoytM3tmg1Q",
+    "name": "sweater-01-longslv-hoodiecoll-strings-tripalecolor",
+    "shape": {
+      "description": "세 가지 색상이 조화롭게 배치된 후드 집업 스타일의 스웨터로, 늘씬한 실루엣과 후드 스트링이 특징입니다. 편안하고 세련된 느낌을 줍니다.",
+      "keywords": ["후드", "세 가지 색상", "늘씬한", "편안한", "세련된"]
+    },
+    "color": {
+      "name": "핑크, 민트, 베이지",
+      "hex": ["#F7CAC9", "#A8E6CE", "#D2B48C"],
+      "tone": "neutral"
+    },
+    "style": {
+      "formal": 0.1,
+      "casual": 0.9,
+      "sporty": 0.5
+    },
+    "tags": {
+      "mood": ["세련된", "편안한", "밝은"],
+      "occasion": ["일상적인", "캐주얼", "스포티"],
+      "age": ["젊은", "중년"]
+    },
+    "additional_details": {
+      "patterns": ["색상 블록 디자인"],
+      "material": "부드러운 소재",
+      "season": ["봄", "가을", "겨울"]
+    }
+  },
+  {
+    "id": "Q1JVYvDeSNWjI0UuA2K8BQ",
+    "name": "sweater-01-longslv-hoodiecoll-strings-cocoasmile",
+    "shape": {
+      "description": "후드가 달린 긴 소매 스웨터로, 편안하고 세련된 느낌을 줍니다. 소매와 밑단에 스트라이프 디테일이 있어 스포티한 스타일을 연출합니다.",
+      "keywords": ["후드", "긴 소매", "스트라이프", "편안한", "세련된"]
+    },
+    "color": {
+      "name": "진한 보라색",
+      "hex": "#4B0082",
+      "tone": "cool"
+    },
+    "style": {
+      "formal": 0.2,
+      "casual": 0.9,
+      "sporty": 0.7
+    },
+    "tags": {
+      "mood": ["편안한", "세련된", "스포티한"],
+      "occasion": ["일상적인", "캐주얼", "스포츠"],
+      "age": ["젊은", "중년"]
+    },
+    "additional_details": {
+      "patterns": ["스트라이프 디테일"],
+      "material": "면 소재",
+      "season": ["가을", "겨울"]
+    }
+  },
+  {
+    "id": "QrMGVJqKQ0yyO7lh2UbkBA",
+    "name": "sweater-01-longslv-roundcoll-brightbluedecal",
+    "shape": {
+      "description": "둥근 목과 긴 소매를 가진 편안한 스웨터로, 밝은 파란색 배경에 흰색 로봇 데칼이 특징입니다. 소매가 넓어 세련된 느낌을 줍니다.",
+      "keywords": ["둥근 목", "긴 소매", "넓은 소매", "데칼", "로봇 디자인"]
+    },
+    "color": {
+      "name": "밝은 파란색",
+      "hex": "#007BFF",
+      "tone": "cool"
+    },
+    "style": {
+      "formal": 0.1,
+      "casual": 0.9,
+      "sporty": 0.3
+    },
+    "tags": {
+      "mood": ["세련된", "편안한", "밝은"],
+      "occasion": ["일상적인", "캐주얼"],
+      "age": ["젊은", "중년"]
+    },
+    "additional_details": {
+      "patterns": ["로봇 데칼"],
+      "material": "면 소재",
+      "season": ["봄", "가을", "겨울"]
+    }
+  },
+  {
+    "id": "8qUNgwRbQUOozQUNZ7-1fA",
+    "name": "tshirt-oversized-01-whiteprint",
+    "shape": {
+      "description": "오버사이즈 디자인의 티셔츠로, 넉넉한 핏과 독특한 흑백 프린트가 특징입니다. 세련되고 모던한 느낌을 줍니다.",
+      "keywords": ["오버사이즈", "넉넉한", "흑백 프린트", "세련된", "모던"]
+    },
+    "color": {
+      "name": "흰색",
+      "hex": "#FFFFFF",
+      "tone": "neutral"
+    },
+    "style": {
+      "formal": 0.1,
+      "casual": 0.9,
+      "sporty": 0.3
+    },
+    "tags": {
+      "mood": ["세련된", "모던", "독특한"],
+      "occasion": ["일상적인", "캐주얼"],
+      "age": ["젊은", "중년"]
+    },
+    "additional_details": {
+      "patterns": ["흑백 프린트", "건축물 디자인"],
+      "material": "면 소재",
+      "season": ["봄", "여름", "가을"]
+    }
+  },
+  {
+    "id": "6B2WygSdQgSbSmPb67laBQ",
+    "name": "tshirt-oversized-01-darkgrey",
+    "shape": {
+      "description": "넉넉한 사이즈의 오버사이즈 티셔츠로, 편안하고 세련된 느낌을 줍니다. 어깨와 소매 부분이 넓어 자유로운 착용감을 제공합니다.",
+      "keywords": ["오버사이즈", "넉넉한", "편안한", "세련된"]
+    },
+    "color": {
+      "name": "진한 회색",
+      "hex": "#3A3B3C",
+      "tone": "neutral"
+    },
+    "style": {
+      "formal": 0.1,
+      "casual": 0.9,
+      "sporty": 0.4
+    },
+    "tags": {
+      "mood": ["편안한", "세련된", "심플한"],
+      "occasion": ["일상적인", "캐주얼"],
+      "age": ["젊은", "중년"]
+    },
+    "additional_details": {
+      "patterns": ["단색"],
+      "material": "면 소재",
+      "season": ["봄", "가을", "여름"]
+    }
+  },
+  {
+    "id": "a0mD7Y46QlSYbQLFCdgQTA",
+    "name": "sweater-01-longslv-hoodiecoll-strings-caquidecal",
+    "shape": {
+      "description": "둥근 디자인의 후드가 달린 스웨터로, 편안하고 세련된 느낌을 줍니다. 옆선에 화려한 데칼이 있어 개성을 더합니다.",
+      "keywords": ["후드", "둥근", "세련된", "데칼", "편안한"]
+    },
+    "color": {
+      "name": "카키색",
+      "hex": "#C3B091",
+      "tone": "neutral"
+    },
+    "style": {
+      "formal": 0.1,
+      "casual": 0.9,
+      "sporty": 0.5
+    },
+    "tags": {
+      "mood": ["편안한", "세련된", "개성적인"],
+      "occasion": ["일상적인", "캐주얼"],
+      "age": ["젊은", "중년"]
+    },
+    "additional_details": {
+      "patterns": ["데칼 디자인"],
+      "material": "면 소재",
+      "season": ["봄", "가을", "겨울"]
+    }
+  },
+  {
+    "id": "NP7CyncJQ82WwO1_tdP6CQ",
+    "name": "jacket-sport-01-pastelgreen",
+    "shape": {
+      "description": "가벼운 스포티한 재킷으로, 둥근 디자인과 부드러운 실루엣이 특징입니다. 후드는 없지만 활동성을 높이는 디자인입니다.",
+      "keywords": ["둥근", "가벼운", "스포티한", "부드러운"]
+    },
+    "color": {
+      "name": "연한 녹색",
+      "hex": "#C9E1C5",
+      "tone": "neutral"
+    },
+    "style": {
+      "formal": 0.1,
+      "casual": 0.8,
+      "sporty": 0.9
+    },
+    "tags": {
+      "mood": ["편안한", "세련된", "스포티한"],
+      "occasion": ["일상적인", "운동", "캐주얼"],
+      "age": ["젊은", "중년"]
+    },
+    "additional_details": {
+      "patterns": ["플라워 패턴", "밝은 색상"],
+      "material": "합성 소재",
+      "season": ["봄", "가을"]
+    }
+  },
+  {
+    "id": "pe32_IT1S2yshCFIcX0DQg",
+    "name": "jacket-sport-01-halfdenim",
+    "shape": {
+      "description": "반은 데님, 반은 체크무늬로 된 스포티한 자켓으로, 다양한 스타일링이 가능합니다. 데님 부분은 빈티지한 느낌을 주고, 체크무늬 부분은 클래식한 느낌을 줍니다.",
+      "keywords": ["데님", "체크무늬", "스포티", "빈티지", "클래식"]
+    },
+    "color": {
+      "name": "베이지, 파란색, 빨간색",
+      "hex": ["#F5F5DC", "#4682B4", "#FF0000"],
+      "tone": "neutral"
+    },
+    "style": {
+      "formal": 0.2,
+      "casual": 0.9,
+      "sporty": 0.8
+    },
+    "tags": {
+      "mood": ["스포티한", "빈티지한", "클래식한"],
+      "occasion": ["일상적인", "캐주얼", "스포츠"],
+      "age": ["젊은", "중년"]
+    },
+    "additional_details": {
+      "patterns": ["데님 패치", "체크무늬 패치"],
+      "material": "데님, 면 소재",
+      "season": ["봄", "가을", "겨울"]
+    }
+  },
+  {
+    "id": "tA0SQdCHSAqIemZLJeeTmQ",
+    "name": "tshirt-oversized-01-palegreen",
+    "shape": {
+      "description": "넉넉한 핏의 오버사이즈 티셔츠로, 편안하고 세련된 느낌을 줍니다. 소매와 밑단이 둥글게 처리되어 있어 부드러운 인상을 준다.",
+      "keywords": ["오버사이즈", "넉넉한", "둥글게 처리된", "편안한"]
+    },
+    "color": {
+      "name": "연한 녹색",
+      "hex": "#a5b888",
+      "tone": "neutral"
+    },
+    "style": {
+      "formal": 0.1,
+      "casual": 0.9,
+      "sporty": 0.4
+    },
+    "tags": {
+      "mood": ["편안한", "세련된", "부드러운"],
+      "occasion": ["일상적인", "캐주얼"],
+      "age": ["젊은", "중년"]
+    },
+    "additional_details": {
+      "material": "면 소재",
+      "season": ["봄", "여름", "가을"]
+    }
+  },
+  {
+    "id": "OFqZJpJgS4-fIxE-z-hiNA",
+    "name": "hoodie-02-eggnavy",
+    "shape": {
+      "description": "이 후드티는 깔끔하고 세련된 디자인으로, 후드와 지퍼가 달려 있어 편안하고 스타일리시한 느낌을 줍니다. 어깨와 소매 부분에 선명한 라인이 들어가 있어 스포티한 느낌을 더합니다.",
+      "keywords": ["후드", "지퍼", "세련된", "스포티한", "편안한"]
+    },
+    "color": {
+      "name": "연한 베이지색",
+      "hex": "#D2B48C",
+      "tone": "neutral"
+    },
+    "style": {
+      "formal": 0.1,
+      "casual": 0.9,
+      "sporty": 0.8
+    },
+    "tags": {
+      "mood": ["편안한", "세련된", "스포티한"],
+      "occasion": ["일상적인", "야외 활동", "스포츠"],
+      "age": ["젊은", "중년"]
+    },
+    "additional_details": {
+      "patterns": ["컬러 블록", "선명한 라인"],
+      "material": "면 소재",
+      "season": ["봄", "가을", "겨울"]
+    }
+  },
+  {
+    "id": "6_JvB8dVQdSSw5kLE3AycA",
+    "name": "top-tshirt-01-wine",
+    "shape": {
+      "description": "단순하고 클래식한 디자인의 티셔츠로, 기본적인 웨어에 잘 어울립니다. 소매는 짧고, 목선은 라운드넥 스타일입니다.",
+      "keywords": ["단순한", "클래식한", "라운드넥", "짧은 소매"]
+    },
+    "color": {
+      "name": "와인색",
+      "hex": "#7D3C98",
+      "tone": "warm"
+    },
+    "style": {
+      "formal": 0.1,
+      "casual": 0.9,
+      "sporty": 0.3
+    },
+    "tags": {
+      "mood": ["편안한", "세련된", "심플한"],
+      "occasion": ["일상적인", "캐주얼"],
+      "age": ["젊은", "중년"]
+    },
+    "additional_details": {
+      "material": "면 소재",
+      "season": ["봄", "가을", "여름"]
+    }
+  },
+  {
+    "id": "DLw_L1uMQimBfmsuch-ZKw",
+    "name": "jacket-sport-01-blueyellow",
+    "shape": {
+      "description": "다채로운 색상의 패치워크 디자인으로, 스포티하면서도 개성적인 느낌을 줍니다. 버튼이 달린 프론트와 긴 소매가 특징입니다.",
+      "keywords": ["패치워크", "스포티", "개성적", "버튼", "긴 소매"]
+    },
+    "color": {
+      "name": "파란색, 노란색, 빨간색",
+      "hex": ["#87CEEB", "#FFD700", "#FF0000"],
+      "tone": "neutral"
+    },
+    "style": {
+      "formal": 0.1,
+      "casual": 0.8,
+      "sporty": 0.9
+    },
+    "tags": {
+      "mood": ["개성적", "스포티", "밝은"],
+      "occasion": ["일상적인", "야외 활동", "스포츠"],
+      "age": ["젊은", "중년"]
+    },
+    "additional_details": {
+      "patterns": ["패치워크", "다색 디자인"],
+      "material": "합성 소재",
+      "season": ["봄", "가을", "겨울"]
+    }
+  },
+  {
+    "id": "wnnHEejFQYOdVQd8UW5s3g",
+    "name": "jacket-puffed-01-olive",
+    "shape": {
+      "description": "검은색의 두꺼운 패딩 재킷으로, 따뜻하고 편안한 느낌을 줍니다. 넓은 목깃은 추운 날씨에 유용합니다. 스포티한 올리브색 티가 포인트입니다.",
+      "keywords": ["두꺼운", "패딩", "후드", "편안한"]
+    },
+    "color": {
+      "name": "검정색과 올리브색",
+      "hex": ["#000000", "#6D594E"],
+      "tone": "neutral"
+    },
+    "style": {
+      "formal": 0.1,
+      "casual": 0.9,
+      "sporty": 0.8
+    },
+    "tags": {
+      "mood": ["편안한", "따뜻한", "스포티한"],
+      "occasion": ["일상적인", "야외 활동"],
+      "age": ["젊은", "중년"]
+    },
+    "additional_details": {
+      "patterns": ["단색 디자인"],
+      "material": "합성 소재",
+      "season": ["겨울", "가을"]
+    }
+  },
+  {
+    "id": "Zm1E1QzdTkqAVEawt9pzNQ",
+    "name": "jacket-occassionwear-02-blueiceemojis",
+    "shape": {
+      "description": "볼륨감 있는 패딩 재킷으로, 포근하고 따뜻한 느낌을 줍니다. 클래식한 디자인과 넉넉한 실루엣이 특징입니다.",
+      "keywords": ["패딩", "볼륨감", "포근한", "넉넉한"]
+    },
+    "color": {
+      "name": "아이스 블루",
+      "hex": "#DCE6EC",
+      "tone": "cool"
+    },
+    "style": {
+      "formal": 0.2,
+      "casual": 0.9,
+      "sporty": 0.6
+    },
+    "tags": {
+      "mood": ["따뜻한", "편안한", "트렌디한"],
+      "occasion": ["일상적인", "야외 활동", "겨울 패션"],
+      "age": ["젊은", "중년"]
+    },
+    "additional_details": {
+      "patterns": ["단색", "미니멀한"],
+      "material": "합성 섬유",
+      "season": ["겨울", "가을"]
+    }
+  },
+  {
+    "id": "S9ChKPhoSY-1cvYvb8BEHQ",
+    "name": "hoodie-02-whitesmileys",
+    "shape": {
+      "description": "다채로운 이모티콘과 낙서가 프린트된 후드 집업입니다. 힙하고 개성 넘치는 스타일을 연출할 수 있습니다.",
+      "keywords": ["후드", "집업", "프린트", "낙서", "이모티콘", "오버핏"]
+    },
+    "color": {
+      "name": "흰색 바탕, 다채로운 색상",      
+      "tone": "neutral"
+    },
+    "style": {
+      "formal": 0.1,
+      "casual": 0.9,
+      "sporty": 0.6,
+      "street": 0.8
+    },
+    "tags": {
+      "mood": ["개성있는", "힙한", "유쾌한", "캐주얼한", "활동적인"],
+      "occasion": ["일상적인", "데이트", "가벼운 외출", "파티"],
+      "age": ["젊은", "10대", "20대"]
+    },
+    "additional_details": {
+      "patterns": ["이모티콘", "낙서"],
+      "material": "합성 소재",
+      "season": ["봄", "가을", "초겨울"]
+    }
+  },
+  {
+    "id": "vA-o4T0SSymkoZ-Cqorltw",
+    "name": "jacket-puffed-05-brown",
+    "shape": {
+      "description": "갈색의 푹신한 패딩 조끼로, 캐주얼하고 따뜻한 느낌을 줍니다. 아우터로 활용도가 높고 활동적인 느낌을 더합니다.",
+      "keywords": ["패딩", "조끼", "갈색", "푹신한", "캐주얼"]
+    },
+    "color": {
+      "name": "갈색",
+      "hex": "#8B4513",  
+      "tone": "warm"
+    },
+    "style": {
+      "formal": 0.1,
+      "casual": 0.9,
+      "sporty": 0.5
+    },
+    "tags": {
+      "mood": ["따뜻한", "편안한", "활동적인", "캐주얼한"],
+      "occasion": ["일상적인", "가벼운 외출", "야외 활동"],
+      "age": ["젊은", "중년"]
+    },
+    "additional_details": {
+      "material": "합성 섬유 (패딩)",
+      "season": ["가을", "겨울"],
+      "fit": "루즈핏 (넉넉한)"
+    }
+  },
+  {
+    "id": "PNRGEG92SGOUUphSIcrqOg",
+    "name": "jacket-puffed-02-painted",
+    "shape": {
+      "description": "볼륨감 있는 패딩 재킷으로, 톡톡 튀는 페인트 패턴이 특징입니다. 개성 넘치고 스타일리시한 룩을 연출할 수 있습니다.",
+      "keywords": ["패딩", "볼륨", "후드", "페인트", "화려한"]
+    },
+    "color": {
+      "name": "멀티컬러",
+      "hex": null,
+      "tone": "warm"
+    },
+    "style": {
+      "formal": 0.1,
+      "casual": 0.9,
+      "sporty": 0.6
+    },
+    "tags": {
+      "mood": ["개성적인", "톡톡 튀는", "화려한", "힙스터"],
+      "occasion": ["일상적인", "파티", "스트릿 패션"],
+      "age": ["젊은"]
+    },
+    "additional_details": {
+      "patterns": ["페인트 스플래터"],
+      "material": "합성 소재",
+      "season": ["겨울", "가을"],
+      "fit": "오버사이즈"
+    }
+  },
+  {
+    "id": "zj3Y_TQJR4mNqPIJZJPkxg",
+    "name": "jacket-puffed-02-black",
+    "shape": {
+      "description": "볼륨감 있는 검정색 패딩 재킷으로, 트렌디하고 스타일리시한 느낌을 줍니다. 넉넉한 핏과 후드가 특징입니다.",
+      "keywords": ["패딩", "볼륨", "후드", "힙스터", "오버사이즈"]
+    },
+    "color": {
+      "name": "검정색",
+      "hex": "#000000",
+      "tone": "neutral"
+    },
+    "style": {
+      "formal": 0.1,
+      "casual": 0.8,
+      "sporty": 0.6
+    },
+    "tags": {
+      "mood": ["트렌디한", "스타일리시한", "힙한"],
+      "occasion": ["일상적인", "캐주얼", "약속"],
+      "age": ["젊은", "10대", "20대"]
+    },
+    "additional_details": {
+      "material": "합성 소재",
+      "season": ["겨울", "가을"],
+      "fit": "오버사이즈",
+      "features": ["후드", "지퍼"]
+    }
+  },
+  {
+    "id": "ISV88W_gQtyrDr06kMcYWg",
+    "name": "jacket-occassionwear-02-blueice",
+    "shape": {
+      "description": "레이어드 스타일의 상의로, 셔츠 위에 한쪽 어깨가 드러나는 티셔츠를 겹쳐 입은 듯한 독특한 디자인입니다. 소매 부분에 밴딩 디테일이 있으며, 캐주얼하면서도 개성 있는 느낌을 줍니다.",
+      "keywords": ["레이어드", "비대칭", "오프숄더", "밴딩", "캐주얼", "개성"]
+    },
+    "color": {
+      "name": "파란색 & 흰색",
+      "hex": ["#ADD8E6", "#FFFFFF"],
+      "tone": "cool"
+    },
+    "style": {
+      "formal": 0.1,
+      "casual": 0.9,
+      "sporty": 0.4,
+      "trendy": 0.8
+    },
+    "tags": {
+      "mood": ["유쾌한", "개성있는", "힙한"],
+      "occasion": ["일상적인", "파티"],
+      "age": ["젊은", "10대"],
+      "theme": ["스트릿", "힙스터"]
+    },
+    "additional_details": {
+      "patterns": ["이모지", "낙서"],
+      "material": ["면", "폴리에스터 혼방"],
+      "season": ["봄", "가을"]
+    }
+  },
+  {
+    "id": "RAMumX7mRJKdtzkYp7SOQw",
+    "name": "jacket-occassionwear-02-blackwhite",
+    "shape": {
+      "description": "언밸런스한 디자인이 돋보이는 레이어드 상의입니다. 셔츠 위에 블랙 스웨터를 비대칭으로 걸친 스타일로, 독특하고 개성 있는 분위기를 연출합니다. 어깨와 팔 부분의 벨트 디테일이 포인트입니다.",
+      "keywords": ["레이어드", "비대칭", "오프숄더", "벨트", "셔츠", "스웨터", "유니크"]
+    },
+    "color": {
+      "name": "블랙 & 화이트",
+      "hex": ["#000000", "#FFFFFF"],
+      "tone": "neutral"
+    },
+    "style": {
+      "formal": 0.4,
+      "casual": 0.7,
+      "sporty": 0.2
+    },
+    "tags": {
+      "mood": ["시크한", "개성있는", "스타일리쉬한"],
+      "occasion": ["일상적인", "세미 포멀", "파티"],
+      "age": ["젊은", "성인"]
+    },
+    "additional_details": {
+      "patterns": ["단색"],
+      "material": ["면", "합성 섬유"],
+      "season": ["봄", "가을"]
+    }
+  },
+  {
+    "id": "UL2Vl14LRpqLssDHcGSPIw",
+    "name": "jacket-puffed-05-yellow",
+    "shape": {
+      "description": "볼륨감 있는 옐로우 패딩 베스트로, 캐주얼하고 트렌디한 느낌을 줍니다. 넉넉한 핏으로 편안하게 착용할 수 있습니다.",
+      "keywords": ["패딩", "베스트", "볼륨감", "넉넉한", "레이어드", "숏기장"]
+    },
+    "color": {
+      "name": "노란색",
+      "hex": "#FFDA61",
+      "tone": "warm"
+    },
+    "style": {
+      "formal": 0.1,
+      "casual": 0.9,
+      "sporty": 0.6
+    },
+    "tags": {
+      "mood": ["캐주얼한", "트렌디한", "힙한", "귀여운"],
+      "occasion": ["일상적인", "간단한 외출"],
+      "age": ["젊은", "10대", "20대"]
+    },
+    "additional_details": {
+      "material": "합성 섬유",
+      "season": ["가을", "겨울", "간절기"],
+      "fit": "루즈핏",
+      "type": "베스트/조끼"
+    }
+  }
+]
