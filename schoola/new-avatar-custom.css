@@ -834,7 +834,7 @@ html, body {
           right: 5 !important;
           bottom: 0 !important;
           border-radius: 0 !important;
-          background-color: rgba(255, 255, 255, 0.3);
+          background-color: rgba(255, 255, 255, 0.6);
       }
 
       .ai-message, .user-message {
@@ -873,10 +873,33 @@ html, body {
           padding: 5px !important;
       }
       
-      /* 입력창 최적화 */
+      /* 입력 컨테이너 개선 */
       .ai-chat-input-container {
-          padding: 5px !important;
-          height: auto !important;
+        padding: 5px !important;
+        height: auto !important;
+        flex-wrap: wrap !important; /* 필요시 줄바꿈 허용 */
+        justify-content: space-between !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+      }
+      
+      /* 인풋 필드 크기 조정 */
+      .ai-chat-input-container input {
+        flex: 1 1 70% !important; /* 가능한 한 많은 공간 차지 */
+        min-width: 0 !important; /* flex 요소가 축소될 수 있도록 */
+        padding: 6px 10px !important;
+        margin-right: 5px !important;
+        font-size: 13px !important;
+        height: 30px !important;
+      }
+      
+      /* 전송 버튼 크기 최적화 */
+      .ai-chat-input-container button {
+        flex: 0 0 auto !important; /* 크기 고정 */
+        padding: 6px 10px !important;
+        font-size: 13px !important;
+        min-width: 50px !important;
+        max-width: 25% !important;
       }
       
       #aiChatInput {
@@ -925,5 +948,27 @@ html, body {
       .ai-chat-header h3:after {
           content: '' !important;
           display: none !important;
+      }
+
+      .ai-chat-input-container {
+        padding: 3px !important;
+      }
+      
+      .ai-chat-input-container input {
+        flex: 1 1 65% !important;
+        padding: 4px 8px !important;
+        font-size: 12px !important;
+        height: 28px !important;
+      }
+      
+      .ai-chat-input-container button {
+        padding: 4px 8px !important;
+        font-size: 12px !important;
+        min-width: 40px !important;
+      }
+      
+      /* 채팅창 상단 여백 감소 */
+      .ai-chat-modal {
+        height: 60% !important;
       }
   }
