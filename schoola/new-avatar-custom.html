@@ -252,18 +252,39 @@
                     chatTitle.innerHTML = 'AI 캐릭터 커스터마이징';
                 }
                 
+                // 모바일 최적화 클래스 추가
+                document.body.classList.add('mobile-device');
+                
+                // 입력 필드와 버튼 레이아웃 최적화
+                const inputContainer = document.querySelector('.ai-chat-input-container');
+                const inputField = document.getElementById('aiChatInput');
+                const sendButton = document.getElementById('aiChatSend');
+                
+                if (inputContainer && inputField && sendButton) {
+                // 플레이스홀더 텍스트 줄이기
+                inputField.setAttribute('placeholder', '메시지 입력...');
+                
+                // 전송 버튼 텍스트 아이콘으로 변경 (옵션)
+                if (window.innerWidth <= 375) {
+                    sendButton.textContent = '↑';
+                }
+                }
+
                 // 대화창 높이 최대화
                 const adjustChatHeight = () => {
                     const chatMessages = document.getElementById('aiChatMessages');
-                    if (chatMessages) {
-                        const header = document.querySelector('.ai-chat-header');
-                        const input = document.querySelector('.ai-chat-input-container');
+                    const header = document.querySelector('.ai-chat-header');
+                    const input = document.querySelector('.ai-chat-input-container');
+
+                    if (chatMessages && header && input) {
                         const headerHeight = header ? header.offsetHeight : 0;
                         const inputHeight = input ? input.offsetHeight : 0;
                         const windowHeight = window.innerHeight;
+                        const modalHeight = document.querySelector('.ai-chat-modal').offsetHeight;
                         
                         // 채팅창 높이 계산 (화면 높이 - 헤더 - 입력창 - 여유공간)
-                        const chatHeight = windowHeight - headerHeight - inputHeight - 20;
+                        //const chatHeight = windowHeight - headerHeight - inputHeight - 20;
+                        const chatHeight = modalHeight - headerHeight - inputHeight - 10;
                         chatMessages.style.height = `${chatHeight}px`;
                     }
                 };
