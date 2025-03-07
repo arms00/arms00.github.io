@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Character Customization</title>    
+    <link rel="stylesheet" href="https://arms00.github.io/schoola/new-avatar-custom.css" />
+    <style>
+        /* 간단한 인라인 스타일 추가 */
+        .undo-button {
+            background: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-size: 12px;
+            color: #444;
+            cursor: pointer;
+            margin-top: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .analyze-button {
+            background: #f0f0f0;
+            border: none;
+            border-radius: 20px;
+            padding: 5px 10px;
+            font-size: 12px;
+            color: #666;
+            margin-left: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>    
+    <!-- AI 대화창 모달 추가 -->
+    <div id="aiChatModal" class="ai-chat-modal">
+        <div class="ai-chat-container">
+        <div class="ai-chat-header">
+            <div class="gender-buttons-group">
+                <button id="femaleButton" class="preset-button gender-button">여성</button>
+                <button id="maleButton" class="preset-button gender-button">남성</button>
+            </div>
+            <h3>AI 캐릭터 커스터마이징&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h3>
+            <span id="aiChatClose" class="chat-close-button">&times;</span>
+        </div>
+        <!-- API 키 입력 대화상자 -->
+        <div id="apiKeyModal" class="api-key-modal">
+            <div class="api-key-container">
+            <div class="api-key-header">
+                <h4>OpenAI API 키 설정</h4>
+                <span id="apiKeyClose" class="api-key-close">&times;</span>
+            </div>
+            <div class="api-key-content">
+                <p>OpenAI API 키를 입력하세요:</p>
+                <input type="password" id="apiKeyInput" placeholder="sk-..." />
+                <div class="api-key-status" id="apiKeyStatus"></div>
+                <button id="apiKeySave">저장</button>
+            </div>
+            </div>
+        </div>        
+        <div id="aiChatMessages" class="ai-chat-messages">
+            <div class="ai-message">안녕하세요! 원하는 캐릭터 스타일을 설명해주세요.</div>
+        </div>
+        <div class="ai-chat-input-container">
+            <input type="text" id="aiChatInput" placeholder="예: 스포티한 스타일로 만들어줘" />
+            <button id="aiChatSend">전송</button>
+        </div>
+        </div>        
+    </div>
+    <div id="avatarCustom-content">        
+        <div id="avatarUrl"></div>
+        <div class="frame-container" style="position: relative;">
+            <iframe id="frame" class="frame" allow="camera *; microphone *; clipboard-write" hidden></iframe>
+            <div id="frame-overlay" class="overlay"></div>
+            <div class="settings-overlay" onclick="quitAvatarCustom()"><svg width="65%" height="65%" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 6.875V5.312a1.563 1.563 0 0 0-1.563-1.562h-7.5a1.562 1.562 0 0 0-1.562 1.562v9.375a1.562 1.562 0 0 0 1.563 1.563h7.5a1.562 1.562 0 0 0 1.562-1.563v-1.562" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M16 6.875 19.125 10 16 13.125" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M8.46 10h10.665" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+            <span id="sw-switch" class="block-overlay-1">
+            </span> <span class="block-overlay-2"></span>            
+            <div class="preset-overlay">                
+                <button id="aiToggleBtn" class="preset-button ai-button active">✨AI</button>                
+                <button onclick="window.setPreset(1)" class="preset-button" id="presetBtn1">학구적</button>
+                <button onclick="window.setPreset(2)" class="preset-button" id="presetBtn2">에너제틱</button>
+                <button onclick="window.setPreset(3)" class="preset-button" id="presetBtn3">단정캐주얼</button>
+                <button onclick="window.setPreset(4)" class="preset-button" id="presetBtn4">크리에이티브</button>
+                <button onclick="window.setPreset(5)" class="preset-button" id="presetBtn5">퓨처리스틱</button>                
+            </div>
+        </div>
+        <div id="avatarModal" class="modal">
+            <div class="modal-content">
+                <span id="modalClose" class="close-button">&times;</span>
+                <canvas id="modalCanvas"></canvas>
+                <button id="exportButton" class="export-button">Download</button>
+            </div>
+        </div>            
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module" src="https://arms00.github.io/schoola/new-avatar-custom.js"></script>
+
+    <!-- 데이터 태그 추가 -->
+    <data id="avatarGLBUrlData" value=""></data>
+    <data id="modelJSONData" value=""></data>
+    <data id="avatarModalModelData" value=""></data>
+    
+    <script>        
+        const avatarCustomWindow = document.getElementById('avatarCustom-content');
+        closeButton = document.querySelector('.close-button');        
+
+        function quitAvatarCustom() {
+            history.back();
+            // try {
+            //     window.close();                
+            // } catch (error) {
+            //     console.error('Avatar Customization window close error:', error);
+            // }
+            // try {
+            //     window.open('','_self').close();                
+            // } catch (error) {
+            //     console.error('Avatar Customization window close error:', error);
+            // }            
+            // avatarCustomWindow.style.display = 'none';            
+        }        
+
+        // 일반 스크립트에서 exportGLB 함수 호출 및 반환값 처리
+        const exportButton = document.getElementById('exportButton');
+        exportButton.addEventListener('click', async () => {
+            if (window.exportGLB) {
+                try {
+                    const result = await window.exportGLB();
+                    console.log('Exported GLB Model:', result);                    
+                } catch (error) {
+                    console.error('Export failed:', error);
+                }
+            } else {
+                console.error('exportGLB 함수가 정의되지 않았습니다.');
+            }
+        });
+
+        // avatarModalModel을 JSON 문자열로 변환하는 함수
+        // @param {THREE.Object3D} model - THREE.js Object3D 모델
+        // @returns {string} - JSON 문자열
+
+        function serializeAvatarModalModel(model) {
+            if (!model) return '';
+
+            const exporter = new THREE.GLTFExporter();
+            let serialized = '';
+
+            exporter.parse(model, function (result) {
+                serialized = JSON.stringify(result, null, 2);
+            }, { binary: false });
+
+            return serialized;
+        }
+
+        // deserializeAvatarModalModel 함수 추가
+        function deserializeAvatarModalModel(serializedModel) {
+            const loader = new THREE.GLTFLoader();
+            let model = null;
+
+            loader.parse(serializedModel, '', function (gltf) {
+                model = gltf.scene;
+                // 필요한 추가 설정
+            }, function (error) {
+                console.error('모델 역직렬화 중 오류 발생:', error);
+            });
+
+            return model;
+        }
+
+
+        window.addEventListener('exportGLBEvent', () => {
+            exportGLB();
+        });
+
+        window.addEventListener('getModelJSONEvent', () => {
+            GetModelJSON();
+        });
+        
+        window.addEventListener('getModelGLBEvent', () => {
+            GetModelGLB();
+        });
+        
+        window.addEventListener('getAvatarGLBUrlEvent', () => {
+            GetAvatarGLBUrl();
+        });     
+        
+        // AI 창 ON/OFF 토글
+        const aiToggleBtn = document.getElementById('aiToggleBtn');
+        aiToggleBtn.addEventListener('click', () => {
+            aiToggleBtn.classList.toggle('active');
+            const aiChatModal = document.getElementById('aiChatModal');
+            aiChatModal.style.display = aiToggleBtn.classList.contains('active') ? 'block' : 'none';
+        });
+
+        window.updatePresetButtons = updatePresetButtons;
+
+        function updatePresetButtons(index) {
+            const presetButtons = document.querySelectorAll('[id^="presetBtn"]');
+            presetButtons.forEach(btn => {
+                if (btn.classList.contains('active')) {
+                    btn.classList.remove('active');
+                }
+            });
+            const selectedButton = document.getElementById(`presetBtn${index}`);
+            if (selectedButton) {
+                selectedButton.classList.add('active');
+            }
+        }
+
+        // 초기 프리셋 버튼 상태 반영
+        window.updatePresetButtons(window.characterPresetIndex || 3);
+
+        // AI 버튼 초기 상태 & 토글
+        document.addEventListener('DOMContentLoaded', () => {
+            const aiToggleBtn = document.getElementById('aiToggleBtn');
+            const aiChatModal = document.getElementById('aiChatModal');
+            // 처음부터 켜져 있으므로
+            aiChatModal.style.display = 'block';
+            aiToggleBtn.classList.add('active');
+            aiToggleBtn.addEventListener('click', () => {
+                const isActive = aiToggleBtn.classList.toggle('active');
+                aiChatModal.style.display = isActive ? 'block' : 'none';
+            });
+            // 초기 프리셋 버튼 활성화
+            window.updatePresetButtons(window.characterPresetIndex || 3);
+        });
+    </script>
+</body>                    
+</html>
