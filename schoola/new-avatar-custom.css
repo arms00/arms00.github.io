@@ -183,13 +183,13 @@ html, body {
 #avatarCustom-content {
     width: 100%;
     height: 100%;
-    margin: 0;
+    margin: 0 auto;
     padding: 0;
     border: none;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: top;
+    justify-content: flex-start;
 }
 
 .frame-container {
