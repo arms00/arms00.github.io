@@ -176,6 +176,10 @@ async function callOpenAI(params) {
 
 // AI 대화창 기능 구현
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log('Window size:', window.innerWidth, 'x', window.innerHeight);
+    console.log('Device pixel ratio:', window.devicePixelRatio);
+    console.log('User agent:', navigator.userAgent);
+    
     // 모든 에셋 데이터 미리 로드
     await preloadAllAssetData();
     
