@@ -401,7 +401,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // 수정: streamChatResponse는 신규 기능들을 이미 사용하도록 업데이트됨 (추가 기능 통합)
+    function scrollToBottom(element, delayed = false) {
+        if (delayed) {
+          // 렌더링 후 약간의 지연을 두고 스크롤
+          setTimeout(() => {
+            element.scrollTop = element.scrollHeight;
+          }, 100);
+        } else {
+          element.scrollTop = element.scrollHeight;
+        }
+    }
+    
     async function streamChatResponse(userMessage, messageElement) {
         try {
             // 1. 사용자에게 먼저 요청 이해 중임을 표시
@@ -457,6 +467,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 messageElement.textContent = originalText;
             }
 
+            scrollToBottom(aiChatMessages, true);
+
         } catch (error) {
             //handleError(error, messageElement, "응답 처리 중 오류가 발생했습니다.");
             console.error("AI 응답 처리 중 오류:", error);
@@ -485,6 +497,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         messageDiv.textContent = text;
         aiChatMessages.appendChild(messageDiv);
         aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
+
+        scrollToBottom(aiChatMessages, true);
     }
     
     /**********************************************************************/
