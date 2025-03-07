@@ -834,7 +834,7 @@ html, body {
           right: 5 !important;
           bottom: 0 !important;
           border-radius: 0 !important;
-          background-color: rgba(255, 255, 255, 0.6);
+          background-color: rgba(255, 255, 255, 0.7);
       }
 
       .ai-message, .user-message {
@@ -926,6 +926,38 @@ html, body {
       }
   }
   
+  /* 매우 작은 화면에서의 입력창 최적화 추가 */
+  @media (max-width: 440px) {
+    /* 입력 컨테이너를 수직 방향으로 변경 */
+    .ai-chat-input-container {
+      flex-direction: column !important;
+      padding: 5px !important;
+      gap: 5px !important;
+    }
+    
+    /* 입력창 너비 최대화 */
+    .ai-chat-input-container input {
+      width: 100% !important;
+      min-width: 0 !important;
+      max-width: 100% !important;
+      flex-basis: auto !important;
+      box-sizing: border-box !important;
+      margin-right: 0 !important;
+    }
+    
+    /* 버튼을 전체 너비로 확장 */
+    .ai-chat-input-container button {
+      width: 100% !important;
+      max-width: 100% !important;
+      margin-top: 3px !important;
+    }
+    
+    /* 메시지 영역 높이 조정 */
+    .ai-chat-messages {
+      height: calc(100% - 120px) !important; /* 수직 배치된 입력창 고려 */
+    }
+  }
+
   /* 초소형 화면 (작은 스마트폰) */
   @media (max-width: 375px) {
       .ai-chat-header h3 {
