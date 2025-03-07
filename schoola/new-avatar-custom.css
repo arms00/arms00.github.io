@@ -60,6 +60,12 @@ html, body {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    scroll-behavior: smooth; 
+  }
+
+  /* 마지막 메시지에 약간의 하단 여백 추가 */
+  .ai-chat-messages > div:last-child {
+    margin-bottom: 10px;
   }
   
   .ai-message, .user-message {
