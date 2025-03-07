@@ -300,6 +300,8 @@
                 }
             }
 
+            setTimeout(optimizeForTinyScreens, 500); 
+
             const aiToggleBtn = document.getElementById('aiToggleBtn');
             const aiChatModal = document.getElementById('aiChatModal');
             // 처음부터 켜져 있으므로
@@ -312,6 +314,27 @@
             // 초기 프리셋 버튼 활성화
             window.updatePresetButtons(window.characterPresetIndex || 3);
         });
+
+        // 초소형 화면에서의 레이아웃 최적화
+        function optimizeForTinyScreens() {
+            const isTinyScreen = window.innerWidth <= 457;
+            const inputContainer = document.querySelector('.ai-chat-input-container');
+            const chatMessages = document.getElementById('aiChatMessages');
+            
+            if (inputContainer && chatMessages && isTinyScreen) {
+                // 수직 레이아웃 강제 적용
+                inputContainer.style.flexDirection = 'column';
+                
+                // 입력창 높이 재조정
+                const header = document.querySelector('.ai-chat-header');
+                const modalHeight = document.querySelector('.ai-chat-modal').offsetHeight;
+                const headerHeight = header ? header.offsetHeight : 0;
+                const inputHeight = inputContainer.offsetHeight;
+                
+                // 높이 계산 및 적용
+                chatMessages.style.height = `${modalHeight - headerHeight - inputHeight - 15}px`;
+            }
+        }
     </script>
 </body>                    
 </html>
