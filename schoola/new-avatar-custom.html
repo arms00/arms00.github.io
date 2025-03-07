@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Character Customization</title>    
     <link rel="stylesheet" href="https://arms00.github.io/schoola/new-avatar-custom.css?v=1.0.1" />
+    <!-- <link rel="stylesheet" href="./new-avatar-custom.css?v=1.0.1" /> -->
     <style>
         /* 간단한 인라인 스타일 추가 */
         .undo-button {
@@ -223,6 +224,61 @@
 
         // AI 버튼 초기 상태 & 토글
         document.addEventListener('DOMContentLoaded', () => {
+            // 모바일 환경 감지
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+            
+            if (isMobile) {
+                // 모바일에서 채팅창 스크롤 시 최상단으로 자동 이동 방지
+                const aiChatMessages = document.getElementById('aiChatMessages');
+                if (aiChatMessages) {
+                    aiChatMessages.style.overscrollBehavior = 'contain';
+                }
+
+                const aiChatInput = document.getElementById('aiChatInput');
+                if (aiChatInput) {
+                    aiChatInput.setAttribute('onfocus', 'this.blur()');  // 처음 로드 시 포커스 방지
+                    // 사용자가 탭했을 때만 입력 가능하도록
+                    aiChatInput.addEventListener('click', function() {
+                        this.removeAttribute('onfocus');
+                    });
+                }
+
+                // 모바일 최적화 클래스 추가
+                document.body.classList.add('mobile-view');
+                
+                // 타이틀 간소화 (공백 제거)
+                const chatTitle = document.querySelector('.ai-chat-header h3');
+                if (chatTitle) {
+                    chatTitle.innerHTML = 'AI 캐릭터 커스터마이징';
+                }
+                
+                // 대화창 높이 최대화
+                const adjustChatHeight = () => {
+                    const chatMessages = document.getElementById('aiChatMessages');
+                    if (chatMessages) {
+                        const header = document.querySelector('.ai-chat-header');
+                        const input = document.querySelector('.ai-chat-input-container');
+                        const headerHeight = header ? header.offsetHeight : 0;
+                        const inputHeight = input ? input.offsetHeight : 0;
+                        const windowHeight = window.innerHeight;
+                        
+                        // 채팅창 높이 계산 (화면 높이 - 헤더 - 입력창 - 여유공간)
+                        const chatHeight = windowHeight - headerHeight - inputHeight - 20;
+                        chatMessages.style.height = `${chatHeight}px`;
+                    }
+                };
+                
+                // 초기 높이 조정 및 리사이징 이벤트에 연결
+                adjustChatHeight();
+                window.addEventListener('resize', adjustChatHeight);
+                
+                // 입력창 패딩 최소화
+                const chatInput = document.getElementById('aiChatInput');
+                if (chatInput) {
+                    chatInput.style.padding = '6px';
+                }
+            }
+
             const aiToggleBtn = document.getElementById('aiToggleBtn');
             const aiChatModal = document.getElementById('aiChatModal');
             // 처음부터 켜져 있으므로
