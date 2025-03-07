@@ -1151,7 +1151,10 @@ function subscribe(event) {
     
     console.log(json);            
 
-    if (json.eventName === 'v1.avatar.exported') {
+    if (json.eventName === 'v1.avatar.exported') {        
+        const aiChatModal = document.getElementById('aiChatModal');
+        if (aiChatModal) aiChatModal.style.display = 'none';
+
         modal.style.display = 'flex';
         frameOverlay.style.display = 'flex';
         avatarGLBUrl = json.data.url;
