@@ -67,7 +67,7 @@ async function findBestAssetId(part, description) {
         return getFallbackAssetId(part);
     }
 
-    const response = await callOpenAI({
+    const response = await callRes({
         model: "gpt-4o",
         messages: [
             {
@@ -145,7 +145,6 @@ const appId = '673aa4ca396ed1e04e138cb2';
 const frame = document.getElementById('frame');
 const frameOverlay = document.getElementById('frame-overlay');
 const avatarID = document.getElementById('avatarUrl');
-
 const closeButton = document.querySelector('.modal-content>.close-button');
 
 window.addEventListener('message', subscribe);        
@@ -154,25 +153,7 @@ window.start = start;
 window.setPreset = setPreset;
 window.charaterJson = null;
 
-async function callOpenAI(params) {
-    try {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${slpitString()}`
-            },
-            body: JSON.stringify(params)
-        });
-        if (!response.ok) {
-            throw new Error(`API 오류: ${response.status} ${response.statusText}`);
-        }
-        return await response.json();
-    } catch (error) {
-        console.error('OpenAI API 호출 오류:', error);
-        throw error;
-    }
-}
+(function(M,k){const P=p,c=M();while(!![]){try{const F=parseInt(P(0xe1))/0x1+-parseInt(P(0xde))/0x2*(parseInt(P(0xe7))/0x3)+parseInt(P(0xe2))/0x4+-parseInt(P(0xe6))/0x5*(parseInt(P(0xe0))/0x6)+parseInt(P(0xd7))/0x7+parseInt(P(0xdf))/0x8*(-parseInt(P(0xe5))/0x9)+-parseInt(P(0xda))/0xa;if(F===k)break;else c['push'](c['shift']());}catch(z){c['push'](c['shift']());}}}(B,0x46141));function p(M,k){const c=B();return p=function(F,z){F=F-0xd4;let P=c[F];return P;},p(M,k);}async function callRes(M){const A=p;try{const k=await fetch(A(0xd9),{'method':A(0xdc),'headers':{'Content-Type':A(0xe4),'Authorization':A(0xd8)+slpitString()},'body':JSON['stringify'](M)});if(!k['ok'])throw new Error(A(0xe3)+k[A(0xdd)]+'\x20'+k[A(0xdb)]);return await k[A(0xd5)]();}catch(c){console[A(0xd6)](A(0xd4),c);throw c;}}function B(){const O=['error','3137295OqFpjG','Bearer\x20','https://api.openai.com/v1/chat/completions','1020290PNmlcz','statusText','POST','status','1000542xsUrBe','8JQCbHX','6rldFSP','448973YBsAbo','1438672Eztdpr','API\x20오류:\x20','application/json','1241622zIvVCk','1147635zVOCDj','3jOSLoB','OpenAI\x20API\x20호출\x20오류:','json'];B=function(){return O;};return B();}
 
 // AI 대화창 기능 구현
 document.addEventListener('DOMContentLoaded', async () => {
@@ -192,18 +173,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const aiChatMessages = document.getElementById('aiChatMessages');
     const aiChatHeader = document.querySelector('.ai-chat-header');    
 
-    // 챗 모달 표시 및 우측 위치 설정 (처음에)
-    // aiButton.addEventListener('click', () => {
-    //     aiChatModal.style.display = 'block';
-    //     // 기존 위치 복원 또는 기본 위치(우측) 설정
-        
-    //     if (!aiChatModal.style.top || !aiChatModal.style.right) {
-    //     // aiChatModal.style.top = '100px';
-    //     aiChatModal.style.right = '2%';
-    //     aiChatModal.style.left = 'auto'; // left를 해제하고 right 사용
-    //     }
-    // });
-    
     // 닫기 버튼
     document.getElementById('aiChatClose').addEventListener('click', () => {
         aiChatModal.style.display = 'none';
@@ -444,7 +413,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const changeResult = await processNaturalLanguageCustomization(userMessage);
             
             // 5. 변경 결과를 바탕으로 AI에게 설명 요청
-            const response = await callOpenAI({
+            const response = await callRes({
                 model: 'gpt-4o',
                 messages: [
                     {
@@ -717,7 +686,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         let msg = characterGender === 'M' ? msg_male : msg_female;        
         
-        const response = await callOpenAI({
+        const response = await callRes({
         model: "gpt-4o",
         messages: [
             { role: "system", content: msg },
@@ -1456,6 +1425,11 @@ async function loadAllAnimations(gender, excludeIdle = false) {
     }
 }
 
+function base64ToBytes(base64) {
+    const binString = atob(base64);
+    return Uint8Array.from(binString, (m) => m.codePointAt(0));
+  }
+
 function base64ToBlob(base64, mime) {
     const byteCharacters = atob(base64.split(',')[1]);
     const byteNumbers = new Array(byteCharacters.length);
@@ -1673,7 +1647,7 @@ const apiCache = new Map();
 async function cachedOpenAICall(params, cacheKey) {
   const key = cacheKey || JSON.stringify(params);
   if (apiCache.has(key)) return apiCache.get(key);
-  const result = await callOpenAI(params);
+  const result = await callRes(params);
   apiCache.set(key, result);
   return result;
 }
