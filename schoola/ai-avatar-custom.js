@@ -152,7 +152,7 @@ async function callRes(requestData, retryCount = 3, initialDelay = 1000) {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${slpitString()}` // API 키 함수는 유지
+                        'Authorization': `Bearer ${slpitString()}`
                     },
                     body: JSON.stringify(requestData)
                 });
@@ -174,7 +174,7 @@ async function callRes(requestData, retryCount = 3, initialDelay = 1000) {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${slpitString()}` // API 키 함수는 유지
+                        'Authorization': `Bearer ${slpitString()}`
                     },
                     body: JSON.stringify(requestData)
                 });
