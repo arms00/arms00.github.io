@@ -240,11 +240,11 @@
     "id": "kwhVa1YNStiAN8B7oceBpg",
     "name": "sweater-01-longslv-hoodiecoll-pocket-strings-navysmile",
     "shape": {
-      "description": "긴 소매에 후드가 달린 편안한 스웨터로, 주머니와 스트링이 있어 실용적이고 스타일리시합니다.",
+      "description": "어두운 색상의 긴 소매에 후드가 달린 편안한 스웨터로, 주머니와 스트링이 있어 실용적이고 스타일리시합니다.",
       "keywords": ["긴 소매", "후드", "주머니", "스트링", "편안한"]
     },
     "color": {
-      "name": "네이비 블루",
+      "name": "어두운 네이비 블루",
       "hex": "#000080",
       "tone": "cool"
     },
