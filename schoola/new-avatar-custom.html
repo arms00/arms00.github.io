@@ -4,7 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, user-scalable=no, target-densitydpi=device-dpi" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Character Customization</title>    
+    <title>Character Customization</title>            
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/jsm/"
+            }
+        }
+    </script>
     <link rel="stylesheet" href="https://arms00.github.io/schoola/new-avatar-custom.css?v=1.0.1" />
     <!-- <link rel="stylesheet" href="./new-avatar-custom.css?v=1.0.1" /> -->
     <style>
@@ -35,6 +43,10 @@
         }
     </style>
 </head>
+<script type="module" src="https://arms00.github.io/schoola/new-avatar-custom.js" defer></script>
+<script type="module" src="https://arms00.github.io/schoola/ai-avatar-custom.js" defer></script>
+<!-- <script type="module" src="./new-avatar-custom.js" defer></script>
+<script type="module" src="./ai-avatar-custom.js" defer></script> -->
 <body>    
     <!-- AI 대화창 모달 추가 -->
     <div id="aiChatModal" class="ai-chat-modal">
@@ -69,6 +81,7 @@
             <input type="text" id="aiChatInput" placeholder="예: 스포티한 스타일로 만들어줘" />
             <button id="aiChatSend">전송</button>
         </div>
+        <div id="api-status" class="api-status"></div>
         </div>        
     </div>
     <div id="avatarCustom-content">        
@@ -96,17 +109,6 @@
             </div>
         </div>            
     </div>
-
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.module.js",
-                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/jsm/"
-            }
-        }
-    </script>
-
-    <script type="module" src="https://arms00.github.io/schoola/new-avatar-custom.js"></script>
 
     <!-- 데이터 태그 추가 -->
     <data id="avatarGLBUrlData" value=""></data>
