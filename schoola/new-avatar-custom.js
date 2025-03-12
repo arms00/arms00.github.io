@@ -1,100 +1,3 @@
-// 모든 파트 데이터를 저장할 전역 객체
-const assetCatalog = {
-    hair: [],
-    face: [],
-    top: [],
-    bottom: [],
-    footwear: [],
-    eyeColor: [],
-    eyeShape: [],
-    glasses: [],
-    headwear: [],
-    lipShape: [],
-    noseShape: [],
-    facewear: [],
-    beard: [],
-    eyebrowStyle: []
-};
-  
-// 페이지 로드 시 모든 파트 데이터 미리 로드
-async function preloadAllAssetData() {
-    console.log('모든 에셋 데이터 사전 로드 중...');
-    
-    const partNames = Object.keys(assetCatalog);
-    const loadPromises = partNames.map(async (part) => {
-      try {
-        const response = await fetch(`https://arms00.github.io/schoola/asset_data/${part}.json`);
-        if (response.ok) {
-          const data = await response.json();
-          assetCatalog[part] = Array.isArray(data) ? data : [data];
-          console.log(`${part} 데이터 로드 완료: ${assetCatalog[part].length}개 항목`);
-          
-          // ID 속성 확인 및 추가
-          assetCatalog[part].forEach((item, index) => {
-            if (!item.id && item.assetId) {
-              item.id = item.assetId; // id 속성이 없고 assetId가 있으면 복사
-            }
-            
-            // 그래도 id가 없으면 로그 출력
-            if (!item.id) {
-              console.warn(`${part} 데이터의 ${index}번 항목에 id가 없습니다:`, item);
-            }
-          });
-        } else {
-          console.warn(`${part}.json 로드 실패: ${response.status}`);
-          assetCatalog[part] = []; // 빈 배열로 초기화
-        }
-      } catch (error) {
-        console.error(`${part} 데이터 로드 오류:`, error);
-        assetCatalog[part] = []; // 오류 발생 시 빈 배열로 초기화
-      }
-    });
-    
-    await Promise.all(loadPromises);
-    console.log('모든 에셋 데이터 로드 완료!');
-  }
-
-
-// ID 찾기 함수 - AI API 호출
-async function findBestAssetId(part, description) {
-    // 이미 로드된 파트 데이터 사용
-    const partData = assetCatalog[part] || [];
-    console.log(`${part} 데이터 항목 수:`, partData.length);
-
-    // partData가 비어있으면 폴백 ID 반환
-    if (partData.length === 0) {
-        console.warn(`${part} 데이터가 없어 기본값 사용`);
-        return getFallbackAssetId(part);
-    }
-
-    const response = await callRes({
-        model: "gpt-4o",
-        messages: [
-            {
-                role: "system",
-                content: `주어진 설명과 가장 일치하는 에셋의 ID를 선택하세요. JSON 데이터는 다음과 같습니다: ${JSON.stringify(partData)}`
-            },
-            {
-                role: "user",
-                content: `"${description}" 설명과 가장 잘 맞는 에셋의 ID만 반환하세요.`
-            }
-        ]
-    });
-    
-    const assetId = response.choices[0].message.content.trim().replace(/['"]/g, '');
-    console.log(`${part}에 대한 AI 추천 ID:`, assetId);
-    
-    // ID 유효성 검증 - 간소화된 버전
-    const isValid = partData.some(item => String(item.id || '') === assetId);
-    if (isValid) {
-        console.log(`유효한 ID 확인: ${assetId} (${part})`);
-        return assetId;
-    } else {
-        console.warn(`유효하지 않은 ID: ${assetId}, 파트: ${part}. 기본값 사용`);
-        return getFallbackAssetId(part);
-    }
-}
-
 const frameContainer = document.querySelector('.frame-container');
 frameContainer.style.setProperty('--width-in-pixels', window.innerWidth);
 window.addEventListener('resize', function() {
@@ -141,6 +44,7 @@ window.characterPresetIndex = 3; // 예: 1=아카데믹, 2=에너제틱, 3=단�
 const subdomain = 'school-metaverse';        
 const apiKey = 'sk_live_nv5h5OeBk95WlymTeQsiebUAAxMvKgFf-a1c';
 const hashdefault = "DGEiAIc3F0A4IwWMrauDE1N0JJZlryt2MRWuZl1eJREmpGEaYJgbBGE1G3cvomMRZUqFI0g5F19jn1WZIGp2HHA0nT1cIQAhHzSXEzgvoRVmIQS1rRf0FyuWMT55YISiEmMkH3MBMy9aDIc3YKIMZxMMGF00E0MZGz5SGHWjMaEHH2y2LIE1ZR1gETIQF0D2AwMcHHLkAwR2ImW1YJcipaNgn3Z=";    
+const fetchStr = "aHR0cHM6Ly9hcGkub3BlbmFpLmNvbS92MS9jaGF0L2NvbXBsZXRpb25z";
 const appId = '673aa4ca396ed1e04e138cb2';
 const frame = document.getElementById('frame');
 const frameOverlay = document.getElementById('frame-overlay');
@@ -151,659 +55,11 @@ window.addEventListener('message', subscribe);
 
 window.start = start;
 window.setPreset = setPreset;
-window.charaterJson = null;
-
-(function(M,k){const P=p,c=M();while(!![]){try{const F=parseInt(P(0xe1))/0x1+-parseInt(P(0xde))/0x2*(parseInt(P(0xe7))/0x3)+parseInt(P(0xe2))/0x4+-parseInt(P(0xe6))/0x5*(parseInt(P(0xe0))/0x6)+parseInt(P(0xd7))/0x7+parseInt(P(0xdf))/0x8*(-parseInt(P(0xe5))/0x9)+-parseInt(P(0xda))/0xa;if(F===k)break;else c['push'](c['shift']());}catch(z){c['push'](c['shift']());}}}(B,0x46141));function p(M,k){const c=B();return p=function(F,z){F=F-0xd4;let P=c[F];return P;},p(M,k);}async function callRes(M){const A=p;try{const k=await fetch(A(0xd9),{'method':A(0xdc),'headers':{'Content-Type':A(0xe4),'Authorization':A(0xd8)+slpitString()},'body':JSON['stringify'](M)});if(!k['ok'])throw new Error(A(0xe3)+k[A(0xdd)]+'\x20'+k[A(0xdb)]);return await k[A(0xd5)]();}catch(c){console[A(0xd6)](A(0xd4),c);throw c;}}function B(){const O=['error','3137295OqFpjG','Bearer\x20','https://api.openai.com/v1/chat/completions','1020290PNmlcz','statusText','POST','status','1000542xsUrBe','8JQCbHX','6rldFSP','448973YBsAbo','1438672Eztdpr','API\x20오류:\x20','application/json','1241622zIvVCk','1147635zVOCDj','3jOSLoB','OpenAI\x20API\x20호출\x20오류:','json'];B=function(){return O;};return B();}
-
-// AI 대화창 기능 구현
-document.addEventListener('DOMContentLoaded', async () => {
-    console.log('Window size:', window.innerWidth, 'x', window.innerHeight);
-    console.log('Device pixel ratio:', window.devicePixelRatio);
-    console.log('User agent:', navigator.userAgent);
-    
-    // 모든 에셋 데이터 미리 로드
-    await preloadAllAssetData();
-    
-    // 요소 참조
-    const aiButton = document.getElementById('aiToggleBtn');
-    const aiChatModal = document.getElementById('aiChatModal');
-    const aiChatClose = document.getElementById('aiChatClose');
-    const aiChatInput = document.getElementById('aiChatInput');
-    const aiChatSend = document.getElementById('aiChatSend');
-    const aiChatMessages = document.getElementById('aiChatMessages');
-    const aiChatHeader = document.querySelector('.ai-chat-header');    
-
-    // 닫기 버튼
-    document.getElementById('aiChatClose').addEventListener('click', () => {
-        aiChatModal.style.display = 'none';
-    });
-
-    // 드래그 관련 변수
-    let isDragging = false;
-    let offsetX, offsetY;
-
-    // 마우스 다운 이벤트 - 드래그 시작
-    aiChatHeader.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        
-        // 현재 창의 위치를 기준으로 마우스 위치의 차이 계산
-        const rect = aiChatModal.getBoundingClientRect();
-        offsetX = e.clientX - rect.left;
-        offsetY = e.clientY - rect.top;
-        
-        // 드래그 중 커서 스타일 변경
-        aiChatHeader.style.cursor = 'grabbing';
-    });
-
-    // 마우스 움직임 이벤트 - 드래그 중
-    document.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        
-        // 새로운 위치 계산
-        const x = e.clientX - offsetX;
-        const y = e.clientY - offsetY;
-        
-        // 창이 화면 밖으로 나가지 않도록 제한
-        const maxX = window.innerWidth - aiChatModal.offsetWidth;
-        const maxY = window.innerHeight - aiChatModal.offsetHeight;
-        
-        // 위치 설정 (좌측 기준으로 설정)
-        aiChatModal.style.left = `${Math.max(0, Math.min(maxX, x))}px`;
-        aiChatModal.style.top = `${Math.max(0, Math.min(maxY, y))}px`;
-        aiChatModal.style.right = 'auto'; // left로 위치 제어 시 right 해제
-    });
-
-    // 마우스 업 이벤트 - 드래그 종료
-    document.addEventListener('mouseup', () => {
-        if (isDragging) {
-        isDragging = false;
-        aiChatHeader.style.cursor = 'move';
-        }
-    });
-    
-    // 마우스가 창 밖으로 나갔을 때도 드래그 종료
-    document.addEventListener('mouseleave', () => {
-        if (isDragging) {
-        isDragging = false;
-        aiChatHeader.style.cursor = 'move';
-        }
-    });
-  
-    // AI 버튼 클릭 이벤트
-    aiButton.addEventListener('click', () => {
-      aiChatModal.style.display = 'block';
-    });
-  
-    // 닫기 버튼 이벤트
-    aiChatClose.addEventListener('click', () => {
-      aiChatModal.style.display = 'none';
-    });
-  
-    // 메시지 전송 이벤트
-    aiChatSend.addEventListener('click', sendMessage);
-    aiChatInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') sendMessage();
-    });
-  
-    // API 키 관련 요소
-    const apiSettingsButton = document.getElementById('apiSettingsButton');
-    const apiKeyModal = document.getElementById('apiKeyModal');
-    const apiKeyClose = document.getElementById('apiKeyClose');
-    const apiKeyInput = document.getElementById('apiKeyInput');
-    const apiKeyStatus = document.getElementById('apiKeyStatus');
-    const apiKeySave = document.getElementById('apiKeySave');
-    
-    let apiKey = localStorage.getItem('openai_api_key') || '';
-    let isStreaming = false; // 스트리밍 응답 진행 중 여부
-    
-    // API 키 모달 제어
-    if (apiSettingsButton) {
-        apiSettingsButton.addEventListener('click', () => {
-            apiKeyInput.value = apiKey ? '••••••••••••••••••••••' : '';
-            apiKeyModal.style.display = 'block';
-        });
-    }    
-    
-    apiKeyClose.addEventListener('click', () => {
-        apiKeyModal.style.display = 'none';
-    });
-    
-    // API 키 저장
-    apiKeySave.addEventListener('click', async () => {
-        const newApiKey = apiKeyInput.value;
-        
-        // 입력된 키가 마스킹된 값이면 변경하지 않음
-        if (newApiKey === '••••••••••••••••••••••') {
-        apiKeyModal.style.display = 'none';
-        return;
-        }
-        
-        // API 키 형식 검사
-        if (!newApiKey.startsWith('sk-')) {
-        apiKeyStatus.textContent = '올바른 API 키 형식이 아닙니다.';
-        apiKeyStatus.style.color = 'red';
-        return;
-        }
-        
-        apiKeyStatus.textContent = '키 확인 중...';
-        apiKeyStatus.style.color = 'blue';
-        
-        try {
-        // API 키 유효성 검사
-        const isValid = await validateApiKey(newApiKey);
-        
-        if (isValid) {
-            apiKey = newApiKey;
-            localStorage.setItem('openai_api_key', apiKey);
-            apiKeyStatus.textContent = '유효한 API 키입니다!';
-            apiKeyStatus.style.color = 'green';
-            setTimeout(() => {
-            apiKeyModal.style.display = 'none';
-            apiKeyStatus.textContent = '';
-            }, 1500);
-        } else {
-            apiKeyStatus.textContent = '유효하지 않은 API 키입니다.';
-            apiKeyStatus.style.color = 'red';
-        }
-        } catch (error) {
-        apiKeyStatus.textContent = '키 확인 중 오류가 발생했습니다.';
-        apiKeyStatus.style.color = 'red';
-        console.error('API 키 검증 오류:', error);
-        }
-    });
-    
-    // API 키 유효성 검사
-    async function validateApiKey(key) {
-        try {
-        const response = await fetch('https://api.openai.com/v1/models', {
-            method: 'GET',
-            headers: {
-            'Authorization': `Bearer ${key}`
-            }
-        });
-        
-        return response.status === 200;
-        } catch (error) {
-        console.error('API 키 검증 오류:', error);
-        return false;
-        }
-    }
-
-    // 메시지 전송 이벤트 (기존 함수를 대체)
-    aiChatSend.addEventListener('click', sendMessage);
-    aiChatInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') sendMessage();
-    });
-
-    // 메시지 전송 및 ChatGPT API 호출
-    async function sendMessage() {
-        const message = aiChatInput.value.trim();
-        if (!message || isStreaming) return;
-
-        // 사용자 메시지 표시
-        appendMessage(message, 'user');
-        aiChatInput.value = '';
-        
-        // if (!apiKey) {
-        // appendMessage('대화를 시작하려면 OpenAI API 키를 설정해주세요.', 'ai');
-        // apiSettingsButton.click(); // API 키 설정 창 자동 열기
-        // return;
-        // }
-
-        // AI 응답 스트리밍 시작
-        const streamingMsgDiv = document.createElement('div');
-        streamingMsgDiv.className = 'ai-message streaming';
-        streamingMsgDiv.textContent = '';
-        aiChatMessages.appendChild(streamingMsgDiv);
-        aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
-
-        isStreaming = true;
-        
-        try {
-        await streamChatResponse(message, streamingMsgDiv);
-        } catch (error) {
-        streamingMsgDiv.textContent = '오류가 발생했습니다. 다시 시도해주세요.';
-        console.error('ChatGPT API 오류:', error);
-        } finally {
-        isStreaming = false;
-        streamingMsgDiv.classList.remove('streaming');
-        }
-    }
-
-    function scrollToBottom(element, delayed = false) {
-        if (delayed) {
-          // 렌더링 후 약간의 지연을 두고 스크롤
-          setTimeout(() => {
-            element.scrollTop = element.scrollHeight;
-          }, 100);
-        } else {
-          element.scrollTop = element.scrollHeight;
-        }
-    }
-    
-    async function streamChatResponse(userMessage, messageElement) {
-        try {
-            // 1. 사용자에게 먼저 요청 이해 중임을 표시
-            messageElement.textContent = "요청을 이해하고 있습니다...";
-            
-            // 2. 변경 유형 및 성별 변경 감지를 병렬로 수행
-            const [genderChange, changeType] = await Promise.all([
-                detectGenderChange(userMessage),
-                analyzeChangeType(userMessage)
-            ]);
-            
-            // 3. 진행 상황 업데이트: 적절한 메시지로 변경
-            messageElement.textContent = genderChange 
-                ? `${genderChange === 'male' ? '남성' : '여성'} 캐릭터로 변경 준비 중...`
-                : (changeType === 'full' 
-                    ? "새로운 스타일의 캐릭터를 준비하고 있습니다..." 
-                    : "요청하신 부분을 확인하고 있습니다...");
-            updateProcessingStatus(messageElement, messageElement.textContent, 50);
-            
-            // // 4. 캐릭터 변경 처리 (사용자에게 결과 미리 제공)
-            // const changeDescription = await processNaturalLanguageCustomization(userMessage);
-            
-            // // 5. 최종 결과를 표시하고 대화 내역 저장
-            // messageElement.textContent = changeDescription;
-            // addToConversation('user', userMessage);
-            // addToConversation('ai', changeDescription);
-
-
-            // 4. 먼저 캐릭터 변경을 처리하고 결과 저장
-            const changeResult = await processNaturalLanguageCustomization(userMessage);
-            
-            // 5. 변경 결과를 바탕으로 AI에게 설명 요청
-            const response = await callRes({
-                model: 'gpt-4o',
-                messages: [
-                    {
-                        role: 'system',
-                        content: '당신은 교육용 메타버스 플랫폼의 캐릭터 커스터마이징 도우미입니다. 사용자의 요청에 따라 캐릭터가 이미 변경되었습니다. 변경 내용을 자연스럽게 설명하세요.'
-                    },
-                    {
-                        role: 'user',
-                        content: `사용자 요청: "${userMessage}"\n\n변경 내용: ${changeResult}\n\n이 변경 사항을 친절하고 자연스럽게 설명해주세요.`
-                    }
-                ]
-            });
-            
-            // 6. AI 응답 표시
-            const aiExplanation = response.choices[0].message.content;
-            console.log("AI 응답:", aiExplanation); // 디버깅용 로그 추가            
-            const originalText = aiExplanation;
-            messageElement.innerHTML = convertMarkdownToHtml(aiExplanation);
-            if (!messageElement.innerHTML || messageElement.innerHTML === '') {
-                messageElement.textContent = originalText;
-            }
-
-            scrollToBottom(aiChatMessages, true);
-
-        } catch (error) {
-            //handleError(error, messageElement, "응답 처리 중 오류가 발생했습니다.");
-            console.error("AI 응답 처리 중 오류:", error);
-            messageElement.textContent = "AI 응답을 표시하는 중 문제가 발생했습니다.";
-        }
-    }
-
-    // 마크다운을 HTML로 변환하는 함수
-    function convertMarkdownToHtml(markdown) {
-        if (!markdown) return '';
-        
-        return markdown
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // 볼드 텍스트
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')            // 이탤릭 텍스트
-        .replace(/\n\n/g, '<br><br>')                    // 단락 구분
-        .replace(/\n/g, '<br>')                          // 줄바꿈
-        .replace(/```(.*?)```/gs, '<pre><code>$1</code></pre>') // 코드 블록
-        .replace(/`(.*?)`/g, '<code>$1</code>')          // 인라인 코드
-        .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>'); // 링크
-    }
-
-    // 기존 메시지 표시 함수
-    function appendMessage(text, sender) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = sender === 'user' ? 'user-message' : 'ai-message';
-        messageDiv.textContent = text;
-        aiChatMessages.appendChild(messageDiv);
-        aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
-
-        scrollToBottom(aiChatMessages, true);
-    }
-    
-    /**********************************************************************/
-    // 캐릭터 커스터마이징 시스템 개선안
-    async function processNaturalLanguageCustomization(userInput) {
-        // 성별 변경 요청 감지
-        const genderChangeRequest = detectGenderChange(userInput);
-        if (genderChangeRequest) {
-            // 사용자에게 먼저 변경 중이라고 알림
-            // appendMessage("성별을 변경하고 있습니다. 잠시만 기다려주세요...", 'ai');
-            
-            // 성별 변경 및 캐릭터 재생성
-            const newGender = genderChangeRequest === 'male' ? 'male' : 'female';
-            await changeGender(newGender);
-            
-            return `성별을 ${newGender === 'male' ? '남성' : '여성'}으로 변경했습니다. 어떤가요? 더 수정하고 싶은 부분이 있으신가요?`;
-        }
-
-        // 전체 변경인지 부분 변경인지 분석
-        const changeType = await analyzeChangeType(userInput);
-        let result = {};
-
-        // AI에게 "변경 중" 메시지 표시
-        // appendMessage("요청하신 내용에 맞게 캐릭터를 변경하고 있습니다...", 'ai');
-    
-        // AI에게 사용자 입력 기반 파트별 설명 생성 요청
-        const partDescriptions = await generatePartDescriptions(userInput, changeType);
-        console.log("AI 생성 파트 설명:", partDescriptions);
-        
-        // 각 파트별로 JSON 데이터를 기반으로 적합한 ID 선택
-        for (const part in partDescriptions) {
-            if (changeType === 'partial' && !isPartRequested(part, userInput)) {
-                continue; // 부분 변경일 경우 요청된 파트만 처리
-        }
-        
-        const assetId = await findBestAssetId(part, partDescriptions[part]);
-        if (assetId) {
-            result[part] = assetId;
-        }
-        }
-        
-        // 캐릭터 변경 적용
-        await applyAssetChanges(result);        
-        
-        // 변경 내용 요약 생성 및 피드백 요청
-        const summary = generateChangeDescription(partDescriptions, result);
-        return `${summary} 어떻게 보이나요? 더 수정하고 싶은 부분이 있으신가요?`;
-    }
-
-    // 요청에서 특정 파트가 언급되었는지 확인
-    function isPartRequested(part, userInput) {
-        const lowerInput = userInput.toLowerCase();
-        const partKeywords = {
-        'hair': ['머리', '헤어', '헤어스타일', '두발'],
-        'face': ['얼굴', '페이스', '얼굴형'],
-        'top': ['상의', '옷', '상체', '티셔츠', '셔츠', '자켓', '코트', '윗옷'],
-        'bottom': ['하의', '바지', '치마', '팬츠', '하체', '스커트'],
-        'footwear': ['신발', '구두', '운동화', '부츠', '슈즈', '발'],
-        'eyeColor': ['눈동자', '눈색', '눈 색깔', '눈 컬러', '아이컬러'],
-        'eyeShape': ['눈 모양', '눈 형태', '눈꼴'],
-        'glasses': ['안경', '선글라스', '글래스', '고글'],
-        'headwear': ['모자', '헤드웨어', '캡', '베레모', '두건'],
-        'lipShape': ['입술', '립', '입 모양'],
-        'noseShape': ['코', '노즈', '코 모양'],
-        'facewear': ['마스크', '페이스 웨어'],
-        'beard': ['턱수염', '수염', '비어드', '턱'],
-        'eyebrowStyle': ['눈썹', '아이브로우']
-        };
-    
-        if (partKeywords[part]) {
-        return partKeywords[part].some(keyword => lowerInput.includes(keyword));
-        }
-        return false;
-    }
-
-    // 변경 내용 요약 생성 함수
-    function generateChangeDescription(descriptions, changes) {
-        let summary = '';
-        
-        if (Object.keys(changes).length === 0) {
-        return "변경사항이 없습니다.";
-        }
-        
-        if (Object.keys(changes).length > 3) {
-        return "캐릭터의 전체적인 스타일을 변경했습니다!";
-        }
-        
-        Object.keys(changes).forEach(part => {
-        const partName = {
-            'hair': '헤어스타일',
-            'face': '얼굴형',
-            'top': '상의',
-            'bottom': '하의',
-            'footwear': '신발',
-            'eyeColor': '눈 색상',
-            'eyeShape': '눈 모양',
-            'glasses': '안경',
-            'headwear': '모자',
-            'lipShape': '입술',
-            'noseShape': '코',
-            'facewear': '페이스 웨어',
-            'beard': '수염',
-            'eyebrowStyle': '눈썹'
-        }[part] || part;
-        
-        // 설명이 너무 길면 짧게 줄이기
-        const desc = descriptions[part] || '';
-        const shortDesc = desc.length > 50 ? desc.substring(0, 50) + "..." : desc;
-        
-        summary += `${partName}을(를) ${shortDesc} 스타일로 변경했습니다. `;
-        });
-        
-        return summary;
-    }
-
-    // 성별 변경 감지 함수
-    function detectGenderChange(userInput) {
-        const input = userInput.toLowerCase();
-        
-        if ((input.includes('남자') || input.includes('남성') || input.includes('male')) && 
-            (input.includes('바꿔') || input.includes('변경') || input.includes('전환'))) {
-        return 'male';
-        }
-        
-        if ((input.includes('여자') || input.includes('여성') || input.includes('female')) && 
-            (input.includes('바꿔') || input.includes('변경') || input.includes('전환'))) {
-        return 'female';
-        }
-        
-        return null;
-    }
-
-    // 성별 변경 함수
-    async function changeGender(newGender) {
-        // 현재 성별과 다를 때만 변경
-        if ((newGender === 'male' && characterGender !== 'M') || 
-            (newGender === 'female' && characterGender !== 'F')) {
-        
-        // gender 변수 업데이트 후 start() 함수 실행
-        const oldGender = characterGender;
-        characterGender = newGender.toUpperCase().charAt(0);
-                
-        await start(newGender);        
-        console.log(`성별 변경: ${oldGender} -> ${characterGender}`);
-        return true;
-        }
-        return false;
-    }
-    
-    // 전체/부분 변경 분석 함수
-    async function analyzeChangeType(userInput) {
-        const response = await cachedOpenAICall({
-        model: "gpt-4o",
-        messages: [
-            {
-            role: "system",
-            content: "사용자의 요청이 캐릭터 전체 스타일 변경인지(full) 특정 부분만 변경인지(partial) 판단하세요. 반드시 full 또는 partial로만 응답해주세요."
-            },
-            {
-            role: "user",
-            content: userInput
-            }
-        ]
-        });
-        
-        const analysis = response.choices[0].message.content.toLowerCase();
-        return analysis.includes('full') ? 'full' : 'partial';
-    }
-    
-    // AI 파트별 설명 생성 함수
-    async function generatePartDescriptions(userInput, changeType) {
-        const msg_male = `
-            사용자의 요청에 따라 남성 캐릭터의 각 부분별 특성을 자연어로 설명해주세요.
-            해당 사항이 없는 경우 항목을 제외하거나, "없음" 또는 "기본"으로 대답하세요.
-            반드시 다음 JSON 형식으로 응답해야 합니다:            
-            {
-                "hair": "설명",
-                "face": "설명",
-                "top": "설명",
-                "bottom": "설명",
-                "footwear": "설명",
-                "eyeColor": "설명",
-                "glasses": "설명",
-                "headwear": "설명",
-                "lipShape": "설명",
-                'noseShape': "설명",
-                'facewear': "설명",
-                'beard': "설명",
-                'eyebrowStyle': "설명",
-                
-            }
-            텍스트가 아닌 정확한 JSON 형식으로만 응답하세요.
-        `;
-        
-        const msg_female = `            
-            사용자의 요청에 따라 여성 캐릭터의 각 부분별 특성을 자연어로 설명해주세요.            
-            해당 사항이 없는 경우 항목을 제외하거나, "없음" 또는 "기본"으로 대답하세요.            
-            반드시 다음 JSON 형식으로 응답해야 합니다:            
-            {
-                "hair": "설명",
-                "face": "설명",
-                "top": "설명",
-                "bottom": "설명",
-                "footwear": "설명",
-                "eyeColor": "설명",
-                "glasses": "설명",
-                "headwear": "설명",
-                "lipShape": "설명",
-                'noseShape': "설명",
-                'facewear': "설명",                
-                'eyebrowStyle': "설명",
-                
-            }
-            텍스트가 아닌 정확한 JSON 형식으로만 응답하세요.
-        `;
-
-        let msg = characterGender === 'M' ? msg_male : msg_female;        
-        
-        const response = await callRes({
-        model: "gpt-4o",
-        messages: [
-            { role: "system", content: msg },
-            {
-            role: "user",
-            content: `이 요청에 맞는 캐릭터 파트별 설명을 생성해주세요: "${userInput}". 변경 타입: ${changeType}`
-            }
-        ]
-        // response_format 파라미터 제거
-        });
-        
-        // 응답에서 JSON 부분만 추출
-        const content = response.choices[0].message.content;
-        try {
-        // JSON 형식 문자열 추출 시도
-        const jsonMatch = content.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-            return JSON.parse(jsonMatch[0]);
-        }
-        // 전체 텍스트가 JSON인 경우
-        return JSON.parse(content);
-        } catch (error) {
-        console.error('JSON 파싱 오류:', error, content);
-        // 기본 설명으로 폴백
-        return {
-            "hair": "기본 헤어스타일",
-            "face": "기본 얼굴형",
-            "top": "기본 상의",
-            "bottom": "기본 하의",
-            "footwear": "기본 신발",
-            "eyeColor": "기본 눈 색상",
-            "eyeShape": "기본 눈 모양",
-            "glasses": "없음",
-            "headwear": "없음",
-            "lipShape": "기본 입술",
-            'noseShape': "기본 코",
-            'facewear': "없음",
-            'beard': "없음",
-            'eyebrowStyle': "기본 눈썹"            
-        };
-        }
-    }
-    
-    // 변경사항 적용 함수
-    async function applyAssetChanges(changes) {
-        if (!window.charaterJson) return;
-        
-        // 변경사항 적용
-        Object.keys(changes).forEach(part => {
-        // API의 키 이름 규칙에 맞게 조정 (예: hairStyle 등)
-        const apiKeyName = getApiKeyForPart(part);
-        window.charaterJson.assets[apiKeyName] = changes[part];
-        });
-        
-        // 변경된 내용으로 아바타 업데이트
-        await changeDraftAvatar(window.token, selectedAvatarId, window.charaterJson);
-
-        setTimeout(() => {
-            saveDraftAvatar(window.token, selectedAvatarId);            
-        }, 500);
-        
-        // iframe 새로고침
-        setTimeout(() => {            
-            displayIframe();
-        }, 1000);
-    }
-    
-    // API 호출용 파트 이름 변환
-    function getApiKeyForPart(part) {
-        const mapping = {
-        'hair': 'hairStyle',
-        'face': 'faceShape',
-        'top': 'top',
-        'bottom': 'bottom',
-        'footwear': 'footwear',
-        'eyeColor': 'eyeColor',
-        'eyeShape': 'eyeShape',
-        'glasses': 'glasses',
-        'headwear': 'headwear',
-        'lipShape': 'lipShape',
-        'noseShape': 'noseShape',
-        'facewear': 'facewear',
-        'beard': 'beardStyle',
-        'eyebrowStyle': 'eyebrowStyle'
-        };
-        
-        return mapping[part] || part;
-    }
-    /**************************************************************************** */
-   
-    const maleButton = document.getElementById('maleButton');
-
-    femaleButton.addEventListener('click', () => {
-        characterGender = 'F';
-        start('female');        
-    });
-
-    maleButton.addEventListener('click', () => {
-        characterGender = 'M';
-        start('male');        
-    });
-
-});
-
-// 성별 토글 버튼 요소 가져오기
-const femaleButton = document.getElementById('femaleButton');
-
-// 성별 버튼 활성화/비활성화 처리 함수
-function updateGenderButtons() {
-    if (characterGender === 'F') {
-        femaleButton.classList.add('active');
-        maleButton.classList.remove('active');
-    } else {
-        femaleButton.classList.remove('active');
-        maleButton.classList.add('active');
-    }
-}
+window.characterJson = null;
+window.strCode = hashdefault;
+window.characterGender = characterGender;
+window.fetchStr = fetchStr;
+window.applyAssetChanges = applyAssetChanges;
 
 async function start(forcedGender = null, avatarJson = null) {
     console.log('Starting...: ', window.characterPresetIndex);
@@ -815,11 +71,11 @@ async function start(forcedGender = null, avatarJson = null) {
     frameContainer.appendChild(spinner);
     
     // Remove spinner when frame is ready
-    const removeSpinner = () => {
-        if (spinner && spinner.parentNode) {
-            spinner.parentNode.removeChild(spinner);
-        }
-    };
+    // const removeSpinner = () => {
+    //     if (spinner && spinner.parentNode) {
+    //         spinner.parentNode.removeChild(spinner);
+    //     }
+    // };
     const userJson = await createUser();
     window.token = userJson.data.token;
     const avatarTemplates = await getAvatarTemplates(window.token);
@@ -843,7 +99,7 @@ async function start(forcedGender = null, avatarJson = null) {
     applyPresetToAvatar(window.draftAvatar.data, window.characterPresetIndex - 1); // 배열은 0부터 시작하므로 -1
     
     await changeDraftAvatar(window.token, selectedAvatarId, window.draftAvatar.data);    
-    window.charaterJson = window.draftAvatar.data;
+    window.characterJson = window.draftAvatar.data;
     console.log('Draft avatar patched:', window.draftAvatar.data);
 
     setTimeout(() => {
@@ -853,10 +109,97 @@ async function start(forcedGender = null, avatarJson = null) {
         spinner.remove();                
     }, 1000);
     createLoadingSpiiner();
+    
+    function updateGenderButtons() {
+        const femaleButton = document.getElementById('femaleButton');
+        const maleButton = document.getElementById('maleButton');
+        if (characterGender === 'F') {
+            femaleButton.classList.add('active');
+            maleButton.classList.remove('active');
+        } else {
+            femaleButton.classList.remove('active');
+            maleButton.classList.add('active');
+        }
+    }
 }
 
 start();
 
+// 변경사항 적용 함수 개선
+// 변경사항 적용 함수 개선
+async function applyAssetChanges(changes) {
+    if (!window.characterJson) return;
+    
+    console.log("변경 전 characterJson:", JSON.stringify(window.characterJson.assets));
+    
+    // 변경사항 적용
+    Object.keys(changes).forEach(part => {
+        // API의 키 이름 규칙에 맞게 조정
+        const apiKeyName = getApiKeyForPart(part);
+        
+        // 값 처리 로직 개선
+        let assetValue = '';
+        
+        if (changes[part] === '') {
+            // 직접 빈 문자열이 전달된 경우 (제거 요청)
+            assetValue = '';
+        } else if (changes[part] === null || changes[part] === undefined) {
+            // null 또는 undefined인 경우 빈 문자열로 처리 (제거 요청)
+            assetValue = '';
+        } else if (typeof changes[part] === 'object' && changes[part] !== null) {
+            // 객체로 전달된 경우 (일반 에셋 변경)
+            assetValue = changes[part].id !== undefined ? changes[part].id : '';
+        } else {
+            // 그 외 문자열이나 다른 값이 전달된 경우
+            assetValue = String(changes[part]);
+        }
+        
+        // characterJson에 값 설정
+        window.characterJson.assets[apiKeyName] = assetValue;
+        
+        // 디버깅 로그 추가
+        console.log(`${part} 변경: ${assetValue} (API 키: ${apiKeyName})`);
+    });
+    
+    console.log("변경 후 characterJson:", JSON.stringify(window.characterJson.assets));
+    
+    // 변경된 내용으로 아바타 업데이트
+    await changeDraftAvatar(window.token, selectedAvatarId, window.characterJson);
+
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    await saveDraftAvatar(window.token, selectedAvatarId);
+    
+    // iframe 새로고침
+    setTimeout(() => {            
+        displayIframe();
+    }, 1000);
+}
+
+// API 호출용 파트 이름 변환
+function getApiKeyForPart(part) {
+    const mapping = {
+    'hair': 'hairStyle',
+    'face': 'faceShape',
+    'top': 'top',
+    'bottom': 'bottom',
+    'footwear': 'footwear',
+    'eyeColor': 'eyeColor',
+    'eyeShape': 'eyeShape',
+    'glasses': 'glasses',
+    'headwear': 'headwear',
+    'lipShape': 'lipShape',
+    'noseShape': 'noseShape',
+    'facewear': 'facewear',
+    'beard': 'beardStyle',
+    'eyebrowStyle': 'eyebrowStyle',
+    'skinColor': 'skinColor',
+    'hairColor': 'hairColor',
+    'eyebrowColor': 'eyebrowColor'
+    };
+    
+    return mapping[part] || part;
+}
 
 // 프리셋 적용 함수
 function applyPresetToAvatar(avatarData, presetIndex) {
@@ -950,6 +293,8 @@ async function createDraftAvatar(partner, body_type, bearer_token, template_id) 
 }
 
 async function changeDraftAvatar(bearer_token, draft_avatar_id, patched_data) {
+    console.log('Patched data:', patched_data);
+    
     const response = await fetch(`https://api.readyplayer.me/v2/avatars/${draft_avatar_id}`, {
         method: 'PATCH',
         headers: {
@@ -959,27 +304,28 @@ async function changeDraftAvatar(bearer_token, draft_avatar_id, patched_data) {
         body: JSON.stringify({
             "data" : {
                 "assets": {
-                    ...(patched_data.assets.skinColor && { "skinColor": patched_data.assets.skinColor }),
-                    ...(patched_data.assets.eyeColor && { "eyeColor": patched_data.assets.eyeColor }),
-                    ...(patched_data.assets.beardColor && { "beardColor": patched_data.assets.beardColor }),
-                    ...(patched_data.assets.beardStyle && { "beardStyle": patched_data.assets.beardStyle }),
-                    ...(patched_data.assets.eyebrowStyle && { "eyebrowStyle": patched_data.assets.eyebrowStyle }),
-                    ...(patched_data.assets.eyebrowColor && { "eyebrowColor": patched_data.assets.eyebrowColor }),
-                    ...(patched_data.assets.faceWear && { "facewear": patched_data.assets.faceWear }),
-                    ...(patched_data.assets.faceMask && { "faceMask": patched_data.assets.faceMask }),
-                    ...(patched_data.assets.glasses && { "glasses": patched_data.assets.glasses }),
-                    ...(patched_data.assets.hairStyle && { "hairStyle": patched_data.assets.hairStyle }),
-                    ...(patched_data.assets.hairColor && { "hairColor": patched_data.assets.hairColor }),
-                    ...(patched_data.assets.headwear && { "headwear": patched_data.assets.headwear }),
-                    ...(patched_data.assets.lipShape && { "lipShape": patched_data.assets.lipShape }),
-                    ...(patched_data.assets.eyeShape && { "eyeShape": patched_data.assets.eyeShape }),
-                    ...(patched_data.assets.noseShape && { "noseShape": patched_data.assets.noseShape }),
-                    ...(patched_data.assets.faceShape && { "faceShape": patched_data.assets.faceShape }),                            
-                    ...(patched_data.assets.top && { "top": patched_data.assets.top }),
-                    ...(patched_data.assets.bottom && { "bottom": patched_data.assets.bottom }),
-                    ...(patched_data.assets.footwear && { "footwear": patched_data.assets.footwear }),
-                    ...(patched_data.assets.skinColorHex && { "skinColorHex": patched_data.assets.skinColorHex }),
-                    ...(patched_data.assets.outfit && { "outfit": '' }),//patched_data.assets.outfit }),
+                    // 빈 문자열인 경우도 처리하도록 수정
+                    ...(patched_data.assets.skinColor !== undefined && { "skinColor": patched_data.assets.skinColor }),
+                    ...(patched_data.assets.eyeColor !== undefined && { "eyeColor": patched_data.assets.eyeColor }),
+                    ...(patched_data.assets.beardColor !== undefined && { "beardColor": patched_data.assets.beardColor }),
+                    ...(patched_data.assets.beardStyle !== undefined && { "beardStyle": patched_data.assets.beardStyle }),
+                    ...(patched_data.assets.eyebrowStyle !== undefined && { "eyebrowStyle": patched_data.assets.eyebrowStyle }),
+                    ...(patched_data.assets.eyebrowColor !== undefined && { "eyebrowColor": patched_data.assets.eyebrowColor }),
+                    ...(patched_data.assets.faceWear !== undefined && { "facewear": patched_data.assets.faceWear }),
+                    ...(patched_data.assets.faceMask !== undefined && { "faceMask": patched_data.assets.faceMask }),
+                    ...(patched_data.assets.glasses !== undefined && { "glasses": patched_data.assets.glasses }),
+                    ...(patched_data.assets.hairStyle !== undefined && { "hairStyle": patched_data.assets.hairStyle }),
+                    ...(patched_data.assets.hairColor !== undefined && { "hairColor": patched_data.assets.hairColor }),
+                    ...(patched_data.assets.headwear !== undefined && { "headwear": patched_data.assets.headwear }),
+                    ...(patched_data.assets.lipShape !== undefined && { "lipShape": patched_data.assets.lipShape }),
+                    ...(patched_data.assets.eyeShape !== undefined && { "eyeShape": patched_data.assets.eyeShape }),
+                    ...(patched_data.assets.noseShape !== undefined && { "noseShape": patched_data.assets.noseShape }),
+                    ...(patched_data.assets.faceShape !== undefined && { "faceShape": patched_data.assets.faceShape }),
+                    ...(patched_data.assets.top !== undefined && { "top": patched_data.assets.top }),
+                    ...(patched_data.assets.bottom !== undefined && { "bottom": patched_data.assets.bottom }),
+                    ...(patched_data.assets.footwear !== undefined && { "footwear": patched_data.assets.footwear }),
+                    ...(patched_data.assets.skinColorHex !== undefined && { "skinColorHex": patched_data.assets.skinColorHex }),
+                    ...(patched_data.assets.outfit !== undefined && { "outfit": patched_data.assets.outfit }),
                 }
             }                    
         })
@@ -1425,36 +771,6 @@ async function loadAllAnimations(gender, excludeIdle = false) {
     }
 }
 
-function base64ToBytes(base64) {
-    const binString = atob(base64);
-    return Uint8Array.from(binString, (m) => m.codePointAt(0));
-  }
-
-function base64ToBlob(base64, mime) {
-    const byteCharacters = atob(base64.split(',')[1]);
-    const byteNumbers = new Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-    const byteArray = new Uint8Array(byteNumbers);
-    return new Blob([byteArray], { type: mime });
-}
-
-function slpitString() {    
-    try {        
-        const splitResult = atob(
-            hashdefault
-                .replace(/[a-zA-Z]/g, c =>
-                    String.fromCharCode((c <= 'Z' ? 90 : 122) >= (c = c.charCodeAt(0) + 13) ? c : c - 26)
-                )
-        ).split('').reverse().join('');
-        return splitResult;
-    } catch (error) {
-        console.error(error);
-        return null;
-    }
-}
-
 function getBoneNames(model) {
     const boneNames = new Set();
     model.traverse((node) => {
@@ -1608,145 +924,4 @@ window.addEventListener('getModelGLBEvent', () => {
 window.addEventListener('getAvatarGLBUrlEvent', () => {
     GetAvatarGLBUrl();
 });
-
-// 폴백 에셋 ID 반환 함수 (확장)
-function getFallbackAssetId(part) {
-    // 각 파트별 기본 ID 목록
-    const fallbacks = {
-        'hair': '23368535',
-        'face': '49918708',
-        'top': 'kwhVa1YNStiAN8B7oceBpg',
-        'bottom': '146120431',
-        'footwear': 'NZtK7woLS_S1OtKh32jJDg',
-        'eyeColor': '56993869',
-        'eyeShape': '50095075',
-        'glasses': '9932578',
-        'headwear': '',
-        'lipShape': '49919049',
-        'noseShape': '50094592', 
-        'facewear': '',
-        'beard': '',
-        'eyebrowStyle': '41308196'
-    };
-    
-    return fallbacks[part] || null;
-}
-
-// [추가] 진행 상태 업데이트 함수
-function updateProcessingStatus(element, status, progress = 0) {
-  element.innerHTML = `
-    <div class="processing-status">
-      <div class="progress-bar"><div style="width: ${progress}%"></div></div>
-      <div class="status-text">${status}</div>
-    </div>
-  `;
-}
-
-// [추가] API 호출 결과 캐싱 함수
-const apiCache = new Map();
-async function cachedOpenAICall(params, cacheKey) {
-  const key = cacheKey || JSON.stringify(params);
-  if (apiCache.has(key)) return apiCache.get(key);
-  const result = await callRes(params);
-  apiCache.set(key, result);
-  return result;
-}
-
-// [추가] 여러 파트를 병렬 처리하는 함수
-async function getMultipleAssetIds(partDescriptions, userInput, changeType) {
-  const tasks = Object.entries(partDescriptions)
-    .filter(([part]) => changeType === 'full' || isPartRequested(part, userInput))
-    .map(async ([part, description]) => {
-      const assetId = await findBestAssetId(part, description);
-      return [part, assetId];
-    });
-  const results = await Promise.all(tasks);
-  return Object.fromEntries(results);
-}
-
-// [추가] 대화 내역 관리
-const conversationHistory = [];
-function addToConversation(role, content) {
-  conversationHistory.push({ role, content });
-  if (conversationHistory.length > 10) {
-    conversationHistory.splice(1, 2); // 시스템 메시지 유지 후 2개 제거
-  }
-}
-
-// [추가] 현재 스타일 저장 기능
-function saveCurrentStyle(name) {
-  if (!window.charaterJson) return;
-  const customPresets = JSON.parse(localStorage.getItem('customPresets') || '[]');
-  customPresets.push({
-    name,
-    assets: { ...window.charaterJson.assets },
-    timestamp: Date.now()
-  });
-  localStorage.setItem('customPresets', JSON.stringify(customPresets));
-}
-
-// [추가] 에러 처리 통합 함수
-function handleError(error, element, fallbackMessage) {
-  console.error('Error:', error);
-  let message = fallbackMessage;
-  if (error.message.includes('API')) {
-    message = "API 서버 연결 중 문제가 발생했습니다.";
-  } else if (error.message.includes('avatar')) {
-    message = "아바타 생성 중 오류가 발생했습니다.";
-  }
-  if (element) {
-    element.textContent = message;
-  } else {
-    appendMessage(message, 'ai');
-  }
-}
-
-// 수정: 분석 함수에 캐싱 적용
-async function analyzeChangeType(userInput) {
-    const response = await cachedOpenAICall({
-        model: "gpt-4o",
-        messages: [
-            {
-              role: "system",
-              content: "사용자의 요청이 캐릭터 전체 스타일 변경인지(full) 특정 부분만 변경인지(partial) 판단하세요."
-            },
-            {
-              role: "user",
-              content: userInput
-            }
-        ]
-    });
-    const analysis = response.choices[0].message.content.toLowerCase();
-    return analysis.includes('full') ? 'full' : 'partial';
-}
-
-// 수정: processNaturalLanguageCustomization에서 병렬 처리 적용
-async function processNaturalLanguageCustomization(userInput) {
-    // 성별 변경 요청 감지
-    const genderChangeRequest = detectGenderChange(userInput);
-    if (genderChangeRequest) {
-        appendMessage("성별을 변경하고 있습니다. 잠시만 기다려주세요...", 'ai');
-        const newGender = genderChangeRequest === 'male' ? 'male' : 'female';
-        await changeGender(newGender);
-        return `성별을 ${newGender === 'male' ? '남성' : '여성'}으로 변경했습니다. 어떤가요? 더 수정하고 싶은 부분이 있으신가요?`;
-    }
-    
-    const changeType = await analyzeChangeType(userInput);
-    // AI 메시지 표시
-    // appendMessage("요청하신 내용에 맞게 캐릭터를 변경하고 있습니다...", 'ai');
-    
-    // AI에게 파트별 설명 생성 요청
-    const partDescriptions = await generatePartDescriptions(userInput, changeType);
-    console.log("AI 생성 파트 설명:", partDescriptions);
-    
-    // 수정: 개별 처리 대신 여러 파트에 대해 병렬로 asset ID 선택
-    const result = await getMultipleAssetIds(partDescriptions, userInput, changeType);
-    
-    // 캐릭터 변경 적용
-    await applyAssetChanges(result);
-    
-    // 변경 내용 요약 생성 및 피드백 요청
-    const summary = generateChangeDescription(partDescriptions, result);
-    return `${summary} 어떻게 보이나요? 더 수정하고 싶은 부분이 있으신가요?`;
-}
 
