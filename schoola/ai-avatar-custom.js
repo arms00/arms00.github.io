@@ -13,6 +13,7 @@ const assetCatalog = {
     noseShape: [],
     facewear: [],
     beard: [],
+    beardColor: [],
     eyebrowStyle: [],
     skinColor: [],
     hairColor: [],
@@ -713,6 +714,7 @@ function isPartRequested(part, userInput) {
     'noseShape': ['코', '노즈', '코 모양'],
     'facewear': ['마스크', '페이스 웨어'],
     'beard': ['턱수염', '수염', '비어드', '턱'],
+    'beardColor': ['수염색', '턱수염색', '비어드 컬러', '턱색'],
     'eyebrowStyle': ['눈썹', '아이브로우'],
     'skinColor': ['피부색', '피부 컬러', '피부색상', '피부톤'],
     'hairColor': ['머리색', '헤어 컬러', '헤어색', '머리색상'],
@@ -743,7 +745,8 @@ async function processRemoveItemRequest(userInput, intent) {
     const removableItems = {
         'headwear': ['모자', '헤드웨어', '두건', '캡', '베레모', '헤드'],
         'glasses': ['안경', '선글라스', '글래스', '고글'],
-        'facewear': ['마스크', '페이스웨어', '페이스 웨어']
+        'facewear': ['마스크', '페이스웨어', '페이스 웨어'],
+        'beard': ['수염', '턱수염', '콧수염', '비어드', '턱']
     };
     
     // 제거 관련 표현
@@ -999,6 +1002,7 @@ async function generatePartDescriptions(userInput, changeType) {
             'noseShape': "설명",
             'facewear': "설명",
             'beard': "설명",
+            'beardColor': "설명",
             'eyebrowStyle': "설명",
             'skinColor': "설명",
             'hairColor': "설명",
@@ -1023,7 +1027,8 @@ async function generatePartDescriptions(userInput, changeType) {
             "lipShape": "설명",
             'noseShape': "설명",
             'facewear': "설명",
-            'beard': "설명",                
+            'beard': "설명",
+            'beardColor': "설명",            
             'eyebrowStyle': "설명",
             'skinColor': "설명",
             'hairColor': "설명",
@@ -1073,6 +1078,7 @@ async function generatePartDescriptions(userInput, changeType) {
         'noseShape': "기본 코",
         'facewear': "없음",
         'beard': "없음",
+        'beardColor': "기본 수염색",
         'eyebrowStyle': "기본 눈썹",
         'skinColor': "기본 피부색",
         'hairColor': "기본 머리색",
@@ -1207,6 +1213,7 @@ function getPartDisplayName(part) {
         'noseShape': '코',
         'facewear': '페이스 웨어',
         'beard': '수염',
+        'beardColor': '수염색',
         'eyebrowStyle': '눈썹',
         'skinColor': '피부색',
         'hairColor': '머리색',
@@ -1254,7 +1261,7 @@ async function analyzeRequestedParts(userInput, previousContext = "") {
                 content: "사용자의 요청에서 캐릭터 커스터마이징에서 변경하려는 부분을 분석하세요. " + 
                          "다음 부분들에 대해 변경 요청이 있는지 확인하고, JSON 형식으로 true/false 값을 반환하세요: " +
                          "hair, face, top, bottom, footwear, eyeColor, glasses, headwear, lipShape, noseShape, " +
-                         "facewear, beard, eyebrowStyle, skinColor, hairColor, eyebrowColor."
+                         "facewear, beard, beardColor, eyebrowStyle, skinColor, hairColor, eyebrowColor."
             },
             {
                 role: "user",
@@ -1376,6 +1383,7 @@ async function generatePartDescriptionsWithContext(userInput, changeType, reques
             'noseShape': "설명",
             'facewear': "설명",
             'beard': "설명",
+            'beardColor': "설명",
             'eyebrowStyle': "설명",
             'skinColor': "설명",
             'hairColor': "설명",
@@ -1396,7 +1404,8 @@ async function generatePartDescriptionsWithContext(userInput, changeType, reques
             "lipShape": "설명",
             'noseShape': "설명",
             'facewear': "설명",
-            'beard': "설명",                
+            'beard': "설명",   
+            'beardColor': "설명",             
             'eyebrowStyle': "설명",
             'skinColor': "설명",
             'hairColor': "설명",
@@ -1448,6 +1457,7 @@ async function generatePartDescriptionsWithContext(userInput, changeType, reques
             'noseShape': "기본 코",
             'facewear': "없음",
             'beard': "없음",
+            'beardColor': "기본 수염색",
             'eyebrowStyle': "기본 눈썹",
             'skinColor': "기본 피부색",
             'hairColor': "기본 머리색",
@@ -1632,7 +1642,7 @@ async function resolveReferences(userInput) {
 }
 
 // 스트리밍 응답 생성 함수 분리
-async function generateStreamingResponse(messageElement, systemPrompt, userPrompt) {
+async function generateStreamingResponse(messageElement, systemPrompt, userPrompt, delay = 1.5) {
     let retryCount = 0;
     const maxRetries = 3;
     const retryDelay = 300; // ms
@@ -1657,6 +1667,9 @@ async function generateStreamingResponse(messageElement, systemPrompt, userPromp
         }
     }
     
+    // 자연스러운 응답을 위한 딜레이
+    await new Promise(resolve => setTimeout(resolve, delay * 1000));
+
     while (retryCount <= maxRetries) {
         try {
             // 재시도 시 점진적으로 요청 단순화
@@ -2094,6 +2107,7 @@ const partNameMap = {
     '코': 'noseShape',
     '페이스 웨어': 'facewear',
     '수염': 'beard',
+    '수염색': 'beardColor',
     '눈썹': 'eyebrowStyle',
     '피부색': 'skinColor',
     '머리색': 'hairColor',
@@ -2131,7 +2145,7 @@ async function analyzeUserIntent(userInput) {
                 
                 다음 정보를 포함한 JSON으로 응답하세요.
                 parts 명은 반드시 다음과 같이 지정된 key 중 하나여야 합니다
-                ["hair", "face", "top", "bottom", "footwear", "eyeColor", "eyeShape", "glasses", "headwear","lipShape", "noseShape", "facewear", "beard", "eyebrowStyle", "skinColor", "hairColor", "eyebrowColor"]
+                ["hair", "face", "top", "bottom", "footwear", "eyeColor", "eyeShape", "glasses", "headwear","lipShape", "noseShape", "facewear", "beard", "beardColor", "eyebrowStyle", "skinColor", "hairColor", "eyebrowColor"]
                 :
                 {
                     "primary_intent": "주요 의도",
