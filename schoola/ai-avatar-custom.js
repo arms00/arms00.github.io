@@ -1445,21 +1445,52 @@ async function generateStreamingResponse(messageElement, systemPrompt, userPromp
     
     // 마크다운 변환 처리 준비
     messageElement.innerHTML = '';
+
+    // 요청 단순화 함수 - 재시도시 사용
+    function simplifyPrompt(originalPrompt, reductionLevel = 1) {
+        // 1차 단순화: 요청 길이 줄이기
+        if (reductionLevel === 1) {
+            return originalPrompt + "\n\n응답을 간결하게 요약해서 제공해주세요. 200단어를 넘지 않도록 해주세요.";
+        }
+        // 2차 단순화: 더 강력한 요약 요청
+        else if (reductionLevel === 2) {
+            return originalPrompt.split('\n')[0] + "\n\n매우 간결하게 핵심만 요약해서 100단어 이내로 답변해주세요.";
+        }
+        // 3차 단순화: 극도로 짧게
+        else {
+            return "다음 요청에 대해 50단어 이내로 극도로 간결하게 답변해주세요: " + originalPrompt.split('\n')[0];
+        }
+    }
     
     while (retryCount <= maxRetries) {
         try {
+            // 재시도 시 점진적으로 요청 단순화
+            const currentPrompt = retryCount === 0 ? 
+            userPrompt : 
+            simplifyPrompt(userPrompt, retryCount);
+        
+            if (retryCount > 0) {
+                console.log(`재시도 ${retryCount}: 요청 단순화 적용`);
+                messageElement.innerHTML = `응답을 간소화하여 재시도 중... (${retryCount}/${maxRetries})`;
+            }
+
             const response = await callRes({
                 model: 'gpt-4o',
                 messages: [
                     { role: 'system', content: systemPrompt },
                     { role: 'user', content: userPrompt }
                 ],
+                // 최대 토큰 수 제한 (재시도시 더 제한)
+                max_tokens: 1000 - (retryCount * 250),
                 stream: true
             });
 
             // 응답 스트리밍 처리
             const reader = response.body.getReader();
             const decoder = new TextDecoder('utf-8');
+
+            let chunkCount = 0;
+            fullText = ''; // 재시도시 초기화
 
             while (true) {
                 const { done, value } = await reader.read();
@@ -1478,16 +1509,21 @@ async function generateStreamingResponse(messageElement, systemPrompt, userPromp
                                 const content = json.choices[0].delta.content;
                                 fullText += content;
                                 
-                                // 렌더링
-                                messageElement.innerHTML = convertMarkdownToHtml(fullText);
+                                // 데이터 청크 카운트 증가
+                                chunkCount++;
                                 
-                                // HTML 변환 실패 시 일반 텍스트 표시
-                                if (!messageElement.innerHTML) {
-                                    messageElement.textContent = fullText;
+                                // 주기적으로 렌더링 (모든 청크마다 렌더링하면 성능 저하)
+                                if (chunkCount % 5 === 0 || fullText.length < 1000) {
+                                    messageElement.innerHTML = convertMarkdownToHtml(fullText);
+                                    
+                                    // HTML 변환 실패 시 일반 텍스트 표시
+                                    if (!messageElement.innerHTML) {
+                                        messageElement.textContent = fullText;
+                                    }
+                                    
+                                    // 스크롤 조정
+                                    scrollToBottom(aiChatMessages, false);
                                 }
-                                
-                                // 스크롤 조정
-                                scrollToBottom(aiChatMessages, false);
                             }
                         } catch (e) {
                             console.error('응답 파싱 오류:', e, line);
@@ -1495,6 +1531,15 @@ async function generateStreamingResponse(messageElement, systemPrompt, userPromp
                     }
                 }
             }
+
+            // 최종 렌더링
+            messageElement.innerHTML = convertMarkdownToHtml(fullText);
+
+            // 대화 내역에 추가 (길이 제한)
+            const MAX_STORED_LENGTH = 2000;
+            const storedText = fullText.length > MAX_STORED_LENGTH ? 
+                                fullText.substring(0, MAX_STORED_LENGTH) + "..." : 
+                                fullText;
             
             // 대화 내역에 추가
             addToConversation("assistant", fullText);
@@ -1502,16 +1547,31 @@ async function generateStreamingResponse(messageElement, systemPrompt, userPromp
             return fullText;
             
         } catch (error) {
-            // 재시도 로직
-            retryCount++;
-            console.error(`API 요청 실패 (${retryCount}/${maxRetries}):`, error);
+            // 오류 세부 정보 확인
+            const errorMsg = error.toString().toLowerCase();
             
-            if (retryCount <= maxRetries) {
-                messageElement.innerHTML = `응답 요청 실패... ${retryCount}번째 재시도 중`;
-                await new Promise(resolve => setTimeout(resolve, retryDelay));
+            // 특정 오류 유형에 따른 처리
+            if (errorMsg.includes('token') || errorMsg.includes('length') || errorMsg.includes('too large')) {
+                console.warn(`토큰/길이 제한 관련 오류 감지: ${errorMsg}`);
+                retryCount++;
+                
+                if (retryCount <= maxRetries) {
+                    messageElement.innerHTML = `응답이 너무 길어 간소화하여 재시도 중... (${retryCount}/${maxRetries})`;
+                    await new Promise(resolve => setTimeout(resolve, retryDelay));
+                    continue; // 재시도
+                }
             } else {
-                messageElement.innerHTML = '죄송합니다, 요청을 처리하는 중 오류가 발생했습니다.';
-                throw error;
+                // 일반 오류는 기존 로직 사용
+                retryCount++;
+                console.error(`API 요청 실패 (${retryCount}/${maxRetries}):`, error);
+                
+                if (retryCount <= maxRetries) {
+                    messageElement.innerHTML = `응답 요청 실패... ${retryCount}번째 재시도 중`;
+                    await new Promise(resolve => setTimeout(resolve, retryDelay));
+                } else {
+                    messageElement.innerHTML = '죄송합니다, 요청을 처리하는 중 오류가 발생했습니다.';
+                    throw error;
+                }
             }
         }
     }
