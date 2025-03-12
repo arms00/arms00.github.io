@@ -439,190 +439,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         streamingMsgDiv.classList.remove('streaming');
         }
     }
-
-    async function streamChatResponse(userMessage, messageElement) {
-        try {
-            // 1. 참조 해석 수행
-            const resolvedMessage = await resolveReferences(userMessage);
-            
-            // 2. 원래 사용자 메시지는 그대로 대화 내역에 저장
-            addToConversation("user", userMessage);
-            
-            // 3. 로딩 상태 표시
-            messageElement.textContent = "요청을 이해하고 있습니다...";
-            scrollToBottom(aiChatMessages, true);
-
-            // 4. 개선된 의도 분석 호출 (문맥 고려)
-            const intent = await analyzeUserIntent(resolvedMessage);
-            console.log("분석된 의도:", intent);
-
-            // 5. 의도 유형에 따른 분기 처리
-            switch(intent.type) {
-                case "gender_change":
-                    // 성별 변경 요청 처리
-                    const genderType = intent.details?.gender || 
-                                     (resolvedMessage.includes('남') ? 'male' : 'female');
-                    
-                    messageElement.textContent = `${genderType === 'male' ? '남성' : '여성'} 캐릭터로 변경 중...`;
-                    updateProcessingStatus(messageElement, messageElement.textContent, 50);
-                    
-                    await changeGender(genderType);
-                    
-                    const genderResponse = `${genderType === 'male' ? '남성' : '여성'} 캐릭터로 변경했습니다. 다른 요청이 있으신가요?`;
-                    messageElement.innerHTML = convertMarkdownToHtml(genderResponse);
-                    addToConversation("assistant", genderResponse);
-                    return;
-                    
-                case "information":
-                    // 정보 요청 처리
-                    messageElement.textContent = "질문에 대한 답변을 준비 중...";
-                    const infoResponse = await generateInformationResponse(resolvedMessage, intent.details);
-                    messageElement.innerHTML = convertMarkdownToHtml(infoResponse);
-                    addToConversation("assistant", infoResponse);
-                    return;
-                
-                case "undo":
-                    // 되돌리기 기능 (향후 구현)
-                    messageElement.textContent = "죄송합니다, 현재 이전 상태로 되돌리기 기능은 지원하지 않습니다.";
-                    addToConversation("assistant", messageElement.textContent);
-                    return;
-                    
-                case "comparison":
-                    // 비교 기능 (향후 구현)
-                    messageElement.textContent = "죄송합니다, 현재 이전 상태와 비교 기능은 지원하지 않습니다.";
-                    addToConversation("assistant", messageElement.textContent);
-                    return;
-                    
-                default:
-                    // partial_customization 또는 full_customization 처리 (기존 로직)
-                    break;
-            }
-
-            // 6. 변경 유형 결정 (문맥 고려)
-            const changeType = intent.type === 'full_customization' ? 'full' : 'partial';
-            
-            // 7. 진행 상황 업데이트
-            messageElement.textContent = changeType === 'full' 
-                ? "새로운 스타일의 캐릭터를 준비하고 있습니다..." 
-                : "요청하신 부분을 수정하고 있습니다...";
-            updateProcessingStatus(messageElement, messageElement.textContent, 30);
-            
-            scrollToBottom(aiChatMessages, true);
-            
-            // 8. 개선된 캐릭터 변경 처리 (문맥 활용)
-            const changeResult = await processNaturalLanguageCustomizationWithContext(resolvedMessage, intent);
-            
-            // 지연 추가
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            // 9. AI 응답 생성 요청
-            const systemPrompt = '당신은 교육용 메타버스 플랫폼의 캐릭터 커스터마이징 도우미입니다. 사용자의 요청에 따라 캐릭터가 변경되었습니다. 변경 내용을 자연스럽게 설명하세요.';
-            const userPrompt = `사용자 요청: "${resolvedMessage}"\n\n변경 내용: ${changeResult}\n\n이 변경 사항을 친절하고 자연스럽게 설명해주세요.`;
-            
-            // 스트리밍 응답 처리 (기존 로직 유지)
-            let retryCount = 0;
-            const maxRetries = 3;
-            const retryDelay = 300; // ms
-            let fullText = '';
-            
-            // 마크다운 변환 처리 준비
-            messageElement.innerHTML = '';
-            
-            // fetchStreamingResponse 함수 호출 (기존 로직)
-            async function fetchStreamingResponse() {
-                // ...existing code...
-                while (retryCount <= maxRetries) {
-                    try {
-                        // callRes 함수를 사용해 스트리밍 응답 받기
-                        const response = await callRes({
-                            model: 'gpt-4o',
-                            messages: [
-                                { role: 'system', content: systemPrompt },
-                                { role: 'user', content: userPrompt }
-                            ],
-                            stream: true
-                        });
-
-                        // 응답 스트리밍 처리 로직...
-                        const reader = response.body.getReader();
-                        const decoder = new TextDecoder('utf-8');
-
-                        while (true) {
-                            const { done, value } = await reader.read();
-                            if (done) break;
-
-                            const chunk = decoder.decode(value);
-                            const lines = chunk.split('\n').filter(line => line.trim() !== '');
-
-                            for (const line of lines) {
-                                if (line.includes('data: [DONE]')) continue;
-                                
-                                if (line.startsWith('data: ')) {
-                                    try {
-                                        const json = JSON.parse(line.slice(6)); // "data: " 제거
-                                        if (json.choices && json.choices[0].delta && json.choices[0].delta.content) {
-                                            const content = json.choices[0].delta.content;
-                                            fullText += content;
-                                            
-                                            // 렌더링
-                                            messageElement.innerHTML = convertMarkdownToHtml(fullText);
-                                            
-                                            // HTML 변환 실패 시 일반 텍스트 표시
-                                            if (!messageElement.innerHTML) {
-                                                messageElement.textContent = fullText;
-                                            }
-                                            
-                                            // 스크롤 조정
-                                            scrollToBottom(aiChatMessages, false);
-                                        }
-                                    } catch (e) {
-                                        console.error('응답 파싱 오류:', e, line);
-                                    }
-                                }
-                            }
-                        }
-                        
-                        return; // 성공 시 함수 종료
-                    } catch (error) {
-                        // 재시도 로직...
-                        retryCount++;
-                        console.error(`API 요청 실패 (${retryCount}/${maxRetries}):`, error);
-                        
-                        if (retryCount <= maxRetries) {
-                            messageElement.innerHTML = `응답 요청 실패... ${retryCount}번째 재시도 중`;
-                            await new Promise(resolve => setTimeout(resolve, retryDelay));
-                        } else {
-                            messageElement.innerHTML = '죄송합니다, 요청을 처리하는 중 오류가 발생했습니다.';
-                            throw error;
-                        }
-                    }
-                }
-            }
-
-            // 스트리밍 응답 실행
-            await fetchStreamingResponse();
-            addToConversation("assistant", fullText);
-            scrollToBottom(aiChatMessages, true);
-
-        } catch (error) {
-            console.error("AI 응답 처리 중 오류:", error);
-            messageElement.textContent = "AI 응답을 표시하는 중 문제가 발생했습니다.";
-        }
-    }
-
-    // 마크다운을 HTML로 변환하는 함수
-    function convertMarkdownToHtml(markdown) {
-        if (!markdown) return '';
-        
-        return markdown
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // 볼드 텍스트
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')            // 이탤릭 텍스트
-        .replace(/\n\n/g, '<br><br>')                    // 단락 구분
-        .replace(/\n/g, '<br>')                          // 줄바꿈
-        .replace(/```(.*?)```/gs, '<pre><code>$1</code></pre>') // 코드 블록
-        .replace(/`(.*?)`/g, '<code>$1</code>')          // 인라인 코드
-        .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>'); // 링크
-    }
     
     // 성별 토글 버튼 요소 가져오기
     const femaleButton = document.getElementById('femaleButton');
@@ -789,33 +605,74 @@ function detectGenderChange(userInput) {
     return null;
 }
 
-// 성별 변경 함수
+// 성별 변경 함수 강화
 async function changeGender(newGender, isStart = true) {
-    console.log(`성별 변경 시도: ${newGender}, 현재 성별: ${window.characterGender}`);
+    // 1. 명확한 로깅
+    console.log(`성별 변경 시도: 요청=${newGender}, 현재=${window.characterGender}`);
+
+    // 명시적인 성별 키워드 세트 정의
+    const maleKeywords = ['남자', '남성', '남', 'male', '맨', 'man', '사내', '남정네', '남자로', '남성으로'];
+    const femaleKeywords = ['여자', '여성', '여', 'female', '우먼', 'woman', '여인', '아가씨', '여자로', '여성으로'];
+
+    // 2. 정확한 성별 타입 결정 (강화된 자연어 분석)
+    let targetGender = newGender;
     
-    // 단순화: 항상 요청된 성별로 변경
-    const targetGender = newGender.toLowerCase().includes('male') || 
-                         newGender.toLowerCase().includes('m') || 
-                         newGender.toLowerCase().includes('남') ? 'male' : 'female';
+    // newGender가 정확히 'male' 또는 'female'이 아닌 경우 처리
+    if (targetGender !== 'male' && targetGender !== 'female') {
+        console.log(`입력된 성별(${targetGender})이 정확한 형식이 아님, 키워드 분석 시도`);
+        
+        // 문자열인 경우만 키워드 분석 수행
+        if (typeof targetGender === 'string') {
+            const input = targetGender.toLowerCase().trim();
+            
+            // 성별 키워드 확인
+            const hasMaleKeyword = maleKeywords.some(keyword => input.includes(keyword));
+            const hasFemaleKeyword = femaleKeywords.some(keyword => input.includes(keyword));
+            
+            if (hasMaleKeyword && !hasFemaleKeyword) {
+                targetGender = 'male';
+                console.log(`남성 키워드 감지: 성별을 'male'로 설정`);
+            } else if (hasFemaleKeyword && !hasMaleKeyword) {
+                targetGender = 'female';
+                console.log(`여성 키워드 감지: 성별을 'female'로 설정`);
+            } else {
+                // 키워드 감지 실패 또는 모호한 경우 현재 성별의 반대로 설정
+                targetGender = window.characterGender === 'M' ? 'female' : 'male';
+                console.log(`명확한 성별 키워드 없음: 현재 성별(${window.characterGender})의 반대로 설정 -> ${targetGender}`);
+            }
+        } else {
+            // 문자열이 아닌 경우 현재 성별의 반대로 설정
+            targetGender = window.characterGender === 'M' ? 'female' : 'male';
+            console.log(`유효한 성별 입력 없음: 현재 성별의 반대로 설정 -> ${targetGender}`);
+        }
+    }
     
-    // 이전 성별 기록
+    // 3. 이전 성별 기록
     const oldGender = window.characterGender;
     
-    // 새 성별로 직접 설정
-    window.characterGender = targetGender === 'male' ? 'M' : 'F';
+    // 4. 성별 실제 적용 전에 명확히 기록
+    const finalCharGender = targetGender === 'male' ? 'M' : 'F';
+    console.log(`적용할 성별: ${targetGender} (${finalCharGender})`);
     
-    console.log(`성별 변경: ${oldGender} -> ${window.characterGender}`);
-    
+    // 5. 성별 변경 시도
     if (isStart) {
         try {
+            window.characterGender = finalCharGender; // 먼저 설정
+            
+            // 성별 변경 함수 호출 전 상태 설정 확인
+            console.log(`window.start 호출 직전: characterGender=${window.characterGender}`);
+            
+            // start 함수 완료까지 확실히 대기
             await window.start(targetGender);
-            console.log(`성별 변경 성공: ${oldGender} -> ${window.characterGender}`);
+            console.log(`성별 변경 성공 확인: ${oldGender} → ${window.characterGender}`);
             return true;
         } catch (error) {
-            console.error("성별 변경 중 오류:", error);
+            console.error(`성별 변경 중 오류(${targetGender})`, error);
             return false;
         }
     }
+    
+    window.characterGender = finalCharGender;
     return true;
 }
 
@@ -880,6 +737,54 @@ async function getMultipleAssetIds(partDescriptions, userInput, changeType) {
   return Object.fromEntries(results);
 }
 
+// 아이템 제거 요청을 처리하는 함수
+async function processRemoveItemRequest(userInput, intent) {
+    // 제거 가능한 아이템 목록
+    const removableItems = {
+        'headwear': ['모자', '헤드웨어', '두건', '캡', '베레모', '헤드'],
+        'glasses': ['안경', '선글라스', '글래스', '고글'],
+        'facewear': ['마스크', '페이스웨어', '페이스 웨어']
+    };
+    
+    // 제거 관련 표현
+    const removalTerms = ['벗어', '치워', '제거', '없애', '지워', '빼', '안 쓸래', '쓰지 않', '쓰고싶지 않'];
+    
+    const lowerInput = userInput.toLowerCase();
+    const removedItems = {};
+    
+    // 의도 객체에서 정보 추출
+    const detectedParts = intent.details?.parts || [];
+    
+    // 자연어 분석으로 제거 요청 파악
+    for (const [itemKey, keywords] of Object.entries(removableItems)) {
+        // 1. 키워드가 언급되었는지 확인
+        const hasItemKeyword = keywords.some(keyword => lowerInput.includes(keyword));
+        
+        // 2. 제거 의도가 표현되었는지 확인
+        const hasRemovalIntent = removalTerms.some(term => lowerInput.includes(term));
+        
+        // 3. 의도 분석에서 해당 파트가 포함되었는지 확인
+        const isPartDetected = detectedParts.includes(itemKey);
+        
+        if ((hasItemKeyword && hasRemovalIntent) || 
+            (isPartDetected && (lowerInput.includes('제거') || lowerInput.includes('없애')))) {
+            console.log(`${itemKey} 제거 요청 감지됨`);
+            removedItems[itemKey] = '';  // 빈 문자열로 설정하여 제거
+        }
+    }
+    
+    // 제거할 아이템이 있으면 적용
+    if (Object.keys(removedItems).length > 0) {
+        await window.applyAssetChanges(removedItems);
+        
+        // 제거한 아이템 목록으로 메시지 생성
+        const removedNames = Object.keys(removedItems).map(key => getPartDisplayName(key));
+        return `${removedNames.join(', ')}을(를) 제거했습니다.`;
+    }
+    
+    return null; // 제거 요청이 없으면 null 반환
+}
+
 // AI 파트별 설명 생성 함수
 async function generatePartDescriptions(userInput, changeType) {
     const msg_male = `
@@ -922,7 +827,8 @@ async function generatePartDescriptions(userInput, changeType) {
             "headwear": "설명",
             "lipShape": "설명",
             'noseShape': "설명",
-            'facewear': "설명",                
+            'facewear': "설명",
+            'beard': "설명",                
             'eyebrowStyle': "설명",
             'skinColor': "설명",
             'hairColor': "설명",
@@ -1043,11 +949,11 @@ function addToConversation(role, content) {
 
 // [추가] 현재 스타일 저장 기능
 function saveCurrentStyle(name) {
-  if (!window.charaterJson) return;
+  if (!window.characterJson) return;
   const customPresets = JSON.parse(localStorage.getItem('customPresets') || '[]');
   customPresets.push({
     name,
-    assets: { ...window.charaterJson.assets },
+    assets: { ...window.characterJson.assets },
     timestamp: Date.now()
   });
   localStorage.setItem('customPresets', JSON.stringify(customPresets));
@@ -1143,33 +1049,6 @@ function slpitString() {
     }
 }
 
-// 1. 사용자 표현의 참조 해석 기능 (예: "머리를 더 짧게")
-async function resolveReferences(userInput) {
-    // 대화 히스토리가 충분하지 않으면 바로 입력 반환
-    if (conversationHistory.length < 3) return userInput;
-    
-    const response = await cachedOpenAICall({
-        model: "gpt-4o",
-        messages: [
-            {
-                role: "system",
-                content: "사용자의 요청에 '더', '그것', '이전 것', '아까' 같은 이전 대화 참조가 있는지 확인하고, " +
-                         "참조가 있다면 이전 대화를 고려하여 완전한 요청으로 변환하세요. " + 
-                         "참조가 없다면 원래 요청을 그대로 반환하세요."
-            },
-            ...conversationHistory.slice(-4), // 최근 대화 제공
-            {
-                role: "user",
-                content: `이 요청을 완전한 표현으로 바꿔주세요: "${userInput}"`
-            }
-        ]
-    });
-    
-    const fullRequest = response.choices[0].message.content;
-    console.log(`참조 해석: "${userInput}" → "${fullRequest}"`);
-    return fullRequest;
-}
-
 // 2. 문맥 기반으로 요청된 파트 분석 (키워드 매칭 대신)
 async function analyzeRequestedParts(userInput, previousContext = "") {
     const response = await cachedOpenAICall({
@@ -1219,233 +1098,6 @@ async function generateInformationResponse(userInput, details = {}) {
     });
     
     return response.choices[0].message.content;
-}
-
-// 4. 개선된 의도 분석 함수 - 더 상세한 의도와 세부사항 추출
-async function analyzeUserIntent(userInput) {
-    const previousContextText = conversationHistory.slice(-4)
-        .filter(msg => msg.role === 'user' || msg.role === 'assistant')
-        .map(msg => msg.content).join("\n");
-    
-    const response = await cachedOpenAICall({
-        model: "gpt-4o",
-        messages: [
-            {
-                role: "system",
-                content: `사용자의 요청을 분석하여 의도를 파악하세요. 가능한 의도 유형:
-                1. gender_change: 성별 변경 요청
-                2. full_customization: 전체 스타일 변경
-                3. partial_customization: 부분 변경
-                4. information: 캐릭터 커스터마이징 관련 정보 요청
-                5. undo: 이전 변경 취소 요청
-                6. comparison: 이전 상태와 비교 요청
-                7. other: 기타 요청
-                
-                JSON 형식으로 다음 정보를 포함해 응답하세요:
-                {
-                    "type": "의도유형",
-                    "details": {
-                        "parts": ["변경하려는 부위1", "변경하려는 부위2", ...],
-                        "style": "요청된 스타일 설명",
-                        "gender": "언급된 성별(있는 경우)",
-                        "reference": "참조하는 이전 대화 내용(있는 경우)"
-                    }
-                }`
-            },
-            ...(previousContextText ? [{
-                role: "system",
-                content: `이전 대화 문맥: ${previousContextText}`
-            }] : []),
-            {
-                role: "user", 
-                content: userInput
-            }
-        ],
-        response_format: { type: "json_object" }
-    });
-    
-    try {
-        const result = JSON.parse(response.choices[0].message.content);
-        return result;
-    } catch (error) {
-        console.error("의도 분석 결과 파싱 오류:", error);
-        return { type: "partial_customization", details: {} };
-    }
-}
-
-// 5. 개선된 streamChatResponse 함수로 문맥 활용
-async function streamChatResponse(userMessage, messageElement) {
-    try {
-        // 1. 참조 해석 수행
-        const resolvedMessage = await resolveReferences(userMessage);
-        
-        // 2. 원래 사용자 메시지는 그대로 대화 내역에 저장
-        addToConversation("user", userMessage);
-        
-        // 3. 로딩 상태 표시
-        messageElement.textContent = "요청을 이해하고 있습니다...";
-        scrollToBottom(aiChatMessages, true);
-
-        // 4. 개선된 의도 분석 호출 (문맥 고려)
-        const intent = await analyzeUserIntent(resolvedMessage);
-        console.log("분석된 의도:", intent);
-
-        // 5. 의도 유형에 따른 분기 처리
-        switch(intent.type) {
-            case "gender_change":
-                // 성별 변경 요청 처리
-                const genderType = intent.details?.gender || 
-                (resolvedMessage.includes('남') ? 'male' : 'female');
-
-                console.log("성별 변경 감지: ", genderType);
-                console.log("현재 성별: ", window.characterGender);
-
-                messageElement.textContent = `${genderType === 'male' ? '남성' : '여성'} 캐릭터로 변경 중...`;
-                updateProcessingStatus(messageElement, messageElement.textContent, 50);
-
-                const changeResult = await changeGender(genderType);
-                console.log("성별 변경 결과: ", changeResult);
-                
-                const genderResponse = `${genderType === 'male' ? '남성' : '여성'} 캐릭터로 변경했습니다. 다른 요청이 있으신가요?`;
-                messageElement.innerHTML = convertMarkdownToHtml(genderResponse);
-                addToConversation("assistant", genderResponse);
-                return;
-                
-            case "information":
-                // 정보 요청 처리
-                messageElement.textContent = "질문에 대한 답변을 준비 중...";
-                const infoResponse = await generateInformationResponse(resolvedMessage, intent.details);
-                messageElement.innerHTML = convertMarkdownToHtml(infoResponse);
-                addToConversation("assistant", infoResponse);
-                return;
-            
-            case "undo":
-                // 되돌리기 기능 (향후 구현)
-                messageElement.textContent = "죄송합니다, 현재 이전 상태로 되돌리기 기능은 지원하지 않습니다.";
-                addToConversation("assistant", messageElement.textContent);
-                return;
-                
-            case "comparison":
-                // 비교 기능 (향후 구현)
-                messageElement.textContent = "죄송합니다, 현재 이전 상태와 비교 기능은 지원하지 않습니다.";
-                addToConversation("assistant", messageElement.textContent);
-                return;
-                
-            default:
-                // partial_customization 또는 full_customization 처리 (기존 로직)
-                break;
-        }
-
-        // 6. 변경 유형 결정 (문맥 고려)
-        const changeType = intent.type === 'full_customization' ? 'full' : 'partial';
-        
-        // 7. 진행 상황 업데이트
-        messageElement.textContent = changeType === 'full' 
-            ? "새로운 스타일의 캐릭터를 준비하고 있습니다..." 
-            : "요청하신 부분을 수정하고 있습니다...";
-        updateProcessingStatus(messageElement, messageElement.textContent, 30);
-        
-        scrollToBottom(aiChatMessages, true);
-        
-        // 8. 개선된 캐릭터 변경 처리 (문맥 활용)
-        const changeResult = await processNaturalLanguageCustomizationWithContext(resolvedMessage, intent);
-        
-        // 지연 추가
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // 9. AI 응답 생성 요청
-        const systemPrompt = '당신은 교육용 메타버스 플랫폼의 캐릭터 커스터마이징 도우미입니다. 사용자의 요청에 따라 캐릭터가 변경되었습니다. 변경 내용을 자연스럽게 설명하세요.';
-        const userPrompt = `사용자 요청: "${resolvedMessage}"\n\n변경 내용: ${changeResult}\n\n이 변경 사항을 친절하고 자연스럽게 설명해주세요.`;
-        
-        // 스트리밍 응답 처리 (기존 로직 유지)
-        let retryCount = 0;
-        const maxRetries = 3;
-        const retryDelay = 300; // ms
-        let fullText = '';
-        
-        // 마크다운 변환 처리 준비
-        messageElement.innerHTML = '';
-        
-        // fetchStreamingResponse 함수 호출 (기존 로직)
-        async function fetchStreamingResponse() {
-            // ...existing code...
-            while (retryCount <= maxRetries) {
-                try {
-                    // callRes 함수를 사용해 스트리밍 응답 받기
-                    const response = await callRes({
-                        model: 'gpt-4o',
-                        messages: [
-                            { role: 'system', content: systemPrompt },
-                            { role: 'user', content: userPrompt }
-                        ],
-                        stream: true
-                    });
-
-                    // 응답 스트리밍 처리 로직...
-                    const reader = response.body.getReader();
-                    const decoder = new TextDecoder('utf-8');
-
-                    while (true) {
-                        const { done, value } = await reader.read();
-                        if (done) break;
-
-                        const chunk = decoder.decode(value);
-                        const lines = chunk.split('\n').filter(line => line.trim() !== '');
-
-                        for (const line of lines) {
-                            if (line.includes('data: [DONE]')) continue;
-                            
-                            if (line.startsWith('data: ')) {
-                                try {
-                                    const json = JSON.parse(line.slice(6)); // "data: " 제거
-                                    if (json.choices && json.choices[0].delta && json.choices[0].delta.content) {
-                                        const content = json.choices[0].delta.content;
-                                        fullText += content;
-                                        
-                                        // 렌더링
-                                        messageElement.innerHTML = convertMarkdownToHtml(fullText);
-                                        
-                                        // HTML 변환 실패 시 일반 텍스트 표시
-                                        if (!messageElement.innerHTML) {
-                                            messageElement.textContent = fullText;
-                                        }
-                                        
-                                        // 스크롤 조정
-                                        scrollToBottom(aiChatMessages, false);
-                                    }
-                                } catch (e) {
-                                    console.error('응답 파싱 오류:', e, line);
-                                }
-                            }
-                        }
-                    }
-                    
-                    return; // 성공 시 함수 종료
-                } catch (error) {
-                    // 재시도 로직...
-                    retryCount++;
-                    console.error(`API 요청 실패 (${retryCount}/${maxRetries}):`, error);
-                    
-                    if (retryCount <= maxRetries) {
-                        messageElement.innerHTML = `응답 요청 실패... ${retryCount}번째 재시도 중`;
-                        await new Promise(resolve => setTimeout(resolve, retryDelay));
-                    } else {
-                        messageElement.innerHTML = '죄송합니다, 요청을 처리하는 중 오류가 발생했습니다.';
-                        throw error;
-                    }
-                }
-            }
-        }
-
-        // 스트리밍 응답 실행
-        await fetchStreamingResponse();
-        addToConversation("assistant", fullText);
-        scrollToBottom(aiChatMessages, true);
-
-    } catch (error) {
-        console.error("AI 응답 처리 중 오류:", error);
-        messageElement.textContent = "AI 응답을 표시하는 중 문제가 발생했습니다.";
-    }
 }
 
 // 6. 문맥을 활용한 커스터마이징 처리 함수
@@ -1548,7 +1200,8 @@ async function generatePartDescriptionsWithContext(userInput, changeType, reques
             "headwear": "설명",
             "lipShape": "설명",
             'noseShape': "설명",
-            'facewear': "설명",                
+            'facewear': "설명",
+            'beard': "설명",                
             'eyebrowStyle': "설명",
             'skinColor': "설명",
             'hairColor': "설명",
@@ -1664,6 +1317,821 @@ function updateConversationCount() {
     if (remainingCount <= 0) {
         alert("대화 횟수가 초과되었습니다. 더 이상 대화를 진행할 수 없습니다.");
         // 추가적인 제한 로직을 여기에 추가
+    }
+}
+
+// 향상된 폴백 함수
+function getFallbackWithDetails(part, description) {
+    const fallbackId = getFallbackAssetId(part);
+    return { 
+        id: fallbackId, 
+        requestedDescription: description, 
+        fallback: true,
+        actualDescription: "기본 스타일",
+        confidence: 0,
+        reason: "요청에 맞는 에셋을 찾을 수 없어 기본값 사용",
+        matchPriority: "fallback"
+    };
+}
+
+// 더 자세한 변경 설명 함수
+function generateAdvancedChangeDescription(descriptions, changes) {
+    let summary = '';
+    
+    if (Object.keys(changes).length === 0) {
+        return "변경사항이 없습니다.";
+    }
+    
+    if (Object.keys(changes).length > 3) {
+        return "캐릭터의 전체적인 스타일을 변경했습니다!";
+    }
+    
+    Object.entries(changes).forEach(([part, result]) => {
+        const partName = getPartDisplayName(part);
+        
+        // 설명이 너무 길면 짧게 줄이기
+        const desc = descriptions[part] || '';
+        const shortDesc = desc.length > 50 ? desc.substring(0, 50) + "..." : desc;
+        
+        // 일치 수준과 자신감 정보 추가
+        let confidenceDesc = "";
+        if (!result.fallback) {
+            confidenceDesc = result.confidence > 8 ? "정확히 일치하는" :
+                           result.confidence > 5 ? "유사한" : "가장 가까운";
+        }
+        
+        // 폴백 여부에 따라 다른 메시지 표시
+        if (result.fallback) {
+            summary += `${partName}을(를) 기본 스타일로 설정했습니다. `;
+        } else {
+            summary += `${partName}을(를) ${shortDesc} 스타일로 변경했습니다 (${confidenceDesc} 스타일). `;
+        }
+    });
+    
+    return summary;
+}
+
+// 기타 의도에 대한 자연스러운 대화형 응답
+async function generateConversationalResponse(userInput) {
+    const response = await callRes({
+        model: "gpt-4o",
+        messages: [
+            {
+                role: "system",
+                content: `당신은 교육용 메타버스 플랫폼의 캐릭터 커스터마이징 도우미입니다. 
+                사용자의 메시지가 캐릭터 커스터마이징과 직접 관련이 없는 것 같습니다.
+                친절하게 대화에 응하되, 가능한 대화 주제를 캐릭터 커스터마이징 관련 내용으로 
+                자연스럽게 유도해보세요. 답변은 간결하고 유용해야 합니다.`
+            },
+            {
+                role: "user",
+                content: userInput
+            }
+        ]
+    });
+    
+    return response.choices[0].message.content;
+}
+
+// 기존 함수들을 새로운 함수로 대체...
+// 디버깅 관련 설정
+const DEBUG_MODE = true;
+
+// 디버깅 전용 로그 함수
+function debugLog(...args) {
+    if (DEBUG_MODE) {
+        console.log("[DEBUG]", ...args);
+    }
+}
+
+// 참조 해석 함수 개선
+async function resolveReferences(userInput) {
+    // 대화 히스토리가 충분하지 않으면 바로 입력 반환
+    if (conversationHistory.length < 3) return userInput;
+    
+    const response = await cachedOpenAICall({
+        model: "gpt-4o",
+        messages: [
+            {
+                role: "system",
+                content: "사용자의 요청에 '더', '그것', '이전 것', '아까' 같은 이전 대화 참조가 있는지 확인하고, " +
+                         "참조가 있다면 이전 대화를 고려하여 완전한 요청으로 변환하세요. " + 
+                         "참조가 없다면 원래 요청을 그대로 반환하세요."
+            },
+            ...conversationHistory.slice(-4), // 최근 대화 제공
+            {
+                role: "user",
+                content: `이 요청을 완전한 표현으로 바꿔주세요: "${userInput}"`
+            }
+        ]
+    });
+    
+    const fullRequest = response.choices[0].message.content;
+    
+    // 변환된 내용이 원본과 다른 경우에만 로깅
+    if (fullRequest !== userInput) {
+        debugLog(`참조 해석: "${userInput}" → "${fullRequest}"`);
+    }
+    
+    return fullRequest;
+}
+
+// 스트리밍 응답 생성 함수 분리
+async function generateStreamingResponse(messageElement, systemPrompt, userPrompt) {
+    let retryCount = 0;
+    const maxRetries = 3;
+    const retryDelay = 300; // ms
+    let fullText = '';
+    
+    // 마크다운 변환 처리 준비
+    messageElement.innerHTML = '';
+    
+    while (retryCount <= maxRetries) {
+        try {
+            const response = await callRes({
+                model: 'gpt-4o',
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    { role: 'user', content: userPrompt }
+                ],
+                stream: true
+            });
+
+            // 응답 스트리밍 처리
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder('utf-8');
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                const chunk = decoder.decode(value);
+                const lines = chunk.split('\n').filter(line => line.trim() !== '');
+
+                for (const line of lines) {
+                    if (line.includes('data: [DONE]')) continue;
+                    
+                    if (line.startsWith('data: ')) {
+                        try {
+                            const json = JSON.parse(line.slice(6)); // "data: " 제거
+                            if (json.choices && json.choices[0].delta && json.choices[0].delta.content) {
+                                const content = json.choices[0].delta.content;
+                                fullText += content;
+                                
+                                // 렌더링
+                                messageElement.innerHTML = convertMarkdownToHtml(fullText);
+                                
+                                // HTML 변환 실패 시 일반 텍스트 표시
+                                if (!messageElement.innerHTML) {
+                                    messageElement.textContent = fullText;
+                                }
+                                
+                                // 스크롤 조정
+                                scrollToBottom(aiChatMessages, false);
+                            }
+                        } catch (e) {
+                            console.error('응답 파싱 오류:', e, line);
+                        }
+                    }
+                }
+            }
+            
+            // 대화 내역에 추가
+            addToConversation("assistant", fullText);
+            scrollToBottom(aiChatMessages, true);
+            return fullText;
+            
+        } catch (error) {
+            // 재시도 로직
+            retryCount++;
+            console.error(`API 요청 실패 (${retryCount}/${maxRetries}):`, error);
+            
+            if (retryCount <= maxRetries) {
+                messageElement.innerHTML = `응답 요청 실패... ${retryCount}번째 재시도 중`;
+                await new Promise(resolve => setTimeout(resolve, retryDelay));
+            } else {
+                messageElement.innerHTML = '죄송합니다, 요청을 처리하는 중 오류가 발생했습니다.';
+                throw error;
+            }
+        }
+    }
+}
+
+// 마크다운을 HTML로 변환하는 함수
+function convertMarkdownToHtml(markdown) {
+    if (!markdown) return '';
+    
+    return markdown
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // 볼드 텍스트
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')            // 이탤릭 텍스트
+    .replace(/\n\n/g, '<br><br>')                    // 단락 구분
+    .replace(/\n/g, '<br>')                          // 줄바꿈
+    .replace(/```(.*?)```/gs, '<pre><code>$1</code></pre>') // 코드 블록
+    .replace(/`(.*?)`/g, '<code>$1</code>')          // 인라인 코드
+    .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>'); // 링크
+}
+
+// 안전한 아이템 제거 함수 개선
+async function processRemoveItems(removeItems) {
+    if (!Array.isArray(removeItems) || removeItems.length === 0) {
+        return null;
+    }
+
+    // 제거 가능한 아이템 매핑
+    const removableItemMap = {
+        'headwear': ['모자', '헤드웨어', '두건', '캡', '베레모', '헤드'],
+        'glasses': ['안경', '선글라스', '글래스', '고글'],
+        'facewear': ['마스크', '페이스웨어', '페이스 웨어']
+    };
+    
+    console.log("아이템 제거 처리 시작:", removeItems);       
+    
+    // 제거할 아이템 목록 생성 (매핑 전)
+    const itemsToRemove = {};
+    const itemsAttemptedToRemove = [];
+    
+    // 1. 요청된 아이템 매핑 및 현재 상태 확인
+    for (const item of removeItems) {
+        // 아이템 이름 정규화
+        const normalizedItem = item.toLowerCase().trim();
+        itemsAttemptedToRemove.push(normalizedItem);
+        
+        // 매핑 시도
+        for (const [part, keywords] of Object.entries(removableItemMap)) {
+            if (normalizedItem === part || keywords.some(keyword => normalizedItem.includes(keyword))) {
+                // 현재 아이템이 착용 중인지 확인 (window.characterJson 사용)
+                const isWearing = window.characterJson?.assets && 
+                                 window.characterJson.assets[part] && 
+                                 window.characterJson.assets[part].length > 0;
+                
+                console.log(`아이템 확인: ${part}, 착용 중: ${isWearing}`);
+                
+                if (isWearing) {
+                    // 아이템이 있는 경우만 제거 명령 추가
+                    itemsToRemove[part] = '';
+                } else {
+                    console.log(`${part} 아이템은 이미 착용되어 있지 않습니다.`);
+                }
+                break;
+            }
+        }
+    }
+    
+    // 2. 제거할 아이템이 없으면 조기 반환
+    if (Object.keys(itemsToRemove).length === 0) {
+        if (itemsAttemptedToRemove.length > 0) {
+            return `요청하신 아이템(${itemsAttemptedToRemove.join(', ')})은 이미 착용되어 있지 않습니다.`;
+        }
+        return null;
+    }
+    
+    // 3. 제거 시도 - 재시도 로직 추가
+    let retryCount = 0;
+    const maxRetries = 2;
+    
+    while (retryCount <= maxRetries) {
+        try {
+            console.log(`아이템 제거 시도:`, itemsToRemove);
+            
+            // itemsToRemove 객체 구조 자세히 출력
+            for (const [key, value] of Object.entries(itemsToRemove)) {
+                console.log(`제거 아이템 키: "${key}", 값 타입: ${typeof value}, 값: "${value}"`);
+            }
+            
+            // 빈 문자열로 설정하여 아이템 제거
+            await window.applyAssetChanges(itemsToRemove);
+            
+            // 제거 후 window.characterJson 확인
+            console.log("제거 후 characterJson:", 
+                window.characterJson.assets.glasses !== undefined ? 
+                `glasses="${window.characterJson.assets.glasses}"` : 
+                "glasses=undefined");
+            
+            const removedNames = Object.keys(itemsToRemove).map(key => getPartDisplayName(key));
+            return `${removedNames.join(', ')}을(를) 제거했습니다.`;
+        } catch (error) {
+            // 기존 에러 처리 코드
+        }
+    }
+}
+
+// 복합 의도를 처리하는 메인 함수 개선
+async function streamChatResponse(userMessage, messageElement) {
+    try {
+        // 1. 참조 해석 수행
+        const resolvedMessage = await resolveReferences(userMessage);
+        addToConversation("user", userMessage);
+        
+        // 2. 로딩 상태 표시
+        messageElement.textContent = "요청을 분석하고 있습니다...";
+        scrollToBottom(aiChatMessages, true);
+        
+        // 3. 복합 의도 분석
+        const intentAnalysis = await analyzeUserIntent(resolvedMessage);
+        debugLog("분석된 복합 의도:", intentAnalysis);
+        
+        // 의도 분석 결과 검증
+        if (!intentAnalysis || typeof intentAnalysis !== 'object') {
+            console.error("의도 분석 결과가 유효하지 않습니다:", intentAnalysis);
+            messageElement.textContent = "요청을 이해하는데 문제가 있습니다. 다시 시도해주세요.";
+            return;
+        }
+        
+        // 4. 주요 의도 및 보조 의도 추출
+        const primaryIntent = intentAnalysis.primary_intent || "other";
+        const secondaryIntents = Array.isArray(intentAnalysis.secondary_intents) ? 
+            intentAnalysis.secondary_intents : [];
+        
+        debugLog(`주요 의도: ${primaryIntent}, 보조 의도: [${secondaryIntents.join(", ")}]`);
+        
+        // 모든 의도 (주요 + 보조)를 하나의 배열로 통합
+        const allIntents = [primaryIntent, ...secondaryIntents];
+        
+        // 각 의도 타입 확인 헬퍼 함수
+        const hasIntent = (intentType) => allIntents.includes(intentType);
+        
+        // 5. 각 의도 처리 결과 저장
+        const results = {
+            genderChanged: false,
+            removedItems: [],
+            customizationApplied: false,
+            customizationDetails: null
+        };
+
+        // 6. 성별 변경 처리 (다른 의도보다 우선)
+        if (hasIntent("gender_change")) {
+            const genderType = intentAnalysis.details?.gender || 
+                             (resolvedMessage.includes('남') ? 'male' : 'female');
+            
+            messageElement.textContent = `${genderType === 'male' ? '남성' : '여성'} 캐릭터로 변경 중...`;
+            updateProcessingStatus(messageElement, messageElement.textContent, 40);
+            
+            try {
+                const genderChangeSuccess = await changeGender(genderType);
+                results.genderChanged = genderChangeSuccess;
+                
+                // 성별 변경만 있는 경우 즉시 응답
+                if (primaryIntent === "gender_change" && secondaryIntents.length === 0) {
+                    const genderResponse = `${genderType === 'male' ? '남성' : '여성'} 캐릭터로 변경했습니다. 다른 요청이 있으신가요?`;
+                    messageElement.innerHTML = convertMarkdownToHtml(genderResponse);
+                    addToConversation("assistant", genderResponse);
+                    return;
+                }
+                
+                // 다른 의도가 있으면 계속 진행
+                messageElement.textContent = "성별을 변경했습니다. 나머지 요청을 처리 중...";
+                updateProcessingStatus(messageElement, messageElement.textContent, 60);
+            } catch (error) {
+                console.error("성별 변경 중 오류:", error);
+                messageElement.textContent = "성별 변경 중 오류가 발생했습니다.";
+                return;
+            }
+        }
+        
+        // 7. 아이템 제거 처리
+        if (hasIntent("remove_item")) {
+            const removeItems = intentAnalysis.details?.remove_items || [];
+            if (removeItems.length > 0) {
+                messageElement.textContent = "아이템을 제거하는 중...";
+                updateProcessingStatus(messageElement, messageElement.textContent, 70);
+                
+                try {
+                    const removalResponse = await processRemoveItems(removeItems);
+                    if (removalResponse) {
+                        results.removedItems = removeItems;
+                    }
+                    
+                    // 제거만 있는 경우 즉시 응답
+                    if (primaryIntent === "remove_item" && secondaryIntents.length === 0) {
+                        const removeMessage = removalResponse || "요청하신 아이템을 제거했습니다.";
+                        messageElement.innerHTML = convertMarkdownToHtml(removeMessage);
+                        addToConversation("assistant", removeMessage);
+                        return;
+                    }
+                } catch (error) {
+                    console.error("아이템 제거 중 오류:", error);
+                }
+            }
+        }
+        
+        // 8. 정보 요청 처리
+        if (primaryIntent === "information" && secondaryIntents.length === 0) {
+            messageElement.textContent = "질문에 대한 답변을 준비 중...";
+            try {
+                const infoResponse = await generateInformationResponse(
+                    resolvedMessage, 
+                    intentAnalysis.details?.question_topic
+                );
+                messageElement.innerHTML = convertMarkdownToHtml(infoResponse);
+                addToConversation("assistant", infoResponse);
+                return;
+            } catch (error) {
+                console.error("정보 제공 중 오류:", error);
+                messageElement.textContent = "답변을 생성하는 데 문제가 발생했습니다.";
+                return;
+            }
+        }
+        
+        // 9. 기타 특수 의도 처리
+        if ((primaryIntent === "undo" || primaryIntent === "comparison") && 
+            secondaryIntents.length === 0) {
+            const response = (primaryIntent === "undo") 
+                ? "죄송합니다, 현재 이전 상태로 되돌리기 기능은 지원하지 않습니다." 
+                : "죄송합니다, 현재 이전 상태와 비교 기능은 지원하지 않습니다.";
+            messageElement.textContent = response;
+            addToConversation("assistant", response);
+            return;
+        }
+        
+        // 10. 커스터마이징 처리
+        if (hasIntent("full_customization") || hasIntent("partial_customization")) {
+            const changeType = hasIntent("full_customization") ? "full" : "partial";
+            
+            messageElement.textContent = changeType === "full" ? 
+                "새로운 스타일의 캐릭터를 준비하고 있습니다..." : 
+                "요청하신 부분을 수정하고 있습니다...";
+            
+            updateProcessingStatus(messageElement, messageElement.textContent, 80);
+            
+            try {
+                // 커스터마이징 처리
+                const customizationResult = await processAdvancedCustomization(
+                    resolvedMessage, 
+                    intentAnalysis, 
+                    changeType
+                );
+                
+                results.customizationApplied = true;
+                results.customizationDetails = customizationResult;
+            } catch (error) {
+                console.error("커스터마이징 중 오류:", error);
+                results.customizationDetails = "스타일 변경 중 오류가 발생했습니다.";
+            }
+        }
+        
+        // 11. 일반 대화 의도 처리
+        if (primaryIntent === "other" && !results.genderChanged && 
+            !results.customizationApplied && results.removedItems.length === 0) {
+            try {
+                const otherResponse = await generateConversationalResponse(resolvedMessage);
+                messageElement.innerHTML = convertMarkdownToHtml(otherResponse);
+                addToConversation("assistant", otherResponse);
+                return;
+            } catch (error) {
+                console.error("대화 응답 생성 중 오류:", error);
+                messageElement.textContent = "응답을 생성하는 중 문제가 발생했습니다.";
+                return;
+            }
+        }
+        
+        // 12. 복합 의도 처리 결과 요약
+        const combinedResults = [];
+        
+        if (results.genderChanged) {
+            combinedResults.push("성별을 변경했습니다");
+        }
+        
+        if (results.removedItems.length > 0) {
+            const itemNames = results.removedItems.map(item => {
+                // item이 직접 파트 이름이면 그대로 사용, 아니면 일반 이름 사용
+                return getPartDisplayName(item) || item;
+            });
+            combinedResults.push(`${itemNames.join(', ')}을(를) 제거했습니다`);
+        }
+        
+        if (results.customizationDetails) {
+            combinedResults.push(results.customizationDetails);
+        }
+        
+        const finalResultSummary = combinedResults.join(". ");
+        
+        // 13. 자연스러운 응답 생성
+        const systemPrompt = `당신은 교육용 메타버스 플랫폼의 캐릭터 커스터마이징 도우미입니다. 
+                             사용자의 요청에 따라 변경된 사항을 친절하고 자연스러운 대화체로 설명해주세요.`;
+                             
+        const userPrompt = `사용자 요청: "${resolvedMessage}"
+                         처리된 변경 내용: ${finalResultSummary}
+                         
+                         이 변경 사항을 자연스러운 대화체로 설명하고, 필요하다면 다음 가능한 
+                         커스터마이징 옵션도 제안해주세요.`;
+        
+        // 응답 스트리밍 처리
+        await generateStreamingResponse(messageElement, systemPrompt, userPrompt);
+        
+    } catch (error) {
+        console.error("AI 응답 처리 중 오류:", error);
+        messageElement.textContent = "AI 응답을 표시하는 중 문제가 발생했습니다.";
+    }
+}
+
+// 파트 이름 매핑 객체
+const partNameMap = {
+    '헤어스타일': 'hair',
+    '얼굴형': 'face',
+    '상의': 'top',
+    '하의': 'bottom',
+    '신발': 'footwear',
+    '눈 색상': 'eyeColor',
+    '눈 모양': 'eyeShape',
+    '안경': 'glasses',
+    '모자': 'headwear',
+    '입술': 'lipShape',
+    '코': 'noseShape',
+    '페이스 웨어': 'facewear',
+    '수염': 'beard',
+    '눈썹': 'eyebrowStyle',
+    '피부색': 'skinColor',
+    '머리색': 'hairColor',
+    '눈썹색': 'eyebrowColor'
+};
+
+// 파트 이름 변환 함수
+function mapPartNameToCode(partName) {
+    return partNameMap[partName] || partName; // 매핑 없으면 원래 이름 반환
+}
+
+// 개선된 의도 분석 함수 - 복합 의도 지원 및 검증 추가
+async function analyzeUserIntent(userInput) {
+    const previousContextText = conversationHistory.slice(-4)
+        .filter(msg => msg.role === 'user' || msg.role === 'assistant')
+        .map(msg => msg.content).join("\n");
+    
+    const response = await cachedOpenAICall({
+        model: "gpt-4o",
+        messages: [
+            {
+                role: "system",
+                content: `사용자의 요청을 심층 분석하여 주요 의도와 보조 의도를 모두 파악하세요. 
+                하나의 요청에 여러 의도가 포함될 수 있습니다(예: 성별 변경과 헤어스타일 변경).
+                
+                가능한 의도 유형:
+                - gender_change: 성별 변경 요청
+                - full_customization: 전체 스타일 변경
+                - partial_customization: 부분 변경
+                - remove_item: 특정 아이템 제거 요청
+                - information: 캐릭터 커스터마이징 관련 정보 요청
+                - undo: 이전 변경 취소 요청
+                - comparison: 이전 상태와 비교 요청
+                - other: 기타 요청
+                
+                다음 정보를 포함한 JSON으로 응답하세요.
+                parts 명은 반드시 다음과 같이 지정된 key 중 하나여야 합니다
+                ["hair", "face", "top", "bottom", "footwear", "eyeColor", "eyeShape", "glasses", "headwear","lipShape", "noseShape", "facewear", "beard", "eyebrowStyle", "skinColor", "hairColor", "eyebrowColor"]
+                :
+                {
+                    "primary_intent": "주요 의도",
+                    "secondary_intents": ["보조 의도1", "보조 의도2", ...],
+                    "details": {
+                        "parts": ["변경하려는 부위1", "변경하려는 부위2", ...],
+                        "styles": {
+                            "부위1": {
+                                "description": "스타일 설명",
+                                "match_priority": "exact|similar|any", // 매칭 우선순위
+                                "importance": 1-10 // 중요도 (1-10)
+                            },
+                            // 다른 부위들...
+                        },
+                        "gender": "변경 요청된 성별",
+                        "question_topic": "information 의도일 때 질문 주제",
+                        "remove_items": ["제거할 아이템1", "제거할 아이템2"]
+                    }
+                }`
+            },
+            ...(previousContextText ? [{
+                role: "system",
+                content: `이전 대화 문맥: ${previousContextText}`
+            }] : []),
+            {
+                role: "user", 
+                content: userInput
+            }
+        ],
+        response_format: { type: "json_object" }
+    });
+
+    // 성별 관련 키워드 직접 확인
+    const genderKeywords = {
+        'male': ['남자', '남성', '남정네', '사내', '남', 'male', 'man', 'men'],
+        'female': ['여자', '여성', '여인', '아가씨', '여', 'female', 'woman', 'women', 'girl']
+    };
+    
+    // 성별 키워드가 있는지 확인하는 보조 로직
+    const detectedGender = Object.entries(genderKeywords).find(([gender, keywords]) =>
+        keywords.some(keyword => userInput.toLowerCase().includes(keyword))
+    )?.[0];
+    
+    try {
+        const result = JSON.parse(response.choices[0].message.content);
+
+        // 직접 감지한 성별로 보완
+        if (detectedGender && (!result.details?.gender || result.details.gender === "null")) {
+            console.log(`의도 분석에서 감지된 성별 없음, 직접 감지한 성별(${detectedGender}) 사용`);
+            if (!result.details) result.details = {};
+            result.details.gender = detectedGender;
+        }
+        
+        // 응답 구조 검증 및 기본값 보강
+        return {
+            primary_intent: result.primary_intent || "partial_customization",
+            secondary_intents: Array.isArray(result.secondary_intents) ? 
+                result.secondary_intents : [],
+            details: {
+                parts: Array.isArray(result.details?.parts) ? 
+                    result.details.parts : [],
+                styles: result.details?.styles || {},
+                gender: result.details?.gender || null,
+                question_topic: result.details?.question_topic || "",
+                remove_items: Array.isArray(result.details?.remove_items) ? 
+                    result.details.remove_items : []
+            }
+        };
+    } catch (error) {
+        console.error("의도 분석 결과 파싱 오류:", error);
+        return { 
+            primary_intent: "partial_customization", 
+            secondary_intents: [],
+            details: { 
+                parts: [],
+                styles: {},
+                gender: null,
+                question_topic: "",
+                remove_items: []
+            }
+        };
+    }
+}
+
+// 3단계 매칭을 적용한 고급 커스터마이징
+async function processAdvancedCustomization(userInput, intentAnalysis, changeType) {
+    debugLog("고급 커스터마이징 처리 시작:");
+    debugLog("- 입력:", userInput);
+    debugLog("- 변경 타입:", changeType);
+    debugLog("- 의도 데이터:", JSON.stringify(intentAnalysis, null, 2));
+    
+    // 1. 매칭 우선순위와 함께 파트별 설명 추출
+    const partsWithPriority = {};
+    const partStyles = intentAnalysis.details?.styles || {};
+    
+    debugLog("- 스타일 데이터:", JSON.stringify(partStyles, null, 2));
+    
+    // 2. 각 파트에 대해 처리할지 결정
+    const requestedParts = intentAnalysis.details?.parts || []; // 요청된 파트 목록
+    
+    Object.entries(partStyles).forEach(([part, style]) => {
+        // 유효성 검사 추가
+        if (!style || typeof style !== 'object') {
+            console.warn(`유효하지 않은 스타일 데이터: ${part}`, style);
+            return;
+        }
+        
+        // 기본값 제공
+        const description = style.description || "기본 스타일";
+        const matchPriority = (style.match_priority === "exact" || 
+                             style.match_priority === "similar" || 
+                             style.match_priority === "any") ? 
+                             style.match_priority : "similar";
+        const importance = typeof style.importance === 'number' ? 
+                         style.importance : 5;
+        
+        // full 변경이거나, partial 변경이면서 요청한 파트인 경우만 처리
+        // 요청된 파트 목록에 포함되어 있는지 확인
+        if (changeType === "full" || requestedParts.includes(part)) {
+            // 파트 이름 매핑
+            const mappedPart = mapPartNameToCode(part);
+            partsWithPriority[mappedPart] = { description, matchPriority, importance };
+        }
+    });
+    
+    debugLog("처리할 파트 및 우선순위:", partsWithPriority);
+    
+    // 3. 각 파트별로 3단계 매칭 적용하여 에셋 ID 찾기
+    const tasks = Object.entries(partsWithPriority).map(async ([part, details]) => {
+        try {
+            const result = await findBestAssetIdWithPriority(
+                part, 
+                details.description, 
+                details.matchPriority
+            );
+            return [part, result];
+        } catch (error) {
+            console.error(`파트 ${part} 처리 중 오류:`, error);
+            // 오류 시 폴백 결과 반환
+            return [part, getFallbackWithDetails(part, details.description)];
+        }
+    });
+    
+    const results = await Promise.all(tasks);
+    const assetsToApply = Object.fromEntries(results);
+    
+    // 4. 변경 사항 적용
+    try {
+        await window.applyAssetChanges(assetsToApply);
+    } catch (error) {
+        console.error("변경 사항 적용 중 오류:", error);
+    }
+    
+    // 5. 변경 내용 요약 생성
+    const actualDescriptions = {};
+    Object.entries(assetsToApply).forEach(([part, result]) => {
+        actualDescriptions[part] = result.fallback ? result.actualDescription : result.requestedDescription;
+    });
+    
+    const summary = generateAdvancedChangeDescription(actualDescriptions, assetsToApply);
+    
+    // 6. 폴백 사용 항목에 대한 정보 포함
+    const fallbackInfo = Object.entries(assetsToApply)
+        .filter(([_, result]) => result.fallback)
+        .map(([part, result]) => {
+            const partName = getPartDisplayName(part);
+            const matchDetail = result.matchPriority === "exact" ? 
+                              "(정확한 일치 요청)" : 
+                              result.matchPriority === "similar" ? 
+                              "(유사 항목 허용)" : "(대체 항목 허용)";
+                              
+            return `${partName}의 경우 "${result.requestedDescription}" 요청 ${matchDetail}이 지원되지 않아 기본 스타일을 적용했습니다.`;
+        })
+        .join(' ');
+    
+    // 7. 최종 설명 반환
+    return fallbackInfo ? `${summary} (참고: ${fallbackInfo})` : summary;
+}
+
+// 3단계 매칭 우선순위를 고려한 에셋 ID 찾기
+async function findBestAssetIdWithPriority(part, description, matchPriority = "similar") {
+    const partData = assetCatalog[part] || [];
+    
+    if (partData.length === 0) {
+        console.warn(`${part}에 대한 에셋 데이터가 없습니다.`);
+        return getFallbackWithDetails(part, description);
+    }
+
+    try {
+        // 매칭 우선순위에 따라 다른 프롬프트 사용
+        let priorityPrompt = "";
+        switch (matchPriority) {
+            case "exact":
+                priorityPrompt = "사용자의 요청과 완벽히 일치하는 에셋만 선택하세요. 일치하는 것이 없다면 'no_match'라고 응답하세요.";
+                break;
+            case "similar":
+                priorityPrompt = "사용자의 요청과 가장 유사한 에셋을 선택하세요. 완벽히 일치하지 않더라도 괜찮습니다.";
+                break;
+            case "any":
+                priorityPrompt = "사용자의 요청과 약간이라도 관련 있는 에셋을 선택하세요. 정확한 일치가 필요하지 않습니다.";
+                break;
+        }
+        
+        const response = await callRes({
+            model: "gpt-4o",
+            messages: [
+                {
+                    role: "system",
+                    content: `주어진 설명과 가장 일치하는 에셋의 ID를 선택하세요. ${priorityPrompt} JSON 데이터는 다음과 같습니다: ${JSON.stringify(partData)}`
+                },
+                {
+                    role: "user",
+                    content: `"${description}" 설명과 가장 잘 맞는 에셋의 ID를 찾아주세요. 결과를 JSON 형식으로 반환하세요: {"id": "선택한 ID", "confidence": 1-10 사이 숫자, "reason": "선택 이유"}`
+                }
+            ],
+            response_format: { type: "json_object" }
+        });
+        
+        const result = JSON.parse(response.choices[0].message.content);
+        
+        // 일치하는 것이 없는 경우 처리
+        if (result.id === 'no_match' && matchPriority === "exact") {
+            // 한 단계 낮은 우선순위로 재시도
+            console.log(`${part}에 대한 정확한 일치 없음, 유사 매칭 시도`);
+            return findBestAssetIdWithPriority(part, description, "similar");
+        }
+        
+        // ID 유효성 검증
+        const matchingAsset = partData.find(item => String(item.id || '') === result.id);
+        if (matchingAsset) {
+            return { 
+                id: result.id, 
+                requestedDescription: description, 
+                fallback: false,
+                actualDescription: matchingAsset.description || matchingAsset.name || description,
+                confidence: result.confidence,
+                reason: result.reason,
+                matchPriority
+            };
+        } else {
+            console.warn(`유효하지 않은 ID: ${result.id}, 파트: ${part}.`);
+            
+            if (matchPriority !== "any") {
+                // 더 낮은 우선순위로 재시도
+                const nextPriority = matchPriority === "exact" ? "similar" : "any";
+                console.log(`${part}에 대한 유효한 ID 없음, ${nextPriority} 매칭 시도`);
+                return findBestAssetIdWithPriority(part, description, nextPriority);
+            } else {
+                console.warn(`모든 우선순위에서 ID를 찾을 수 없음: ${part}.`);
+                return getFallbackWithDetails(part, description);
+            }
+        }
+    } catch (error) {
+        console.error(`${part} 에셋 ID 찾기 오류:`, error);
+        return getFallbackWithDetails(part, description);
     }
 }
 
