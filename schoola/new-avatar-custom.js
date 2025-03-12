@@ -102,8 +102,13 @@ async function start(forcedGender = null, avatarJson = null) {
     window.characterJson = window.draftAvatar.data;
     console.log('Draft avatar patched:', window.draftAvatar.data);
 
-    setTimeout(() => {
-        saveDraftAvatar(window.token, selectedAvatarId);
+    setTimeout(async () => {
+        const ret = await saveDraftAvatar(window.token, selectedAvatarId);        
+        if (!ret) {
+            console.error('Draft avatar save failed.');
+            start(forcedGender, avatarJson);
+            return;
+        }
         updateGenderButtons();
         displayIframe();
         spinner.remove();                
@@ -306,7 +311,7 @@ async function changeDraftAvatar(bearer_token, draft_avatar_id, patched_data) {
                 "assets": {
                     ...(patched_data.assets.skinColor && { "skinColor": patched_data.assets.skinColor }),
                     ...(patched_data.assets.eyeColor && { "eyeColor": patched_data.assets.eyeColor }),
-                    ...(patched_data.assets.beardColor && { "beardColor": patched_data.assets.beardColor })||(patched_data.assets.beardColor === "" && { "beardColor": patched_data.assets.beardColor }),
+                    ...(patched_data.assets.beardColor && { "beardColor": patched_data.assets.beardColor }),
                     ...(patched_data.assets.beardStyle && { "beardStyle": patched_data.assets.beardStyle })||(patched_data.assets.beardStyle === "" && { "beardStyle": patched_data.assets.beardStyle }),
                     ...(patched_data.assets.eyebrowStyle && { "eyebrowStyle": patched_data.assets.eyebrowStyle }),
                     ...(patched_data.assets.eyebrowColor && { "eyebrowColor": patched_data.assets.eyebrowColor }),
@@ -344,14 +349,21 @@ async function saveDraftAvatar(bearer_token, draft_avatar_id) {
             },
             body: JSON.stringify({})
         });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+            return null;
+        }
+        
         const json = await response.json();
         console.log('Draft avatar saved:', json);
         return json;
     }
     catch (error) {
         console.error('Draft avatar save failed:', error);
-        start();
-    }   
+        console.log('Retrying in 0.5 second...');        
+        return null;
+    }
 }
 
 function displayIframe() {
