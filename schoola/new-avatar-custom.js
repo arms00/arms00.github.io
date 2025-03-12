@@ -335,17 +335,23 @@ async function changeDraftAvatar(bearer_token, draft_avatar_id, patched_data) {
 }
 
 async function saveDraftAvatar(bearer_token, draft_avatar_id) {
-    const response = await fetch(`https://api.readyplayer.me/v2/avatars/${draft_avatar_id}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${bearer_token}`
-        },
-        body: JSON.stringify({})
-    });
-    const json = await response.json();
-    console.log('Draft avatar saved:', json);
-    return json;
+    try {
+        const response = await fetch(`https://api.readyplayer.me/v2/avatars/${draft_avatar_id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${bearer_token}`
+            },
+            body: JSON.stringify({})
+        });
+        const json = await response.json();
+        console.log('Draft avatar saved:', json);
+        return json;
+    }
+    catch (error) {
+        console.error('Draft avatar save failed:', error);
+        start();
+    }   
 }
 
 function displayIframe() {
