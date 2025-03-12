@@ -785,6 +785,201 @@ async function processRemoveItemRequest(userInput, intent) {
     return null; // 제거 요청이 없으면 null 반환
 }
 
+// 에셋 ID 캐싱을 위한 추가 설정
+const assetIDCache = new Map();
+const ASSET_CACHE_TTL = 1000 * 60 * 5; // 5분
+
+// 캐시 키 생성 함수
+function generateAssetCacheKey(part, description, currentAssetId) {
+    return `${part}:${description}:${currentAssetId || 'none'}`;
+}
+
+// 에셋 설명 찾기 헬퍼 함수
+function findAssetDescription(assetData, assetId) {
+    const asset = assetData.find(item => String(item.id || '') === assetId);
+    return asset ? (asset.description || asset.name || "기본 스타일") : "기본 스타일";
+}
+
+// 내부 파트 이름을 API 키로 변환하는 함수
+function getApiKeyForPart(part) {
+    // 대부분의 경우 파트 이름이 API 키와 동일
+    // 다른 경우에는 매핑 정의
+    const apiKeyMap = {
+        // 특별한 매핑이 필요한 경우 여기에 추가
+        // 'internalName': 'apiKeyName'
+    };
+    
+    return apiKeyMap[part] || part; // 매핑이 없으면 파트 이름 그대로 사용
+}
+
+// 3단계 매칭 우선순위를 고려한 에셋 ID 찾기 - 현재 에셋 ID 고려
+async function findBestAssetIdWithPriority(part, description, matchPriority = "similar", currentAssetId = null) {
+    const partData = assetCatalog[part] || [];
+    
+    if (partData.length === 0) {
+        console.warn(`${part}에 대한 에셋 데이터가 없습니다.`);
+        return getFallbackWithDetails(part, description);
+    }
+
+    try {
+        // 현재 에셋 ID를 프롬프트에 포함
+        let currentAssetPrompt = "";
+        if (currentAssetId) {
+            currentAssetPrompt = `현재 적용된 에셋 ID는 "${currentAssetId}"입니다. 사용자 요청에 더 적합한 다른 에셋이 있다면 그것을 선택하세요.`;
+        }
+        
+        // 매칭 우선순위에 따라 다른 프롬프트 사용
+        let priorityPrompt = "";
+        switch (matchPriority) {
+            case "exact":
+                priorityPrompt = "사용자의 요청과 완벽히 일치하는 에셋만 선택하세요.";
+                break;
+            case "similar":
+                priorityPrompt = "사용자의 요청과 가장 유사한 에셋을 선택하세요. 완벽히 일치하지 않더라도 괜찮습니다.";
+                break;
+            case "any":
+                priorityPrompt = "사용자의 요청과 약간이라도 관련 있는 에셋을 선택하세요.";
+                break;
+        }
+        
+        const response = await callRes({
+            model: "gpt-4o",
+            messages: [
+                {
+                    role: "system",
+                    content: `주어진 설명과 가장 일치하는 에셋의 ID를 선택하세요. ${priorityPrompt} ${currentAssetPrompt} JSON 데이터는 다음과 같습니다: ${JSON.stringify(partData)}`
+                },
+                {
+                    role: "user",
+                    content: `"${description}" 설명과 가장 잘 맞는 에셋의 ID를 찾아주세요. 결과를 JSON 형식으로 반환하세요: {"id": "선택한 ID", "confidence": 1-10 사이 숫자, "reason": "선택 이유", "is_different_from_current": true/false}`
+                }
+            ],
+            response_format: { type: "json_object" }
+        });
+        
+        const result = JSON.parse(response.choices[0].message.content);
+        
+        // 현재 ID와 동일하고 변경이 필요한 경우
+        if (result.id === currentAssetId && !result.is_different_from_current) {
+            // 신뢰도에 따른 처리
+            if (result.confidence >= 8) {
+                // 신뢰도가 매우 높으면 - 현재 에셋이 최적임을 사용자에게 알림
+                console.log(`${part}의 현재 에셋이 이미 최적입니다. 신뢰도: ${result.confidence}`);
+                return { 
+                    id: result.id, 
+                    requestedDescription: description, 
+                    fallback: false,
+                    actualDescription: findAssetDescription(partData, result.id),
+                    confidence: result.confidence,
+                    reason: result.reason,
+                    matchPriority,
+                    noChange: true  // 변경 없음을 표시
+                };
+            } else {
+                // 신뢰도가 높지 않으면 - 두 번째로 적합한 에셋 요청
+                console.log(`${part}에 대해 현재 에셋과 다른 대안 검색 중...`);
+                
+                const altResponse = await callRes({
+                    model: "gpt-4o",
+                    messages: [
+                        {
+                            role: "system",
+                            content: `주어진 설명과 일치하면서, 현재 에셋(ID: "${currentAssetId}")과는 다른 대체 에셋을 찾아주세요. 가능한 유사한 품질과 스타일을 유지하되, 요청에 적합한 대안을 선택하세요. JSON 데이터는 다음과 같습니다: ${JSON.stringify(partData)}`
+                        },
+                        {
+                            role: "user",
+                            content: `"${description}" 설명과 일치하면서 ID가 "${currentAssetId}"가 아닌 대체 에셋을 찾아주세요. 결과를 JSON 형식으로 반환하세요: {"id": "선택한 ID", "confidence": 1-10 사이 숫자, "reason": "선택 이유"}`
+                        }
+                    ],
+                    response_format: { type: "json_object" }
+                });
+                
+                const altResult = JSON.parse(altResponse.choices[0].message.content);
+                
+                // 대체 에셋이 현재 에셋과 같은지 확인
+                if (altResult.id === currentAssetId) {
+                    console.log(`${part}에 대해 적절한 대체 에셋을 찾을 수 없습니다.`);
+                    return { 
+                        id: result.id, 
+                        requestedDescription: description, 
+                        fallback: false,
+                        actualDescription: findAssetDescription(partData, result.id),
+                        confidence: result.confidence,
+                        reason: "대체 에셋을 찾을 수 없어 현재 에셋 유지",
+                        matchPriority,
+                        noChange: true  // 변경 없음을 표시
+                    };
+                }
+                
+                // 대체 에셋 반환
+                return { 
+                    id: altResult.id, 
+                    requestedDescription: description, 
+                    fallback: false,
+                    actualDescription: findAssetDescription(partData, altResult.id),
+                    confidence: altResult.confidence,
+                    reason: altResult.reason,
+                    matchPriority,
+                    alternative: true  // 대체 에셋임을 표시
+                };
+            }
+        }
+        
+        // 현재 ID와 다른 경우 또는 변경이 필요한 경우 - 정상적으로 진행
+        const matchingAsset = partData.find(item => String(item.id || '') === result.id);
+        if (matchingAsset) {
+            return { 
+                id: result.id, 
+                requestedDescription: description, 
+                fallback: false,
+                actualDescription: matchingAsset.description || matchingAsset.name || description,
+                confidence: result.confidence,
+                reason: result.reason,
+                matchPriority
+            };
+        } else if (matchPriority !== "any") {
+            // 더 낮은 우선순위로 재시도
+            const nextPriority = matchPriority === "exact" ? "similar" : "any";
+            return findBestAssetIdWithPriority(part, description, nextPriority, currentAssetId);
+        }
+        
+        return getFallbackWithDetails(part, description);
+        
+    } catch (error) {
+        console.error(`${part} 에셋 ID 찾기 오류:`, error);
+        return getFallbackWithDetails(part, description);
+    }
+}
+
+// 캐시된 에셋 ID 조회 또는 검색 함수
+async function getCachedOrFindAssetId(part, description, matchPriority, currentAssetId) {
+    const cacheKey = generateAssetCacheKey(part, description, currentAssetId);
+    const now = Date.now();
+    
+    if (assetIDCache.has(cacheKey)) {
+        const { data, timestamp } = assetIDCache.get(cacheKey);
+        if (now - timestamp < ASSET_CACHE_TTL) {
+            console.log(`에셋 ID 캐시 적중: ${part}, ${description}`);
+            return data;
+        }
+    }
+    
+    // 실제 검색 실행
+    const result = await findBestAssetIdWithPriority(part, description, matchPriority, currentAssetId);
+    
+    // 결과 캐싱
+    assetIDCache.set(cacheKey, { data: result, timestamp: now });
+    
+    // 캐시 크기 관리 (최대 100개 항목)
+    if (assetIDCache.size > 100) {
+        const oldestKey = [...assetIDCache.entries()]
+            .sort(([, a], [, b]) => a.timestamp - b.timestamp)[0][0];
+        assetIDCache.delete(oldestKey);
+    }
+    
+    return result;
+}
+
 // AI 파트별 설명 생성 함수
 async function generatePartDescriptions(userInput, changeType) {
     const msg_male = `
@@ -2064,13 +2259,20 @@ async function processAdvancedCustomization(userInput, intentAnalysis, changeTyp
     
     debugLog("처리할 파트 및 우선순위:", partsWithPriority);
     
-    // 3. 각 파트별로 3단계 매칭 적용하여 에셋 ID 찾기
+    // 3. 각 파트별로 3단계 매칭 적용하여 에셋 ID 찾기 - 캐싱 적용
     const tasks = Object.entries(partsWithPriority).map(async ([part, details]) => {
         try {
-            const result = await findBestAssetIdWithPriority(
+            // 현재 에셋 ID 가져오기
+            const currentAssetId = window.characterJson?.assets ? 
+                               window.characterJson.assets[getApiKeyForPart(part)] : 
+                               null;
+            
+            // 캐시된 결과 또는 새로 검색
+            const result = await getCachedOrFindAssetId(
                 part, 
                 details.description, 
-                details.matchPriority
+                details.matchPriority,
+                currentAssetId  // 현재 에셋 ID 전달
             );
             return [part, result];
         } catch (error) {
@@ -2115,84 +2317,3 @@ async function processAdvancedCustomization(userInput, intentAnalysis, changeTyp
     // 7. 최종 설명 반환
     return fallbackInfo ? `${summary} (참고: ${fallbackInfo})` : summary;
 }
-
-// 3단계 매칭 우선순위를 고려한 에셋 ID 찾기
-async function findBestAssetIdWithPriority(part, description, matchPriority = "similar") {
-    const partData = assetCatalog[part] || [];
-    
-    if (partData.length === 0) {
-        console.warn(`${part}에 대한 에셋 데이터가 없습니다.`);
-        return getFallbackWithDetails(part, description);
-    }
-
-    try {
-        // 매칭 우선순위에 따라 다른 프롬프트 사용
-        let priorityPrompt = "";
-        switch (matchPriority) {
-            case "exact":
-                priorityPrompt = "사용자의 요청과 완벽히 일치하는 에셋만 선택하세요. 일치하는 것이 없다면 'no_match'라고 응답하세요.";
-                break;
-            case "similar":
-                priorityPrompt = "사용자의 요청과 가장 유사한 에셋을 선택하세요. 완벽히 일치하지 않더라도 괜찮습니다.";
-                break;
-            case "any":
-                priorityPrompt = "사용자의 요청과 약간이라도 관련 있는 에셋을 선택하세요. 정확한 일치가 필요하지 않습니다.";
-                break;
-        }
-        
-        const response = await callRes({
-            model: "gpt-4o",
-            messages: [
-                {
-                    role: "system",
-                    content: `주어진 설명과 가장 일치하는 에셋의 ID를 선택하세요. ${priorityPrompt} JSON 데이터는 다음과 같습니다: ${JSON.stringify(partData)}`
-                },
-                {
-                    role: "user",
-                    content: `"${description}" 설명과 가장 잘 맞는 에셋의 ID를 찾아주세요. 결과를 JSON 형식으로 반환하세요: {"id": "선택한 ID", "confidence": 1-10 사이 숫자, "reason": "선택 이유"}`
-                }
-            ],
-            response_format: { type: "json_object" }
-        });
-        
-        const result = JSON.parse(response.choices[0].message.content);
-        
-        // 일치하는 것이 없는 경우 처리
-        if (result.id === 'no_match' && matchPriority === "exact") {
-            // 한 단계 낮은 우선순위로 재시도
-            console.log(`${part}에 대한 정확한 일치 없음, 유사 매칭 시도`);
-            return findBestAssetIdWithPriority(part, description, "similar");
-        }
-        
-        // ID 유효성 검증
-        const matchingAsset = partData.find(item => String(item.id || '') === result.id);
-        if (matchingAsset) {
-            return { 
-                id: result.id, 
-                requestedDescription: description, 
-                fallback: false,
-                actualDescription: matchingAsset.description || matchingAsset.name || description,
-                confidence: result.confidence,
-                reason: result.reason,
-                matchPriority
-            };
-        } else {
-            console.warn(`유효하지 않은 ID: ${result.id}, 파트: ${part}.`);
-            
-            if (matchPriority !== "any") {
-                // 더 낮은 우선순위로 재시도
-                const nextPriority = matchPriority === "exact" ? "similar" : "any";
-                console.log(`${part}에 대한 유효한 ID 없음, ${nextPriority} 매칭 시도`);
-                return findBestAssetIdWithPriority(part, description, nextPriority);
-            } else {
-                console.warn(`모든 우선순위에서 ID를 찾을 수 없음: ${part}.`);
-                return getFallbackWithDetails(part, description);
-            }
-        }
-    } catch (error) {
-        console.error(`${part} 에셋 ID 찾기 오류:`, error);
-        return getFallbackWithDetails(part, description);
-    }
-}
-
-
