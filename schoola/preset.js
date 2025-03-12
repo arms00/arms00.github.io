@@ -60,8 +60,7 @@ export const avatarPreset =
             "안경, 심플한 액세서리",
         ],
         "color": "화이트, 블랙, 네이비 등 심플한 색상",
-        "data": {
-            "hair": ["9247422", "16706931", "50051765"],
+        "data": {            
             "top": ["145857239", "tjfdXbNjQAubq1R8TNc6iw"],
             "bottom": ["5v8yAHTgStqDnYZuJEmFrw", "146120748"],
             "footwear": ["146120526", "XIzjukD6Tl-AIuznRKxLjg"],
