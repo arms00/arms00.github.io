@@ -231,183 +231,26 @@ function updateApiCallStatus(message, isRetrying = false) {
 
 // AI 대화창 기능 구현
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('Window size:', window.innerWidth, 'x', window.innerHeight);
-    console.log('Device pixel ratio:', window.devicePixelRatio);
-    console.log('User agent:', navigator.userAgent);
-    
+
     // 모든 에셋 데이터 미리 로드
-    await preloadAllAssetData();
-    
-    // 요소 참조
-    const aiButton = document.getElementById('aiToggleBtn');
-    const aiChatModal = document.getElementById('aiChatModal');
-    const aiChatClose = document.getElementById('aiChatClose');
+    await preloadAllAssetData();    
+
     const aiChatInput = document.getElementById('aiChatInput');
-    const aiChatSend = document.getElementById('aiChatSend');
-    const aiChatMessages = document.getElementById('aiChatMessages');
-    const aiChatHeader = document.querySelector('.ai-chat-header');    
-
-    // 닫기 버튼
-    document.getElementById('aiChatClose').addEventListener('click', () => {
-        aiChatModal.style.display = 'none';
-    });
-
-    // 드래그 관련 변수
-    let isDragging = false;
-    let offsetX, offsetY;
-
-    // 마우스 다운 이벤트 - 드래그 시작
-    aiChatHeader.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        
-        // 현재 창의 위치를 기준으로 마우스 위치의 차이 계산
-        const rect = aiChatModal.getBoundingClientRect();
-        offsetX = e.clientX - rect.left;
-        offsetY = e.clientY - rect.top;
-        
-        // 드래그 중 커서 스타일 변경
-        aiChatHeader.style.cursor = 'grabbing';
-    });
-
-    // 마우스 움직임 이벤트 - 드래그 중
-    document.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        
-        // 새로운 위치 계산
-        const x = e.clientX - offsetX;
-        const y = e.clientY - offsetY;
-        
-        // 창이 화면 밖으로 나가지 않도록 제한
-        const maxX = window.innerWidth - aiChatModal.offsetWidth;
-        const maxY = window.innerHeight - aiChatModal.offsetHeight;
-        
-        // 위치 설정 (좌측 기준으로 설정)
-        aiChatModal.style.left = `${Math.max(0, Math.min(maxX, x))}px`;
-        aiChatModal.style.top = `${Math.max(0, Math.min(maxY, y))}px`;
-        aiChatModal.style.right = 'auto'; // left로 위치 제어 시 right 해제
-    });
-
-    // 마우스 업 이벤트 - 드래그 종료
-    document.addEventListener('mouseup', () => {
-        if (isDragging) {
-        isDragging = false;
-        aiChatHeader.style.cursor = 'move';
-        }
-    });
-    
-    // 마우스가 창 밖으로 나갔을 때도 드래그 종료
-    document.addEventListener('mouseleave', () => {
-        if (isDragging) {
-        isDragging = false;
-        aiChatHeader.style.cursor = 'move';
-        }
-    });
-  
-    // AI 버튼 클릭 이벤트
-    aiButton.addEventListener('click', () => {
-      aiChatModal.style.display = 'block';
-    });
-  
-    // 닫기 버튼 이벤트
-    aiChatClose.addEventListener('click', () => {
-      aiChatModal.style.display = 'none';
-    });
+    const aiChatSend = document.getElementById('aiChatSend');    
   
     // 메시지 전송 이벤트
     aiChatSend.addEventListener('click', sendMessage);
     aiChatInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') sendMessage();
     });
-  
-    // API 키 관련 요소
-    const apiSettingsButton = document.getElementById('apiSettingsButton');
-    const apiKeyModal = document.getElementById('apiKeyModal');
-    const apiKeyClose = document.getElementById('apiKeyClose');
-    const apiKeyInput = document.getElementById('apiKeyInput');
-    const apiKeyStatus = document.getElementById('apiKeyStatus');
-    const apiKeySave = document.getElementById('apiKeySave');
-    
-    let apiKey = localStorage.getItem('openai_api_key') || '';
-    let isStreaming = false; // 스트리밍 응답 진행 중 여부
-    
-    // API 키 모달 제어
-    if (apiSettingsButton) {
-        apiSettingsButton.addEventListener('click', () => {
-            apiKeyInput.value = apiKey ? '••••••••••••••••••••••' : '';
-            apiKeyModal.style.display = 'block';
-        });
-    }    
-    
-    apiKeyClose.addEventListener('click', () => {
-        apiKeyModal.style.display = 'none';
-    });
-    
-    // API 키 저장
-    apiKeySave.addEventListener('click', async () => {
-        const newApiKey = apiKeyInput.value;
-        
-        // 입력된 키가 마스킹된 값이면 변경하지 않음
-        if (newApiKey === '••••••••••••••••••••••') {
-        apiKeyModal.style.display = 'none';
-        return;
-        }
-        
-        // API 키 형식 검사
-        if (!newApiKey.startsWith('sk-')) {
-        apiKeyStatus.textContent = '올바른 API 키 형식이 아닙니다.';
-        apiKeyStatus.style.color = 'red';
-        return;
-        }
-        
-        apiKeyStatus.textContent = '키 확인 중...';
-        apiKeyStatus.style.color = 'blue';
-        
-        try {
-        // API 키 유효성 검사
-        const isValid = await validateApiKey(newApiKey);
-        
-        if (isValid) {
-            apiKey = newApiKey;
-            localStorage.setItem('openai_api_key', apiKey);
-            apiKeyStatus.textContent = '유효한 API 키입니다!';
-            apiKeyStatus.style.color = 'green';
-            setTimeout(() => {
-            apiKeyModal.style.display = 'none';
-            apiKeyStatus.textContent = '';
-            }, 1500);
-        } else {
-            apiKeyStatus.textContent = '유효하지 않은 API 키입니다.';
-            apiKeyStatus.style.color = 'red';
-        }
-        } catch (error) {
-        apiKeyStatus.textContent = '키 확인 중 오류가 발생했습니다.';
-        apiKeyStatus.style.color = 'red';
-        console.error('API 키 검증 오류:', error);
-        }
-    });
-    
-    // API 키 유효성 검사
-    async function validateApiKey(key) {
-        try {
-        const response = await fetch('https://api.openai.com/v1/models', {
-            method: 'GET',
-            headers: {
-            'Authorization': `Bearer ${key}`
-            }
-        });
-        
-        return response.status === 200;
-        } catch (error) {
-        console.error('API 키 검증 오류:', error);
-        return false;
-        }
-    }
 
     // 메시지 전송 이벤트 (기존 함수를 대체)
     aiChatSend.addEventListener('click', sendMessage);
     aiChatInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') sendMessage();
     });
+
+    let isStreaming = false; // 스트리밍 응답 진행 중 여부
 
     // 메시지 전송 및 ChatGPT API 호출
     async function sendMessage() {
@@ -439,28 +282,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         isStreaming = false;
         streamingMsgDiv.classList.remove('streaming');
         }
-    }
-    
-    // 성별 토글 버튼 요소 가져오기
-    const femaleButton = document.getElementById('femaleButton');
-    const maleButton = document.getElementById('maleButton');
-
-    femaleButton.addEventListener('click', () => {
-        window.characterGender = 'F';
-        window.start('female');        
-    });
-
-    maleButton.addEventListener('click', () => {
-        window.characterGender = 'M';
-        window.start('male');        
-    });
-
-    // 대화 횟수 상태 표시 요소 추가
-    const conversationStatus = document.createElement('div');
-    conversationStatus.id = 'conversation-status';
-    conversationStatus.textContent = null;//`남은 대화 횟수: ${MAX_CONVERSATION_COUNT}`;
-    aiChatMessages.appendChild(conversationStatus);
-
+    }    
 });
 
 // 폴백 에셋 ID 반환 함수 (확장)
@@ -523,60 +345,6 @@ async function cachedOpenAICall(params, cacheKey) {
   }
   
   return result;
-}
-
-// 수정: processNaturalLanguageCustomization에서 병렬 처리 적용
-async function processNaturalLanguageCustomization(userInput) {
-    // 성별 변경 요청 감지
-    const genderChangeRequest = detectGenderChange(userInput);
-    if (genderChangeRequest) {
-        const newGender = genderChangeRequest === 'male' ? 'male' : 'female';
-        await changeGender(newGender);
-        return `성별을 ${newGender === 'male' ? '남성' : '여성'}으로 변경했습니다. 어떤가요? 더 수정하고 싶은 부분이 있으신가요?`;
-    }
-    
-    const changeType = await analyzeChangeType(userInput);
-    
-    // AI에게 파트별 설명 생성 요청
-    const partDescriptions = await generatePartDescriptions(userInput, changeType);
-    console.log("AI 생성 파트 설명:", partDescriptions);
-    
-    // 수정: 여러 파트에 대해 병렬로 asset ID 선택 (이제 결과에 실제 적용된 정보가 포함됨)
-    const results = await getMultipleAssetIds(partDescriptions, userInput, changeType);
-    
-    // 변경 내용 요약 생성을 위한 데이터 구성
-    const appliedChanges = {};
-    const actualDescriptions = {};
-    
-    // 결과에서 실제 ID만 추출하여 적용하기 위한 구조 생성
-    Object.entries(results).forEach(([part, result]) => {
-        appliedChanges[part] = result;
-        
-        // 실제로 적용된 설명 저장 (폴백인 경우 "기본 스타일", 아니면 요청한 설명)
-        actualDescriptions[part] = result.fallback ? result.actualDescription : result.requestedDescription;
-    });
-    
-    // 캐릭터 변경 적용
-    await window.applyAssetChanges(results);
-    
-    // 변경 내용 요약 생성 (실제 적용된 설명 사용)
-    const summary = generateChangeDescription(actualDescriptions, appliedChanges);
-    
-    // 추가: 실제 변경에 대한 정보 포함
-    const actualChangeInfo = Object.entries(results)
-        .filter(([_, result]) => result.fallback)
-        .map(([part, result]) => {
-            const partName = getPartDisplayName(part);
-            return `${partName}의 경우 "${result.requestedDescription}" 요청이 지원되지 않아 기본 스타일을 적용했습니다.`;
-        })
-        .join(' ');
-        
-    // 기본값을 사용한 항목이 있으면 그 내용을 포함하여 반환
-    const explanationWithChanges = actualChangeInfo ? 
-        `${summary} (참고: ${actualChangeInfo})` : 
-        summary;
-    
-    return explanationWithChanges;
 }
 
 function detectGenderChange(userInput) {
@@ -1300,170 +1068,6 @@ async function generateInformationResponse(userInput, details = {}) {
     });
     
     return response.choices[0].message.content;
-}
-
-// 6. 문맥을 활용한 커스터마이징 처리 함수
-async function processNaturalLanguageCustomizationWithContext(resolvedMessage, intent) {
-    // 이미 성별 변경이 처리되었으면 넘어감
-    if (intent.type === 'gender_change') {
-        return "성별이 변경되었습니다.";
-    }
-    
-    const changeType = intent.type === 'full_customization' ? 'full' : 'partial';
-    
-    // 1. 이전 문맥을 고려한 파트 요청 분석
-    const previousContextText = conversationHistory.slice(-6)
-        .filter(msg => msg.role === 'user' || msg.role === 'assistant')
-        .map(msg => msg.content).join("\n");
-    
-    // 2. 파트별 설명 생성 요청 전 문맥 활용
-    const partDescriptions = await generatePartDescriptionsWithContext(
-        resolvedMessage, 
-        changeType, 
-        intent.details?.parts || [],
-        previousContextText
-    );
-    console.log("AI 생성 파트 설명 (문맥 활용):", partDescriptions);
-    
-    // 3. 병렬로 asset ID 선택 처리
-    const results = await getMultipleAssetIds(partDescriptions, resolvedMessage, changeType, intent);
-    
-    // 4. 결과 처리 로직
-    const appliedChanges = {};
-    const actualDescriptions = {};
-    
-    Object.entries(results).forEach(([part, result]) => {
-        appliedChanges[part] = result;
-        actualDescriptions[part] = result.fallback ? result.actualDescription : result.requestedDescription;
-    });
-    
-    // 5. 변경 사항 적용
-    await window.applyAssetChanges(results);
-    
-    // 6. 변경 요약 생성
-    const summary = generateChangeDescription(actualDescriptions, appliedChanges);
-    
-    // 7. 폴백 사용 항목에 대한 정보 포함
-    const actualChangeInfo = Object.entries(results)
-        .filter(([_, result]) => result.fallback)
-        .map(([part, result]) => {
-            const partName = getPartDisplayName(part);
-            return `${partName}의 경우 "${result.requestedDescription}" 요청이 지원되지 않아 기본 스타일을 적용했습니다.`;
-        })
-        .join(' ');
-    
-    // 8. 최종 설명 반환
-    return actualChangeInfo ? `${summary} (참고: ${actualChangeInfo})` : summary;
-}
-
-// 7. 문맥을 활용한 파트별 설명 생성
-async function generatePartDescriptionsWithContext(userInput, changeType, requestedParts = [], previousContext = "") {
-    const msg_context = `
-        이전 대화 문맥: ${previousContext}
-    `;
-    
-    const msg_base = `
-        사용자의 요청과 이전 대화 문맥을 고려하여 캐릭터의 각 부분별 특성을 자연어로 설명해주세요.
-        해당 사항이 없는 경우 항목을 제외하거나, "없음" 또는 "기본"으로 대답하세요.
-        ${changeType === 'partial' ? '요청된 부분만 변경하고 나머지는 그대로 유지하세요.' : '전체적인 스타일 변경을 수행하세요.'}
-        반드시 다음 JSON 형식으로 응답해야 합니다:
-    `;
-    
-    const msg_male = `
-        {
-            "hair": "설명",
-            "face": "설명",
-            "top": "설명",
-            "bottom": "설명",
-            "footwear": "설명",
-            "eyeColor": "설명",
-            "glasses": "설명",
-            "headwear": "설명",
-            "lipShape": "설명",
-            'noseShape': "설명",
-            'facewear': "설명",
-            'beard': "설명",
-            'beardColor': "설명",
-            'eyebrowStyle': "설명",
-            'skinColor': "설명",
-            'hairColor': "설명",
-            'eyebrowColor': "설명"
-        }
-    `;
-    
-    const msg_female = `
-        {
-            "hair": "설명",
-            "face": "설명",
-            "top": "설명",
-            "bottom": "설명",
-            "footwear": "설명",
-            "eyeColor": "설명",
-            "glasses": "설명",
-            "headwear": "설명",
-            "lipShape": "설명",
-            'noseShape': "설명",
-            'facewear': "설명",
-            'beard': "설명",   
-            'beardColor': "설명",             
-            'eyebrowStyle': "설명",
-            'skinColor': "설명",
-            'hairColor': "설명",
-            'eyebrowColor': "설명"
-        }
-    `;
-    
-    const genderMsg = window.characterGender === 'M' ? msg_male : msg_female;
-    const msg = msg_base + genderMsg + "\n텍스트가 아닌 정확한 JSON 형식으로만 응답하세요.";
-    
-    const response = await callRes({
-        model: "gpt-4o",
-        messages: [
-            { role: "system", content: msg },
-            { role: "system", content: msg_context },
-            {
-                role: "user",
-                content: `이 요청에 맞는 캐릭터 파트별 설명을 생성해주세요: "${userInput}". 변경 타입: ${changeType}, 특별히 요청된 부분: ${JSON.stringify(requestedParts)}`
-            }
-        ],        
-        response_format: { type: "json_object" }
-    });
-    
-    // 응답에서 JSON 추출 및 파싱 (기존 로직)
-    const content = response.choices[0].message.content;
-    try {
-        // JSON 형식 문자열 추출 시도
-        const jsonMatch = content.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-            return JSON.parse(jsonMatch[0]);
-        }
-        // 전체 텍스트가 JSON인 경우
-        return JSON.parse(content);
-    } catch (error) {
-        console.error('JSON 파싱 오류:', error, content);
-        // 기본 설명으로 폴백
-        return {
-            // 기본 파트 설명...
-            "hair": "기본 헤어스타일",
-            "face": "기본 얼굴형",
-            "top": "기본 상의",
-            "bottom": "기본 하의",
-            "footwear": "기본 신발",
-            "eyeColor": "기본 눈 색상",
-            "eyeShape": "기본 눈 모양",
-            "glasses": "없음",
-            "headwear": "없음",
-            "lipShape": "기본 입술",
-            'noseShape': "기본 코",
-            'facewear': "없음",
-            'beard': "없음",
-            'beardColor': "기본 수염색",
-            'eyebrowStyle': "기본 눈썹",
-            'skinColor': "기본 피부색",
-            'hairColor': "기본 머리색",
-            'eyebrowColor': "기본 눈썹색"
-        };
-    }
 }
 
 // 대화 횟수 제한을 위한 변수
@@ -2230,7 +1834,7 @@ async function analyzeUserIntent(userInput) {
     }
 }
 
-// 3단계 매칭을 적용한 고급 커스터마이징
+// 3단계 매칭을 적용한 고급 커스터마이징 함수 수정
 async function processAdvancedCustomization(userInput, intentAnalysis, changeType) {
     debugLog("고급 커스터마이징 처리 시작:");
     debugLog("- 입력:", userInput);
@@ -2299,35 +1903,109 @@ async function processAdvancedCustomization(userInput, intentAnalysis, changeTyp
     const results = await Promise.all(tasks);
     const assetsToApply = Object.fromEntries(results);
     
+    // 변경 전 현재 에셋 상태 저장
+    const currentAssets = { ...window.characterJson?.assets } || {};
+    
     // 4. 변경 사항 적용
     try {
         await window.applyAssetChanges(assetsToApply);
+        
+        // 5. 변경 후 실제 적용된 에셋 확인
+        const appliedAssets = {};
+        const finalAssets = window.characterJson?.assets || {};
+        
+        // 각 파트별로 실제 적용된 에셋 ID 확인
+        Object.entries(assetsToApply).forEach(([part, requestedAsset]) => {
+            const apiKey = getApiKeyForPart(part);
+            const appliedId = finalAssets[apiKey];
+            
+            console.log(`[${part}] 요청 에셋 ID: ${requestedAsset.id}, 적용된 에셋 ID: ${appliedId}`);
+            
+            // 실제 적용된 에셋 정보 저장
+            appliedAssets[part] = {
+                ...requestedAsset,
+                appliedId: appliedId,
+                wasApplied: requestedAsset.id === appliedId,
+                actuallyChanged: currentAssets[apiKey] !== appliedId
+            };
+        });
+        
+        // 6. 실제 적용된 에셋의 설명 가져오기
+        const getAppliedAssetDescription = (part, assetId) => {
+            if (!assetId) return "기본 스타일";
+            const partData = assetCatalog[part] || [];
+            return findAssetDescription(partData, assetId);
+        };
+
+        // 적용된 에셋 ID로 실제 설명 업데이트
+        Object.entries(appliedAssets).forEach(([part, result]) => {
+            if (result.wasApplied && result.appliedId) {
+                result.actualDescription = getAppliedAssetDescription(part, result.appliedId);
+            }
+        });
+
+        // 7. 변경 내용 요약 생성 - 실제 적용된 에셋 기준
+        const actualDescriptions = {};
+        Object.entries(appliedAssets).forEach(([part, result]) => {
+            actualDescriptions[part] = (result.fallback || result.alternative) ? 
+                result.actualDescription : result.requestedDescription;
+        });
+        
+        const summary = generateAccurateChangeDescription(actualDescriptions, appliedAssets);
+        return summary;
     } catch (error) {
         console.error("변경 사항 적용 중 오류:", error);
+        return "스타일 변경 중 오류가 발생했습니다.";
+    }
+}
+
+// 정확한 변경 요약 생성을 위한 새 함수
+function generateAccurateChangeDescription(descriptions, appliedAssets) {
+    let summary = '';
+    
+    if (Object.keys(appliedAssets).length === 0) {
+        return "변경사항이 없습니다.";
     }
     
-    // 5. 변경 내용 요약 생성
-    const actualDescriptions = {};
-    Object.entries(assetsToApply).forEach(([part, result]) => {
-        actualDescriptions[part] = result.fallback ? result.actualDescription : result.requestedDescription;
+    // 변경된 항목과 유지된 항목 분리
+    const changedItems = [];
+    const unchangedItems = [];
+    const failedItems = [];
+    
+    Object.entries(appliedAssets).forEach(([part, result]) => {
+        const partName = getPartDisplayName(part);
+        const desc = descriptions[part] || '';
+        const shortDesc = desc.length > 50 ? desc.substring(0, 50) + "..." : desc;
+        
+        // 실제로 적용되었는지 여부에 따라 다른 메시지 구성
+        if (!result.wasApplied) {
+            // 요청한 에셋과 다른 에셋이 적용된 경우
+            failedItems.push(`${partName} 변경이 요청과 다르게 적용되었습니다`);
+        } else if (!result.actuallyChanged) {
+            // 이전과 동일한 에셋이 유지된 경우
+            unchangedItems.push(`${partName}은(는) 변경되지 않았습니다`);
+        } else if (result.fallback) {
+            // 폴백 에셋이 적용된 경우
+            changedItems.push(`${partName}을(를) 기본 스타일로 설정했습니다`);
+        } else if (result.alternative) {
+            // 대체 에셋이 적용된 경우
+            changedItems.push(`${partName}을(를) 요청과 유사한 "${shortDesc}" 스타일로 변경했습니다`);
+        } else {
+            // 정상적으로 변경된 경우
+            changedItems.push(`${partName}을(를) ${shortDesc} 스타일로 변경했습니다`);
+        }
     });
     
-    const summary = generateAdvancedChangeDescription(actualDescriptions, assetsToApply);
+    // 변경, 유지, 실패 항목을 순서대로 표시
+    if (changedItems.length > 0) summary += changedItems.join('. ');
+    if (unchangedItems.length > 0) {
+        if (summary) summary += '. ';
+        summary += unchangedItems.join('. ');
+    }
+    if (failedItems.length > 0) {
+        if (summary) summary += '. ';
+        summary += failedItems.join('. ');
+    }
     
-    // 6. 폴백 사용 항목에 대한 정보 포함
-    const fallbackInfo = Object.entries(assetsToApply)
-        .filter(([_, result]) => result.fallback)
-        .map(([part, result]) => {
-            const partName = getPartDisplayName(part);
-            const matchDetail = result.matchPriority === "exact" ? 
-                              "(정확한 일치 요청)" : 
-                              result.matchPriority === "similar" ? 
-                              "(유사 항목 허용)" : "(대체 항목 허용)";
-                              
-            return `${partName}의 경우 "${result.requestedDescription}" 요청 ${matchDetail}이 지원되지 않아 기본 스타일을 적용했습니다.`;
-        })
-        .join(' ');
-    
-    // 7. 최종 설명 반환
-    return fallbackInfo ? `${summary} (참고: ${fallbackInfo})` : summary;
+    return summary;
 }
