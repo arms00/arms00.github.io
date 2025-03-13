@@ -689,6 +689,17 @@ async function loadAvatarModal(url) {
     });
 }
 
+// Base64 to Blob conversion utility
+function base64ToBlob(base64, mime) {
+    const byteCharacters = atob(base64.split(',')[1]);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    return new Blob([byteArray], { type: mime });
+}
+
 // loadAllAnimations() 호출 시점에는 이미 모델 본 이름이 변경되어 있으므로,
 // 여기서 필터링이 정상적으로 동작하고 Idle 애니메이션이 일치하는 본을 찾을 수 있음.
 async function loadAllAnimations(gender, excludeIdle = false) {
