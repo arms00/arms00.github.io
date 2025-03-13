@@ -58,7 +58,7 @@
             </div>
             <h3>AI 캐릭터 커스터마이징&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h3>
             <span id="aiChatClose" class="chat-close-button">&times;</span>
-        </div>
+        </div>        
         <!-- API 키 입력 대화상자 -->
         <div id="apiKeyModal" class="api-key-modal">
             <div class="api-key-container">
@@ -75,14 +75,18 @@
             </div>
         </div>        
         <div id="aiChatMessages" class="ai-chat-messages">
-            <div class="ai-message">안녕하세요! 원하는 캐릭터 스타일을 설명해주세요.</div>
-        </div>
+            <div class="ai-message">안녕하세요! 원하는 캐릭터 스타일을 설명해주세요.</div>            
+        </div>        
         <div class="ai-chat-input-container">
             <input type="text" id="aiChatInput" placeholder="예: 스포티한 스타일로 만들어줘" />
             <button id="aiChatSend">전송</button>
         </div>
         <div id="api-status" class="api-status"></div>
-        </div>        
+        <div id="conversation-status"></div>
+        </div>   
+        <!-- <div class="resize-handle resize-handle-e"></div>
+        <div class="resize-handle resize-handle-s"></div>
+        <div class="resize-handle resize-handle-se"></div>      -->
     </div>
     <div id="avatarCustom-content">        
         <div id="avatarUrl"></div>
@@ -196,8 +200,8 @@
         
         window.addEventListener('getAvatarGLBUrlEvent', () => {
             GetAvatarGLBUrl();
-        });     
-        
+        });
+
         // AI 창 ON/OFF 토글
         const aiToggleBtn = document.getElementById('aiToggleBtn');
         aiToggleBtn.addEventListener('click', () => {
@@ -225,7 +229,184 @@
         window.updatePresetButtons(window.characterPresetIndex || 3);
 
         // AI 버튼 초기 상태 & 토글
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', () => {            
+
+            console.log('Window size:', window.innerWidth, 'x', window.innerHeight);
+            console.log('Device pixel ratio:', window.devicePixelRatio);
+            console.log('User agent:', navigator.userAgent);
+
+            // 요소 참조
+            const aiButton = document.getElementById('aiToggleBtn');
+            const aiChatModal = document.getElementById('aiChatModal');
+            const aiChatClose = document.getElementById('aiChatClose');            
+            const aiChatMessages = document.getElementById('aiChatMessages');
+            const aiChatHeader = document.querySelector('.ai-chat-header');    
+            const aiToggleBtn = document.getElementById('aiToggleBtn');
+
+            // 닫기 버튼
+            document.getElementById('aiChatClose').addEventListener('click', () => {
+                aiChatModal.style.display = 'none';
+            });
+
+            // 드래그 관련 변수
+            let isDragging = false;
+            let offsetX, offsetY;
+
+            // 마우스 다운 이벤트 - 드래그 시작
+            aiChatHeader.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                
+                // 현재 창의 위치를 기준으로 마우스 위치의 차이 계산
+                const rect = aiChatModal.getBoundingClientRect();
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+                
+                // 드래그 중 커서 스타일 변경
+                aiChatHeader.style.cursor = 'grabbing';
+            });
+
+            // 마우스 움직임 이벤트 - 드래그 중
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                
+                // 새로운 위치 계산
+                const x = e.clientX - offsetX;
+                const y = e.clientY - offsetY;
+                
+                // 창이 화면 밖으로 나가지 않도록 제한
+                const maxX = window.innerWidth - aiChatModal.offsetWidth;
+                const maxY = window.innerHeight - aiChatModal.offsetHeight;
+                
+                // 위치 설정 (좌측 기준으로 설정)
+                aiChatModal.style.left = `${Math.max(0, Math.min(maxX, x))}px`;
+                aiChatModal.style.top = `${Math.max(0, Math.min(maxY, y))}px`;
+                aiChatModal.style.right = 'auto'; // left로 위치 제어 시 right 해제
+            });
+
+            // 마우스 업 이벤트 - 드래그 종료
+            document.addEventListener('mouseup', () => {
+                if (isDragging) {
+                isDragging = false;
+                aiChatHeader.style.cursor = 'move';
+                }
+            });
+            
+            // 마우스가 창 밖으로 나갔을 때도 드래그 종료
+            document.addEventListener('mouseleave', () => {
+                if (isDragging) {
+                isDragging = false;
+                aiChatHeader.style.cursor = 'move';
+                }
+            });
+        
+            // AI 버튼 클릭 이벤트
+            aiButton.addEventListener('click', () => {
+            aiChatModal.style.display = 'block';
+            });
+        
+            // 닫기 버튼 이벤트
+            aiChatClose.addEventListener('click', () => {
+            aiChatModal.style.display = 'none';
+            });
+    
+            // API 키 관련 요소
+            const apiSettingsButton = document.getElementById('apiSettingsButton');
+            const apiKeyModal = document.getElementById('apiKeyModal');
+            const apiKeyClose = document.getElementById('apiKeyClose');
+            const apiKeyInput = document.getElementById('apiKeyInput');
+            const apiKeyStatus = document.getElementById('apiKeyStatus');
+            const apiKeySave = document.getElementById('apiKeySave');
+            
+            let apiKey = localStorage.getItem('openai_api_key') || '';            
+            
+            // API 키 모달 제어
+            if (apiSettingsButton) {
+                apiSettingsButton.addEventListener('click', () => {
+                    apiKeyInput.value = apiKey ? '••••••••••••••••••••••' : '';
+                    apiKeyModal.style.display = 'block';
+                });
+            }    
+            
+            apiKeyClose.addEventListener('click', () => {
+                apiKeyModal.style.display = 'none';
+            });
+            
+            // API 키 저장
+            apiKeySave.addEventListener('click', async () => {
+                const newApiKey = apiKeyInput.value;
+                
+                // 입력된 키가 마스킹된 값이면 변경하지 않음
+                if (newApiKey === '••••••••••••••••••••••') {
+                apiKeyModal.style.display = 'none';
+                return;
+                }
+                
+                // API 키 형식 검사
+                if (!newApiKey.startsWith('sk-')) {
+                apiKeyStatus.textContent = '올바른 API 키 형식이 아닙니다.';
+                apiKeyStatus.style.color = 'red';
+                return;
+                }
+                
+                apiKeyStatus.textContent = '키 확인 중...';
+                apiKeyStatus.style.color = 'blue';
+                
+                try {
+                // API 키 유효성 검사
+                const isValid = await validateApiKey(newApiKey);
+                
+                if (isValid) {
+                    apiKey = newApiKey;
+                    localStorage.setItem('openai_api_key', apiKey);
+                    apiKeyStatus.textContent = '유효한 API 키입니다!';
+                    apiKeyStatus.style.color = 'green';
+                    setTimeout(() => {
+                    apiKeyModal.style.display = 'none';
+                    apiKeyStatus.textContent = '';
+                    }, 1500);
+                } else {
+                    apiKeyStatus.textContent = '유효하지 않은 API 키입니다.';
+                    apiKeyStatus.style.color = 'red';
+                }
+                } catch (error) {
+                apiKeyStatus.textContent = '키 확인 중 오류가 발생했습니다.';
+                apiKeyStatus.style.color = 'red';
+                console.error('API 키 검증 오류:', error);
+                }
+            });
+
+            
+            // API 키 유효성 검사
+            async function validateApiKey(key) {
+                try {
+                const response = await fetch('https://api.openai.com/v1/models', {
+                    method: 'GET',
+                    headers: {
+                    'Authorization': `Bearer ${key}`
+                    }
+                });
+                
+                return response.status === 200;
+                } catch (error) {
+                console.error('API 키 검증 오류:', error);
+                return false;
+                }
+            }
+
+            // 성별 토글 버튼 요소 가져오기
+            const femaleButton = document.getElementById('femaleButton');
+            const maleButton = document.getElementById('maleButton');
+
+            femaleButton.addEventListener('click', () => {
+                window.characterGender = 'F';
+                window.start('female');        
+            });
+
+            maleButton.addEventListener('click', () => {
+                window.characterGender = 'M';
+                window.start('male');        
+            });
+            
             // 모바일 환경 감지
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
             
@@ -304,8 +485,6 @@
 
             setTimeout(optimizeForTinyScreens, 500); 
 
-            const aiToggleBtn = document.getElementById('aiToggleBtn');
-            const aiChatModal = document.getElementById('aiChatModal');
             // 처음부터 켜져 있으므로
             aiChatModal.style.display = 'block';
             aiToggleBtn.classList.add('active');
