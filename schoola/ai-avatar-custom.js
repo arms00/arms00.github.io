@@ -413,25 +413,40 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // 폴백 에셋 ID 반환 함수 (확장)
 function getFallbackAssetId(part) {
-    // 각 파트별 기본 ID 목록
+    // 먼저 window.defaultCharacterJson에서 값을 확인
+    if (window.defaultCharacterJson && 
+        window.defaultCharacterJson.assets && 
+        window.defaultCharacterJson.assets[part]) {
+        
+        console.log(`${part}의 기본값을 window.defaultCharacterJson에서 찾음:`, window.defaultCharacterJson.assets[part]);
+        return window.defaultCharacterJson.assets[part];
+    }
+    
+    // window.defaultCharacterJson에 값이 없을 경우 기본 ID 목록 사용
     const fallbacks = {
         'hair': '23368535',
         'face': '49918708',
-        //'top': 'kwhVa1YNStiAN8B7oceBpg',
+        'top': 'kwhVa1YNStiAN8B7oceBpg',
         'bottom': '146120431',
         'footwear': 'NZtK7woLS_S1OtKh32jJDg',
         'eyeColor': '56993869',
         'eyeShape': '50095075',
-        'glasses': '9932578',
-        //'headwear': '',
+        'glasses': '',
+        'headwear': '',
         'lipShape': '49919049',
         'noseShape': '50094592', 
-        //'facewear': '',
-        //'beard': '',
-        'eyebrowStyle': '41308196'
+        'facewear': '',
+        'beard': '',
+        'beardColor': '',
+        'eyebrowStyle': '41308196',
+        'outfit': '',
+        'skinColor': '4',
+        'hairColor': '0',
     };
     
-    return fallbacks[part] || null;
+    const fallbackId = fallbacks[part] || '';
+    console.log(`${part}의 기본값을 fallbacks에서 사용:`, fallbackId);
+    return fallbackId;
 }
 
 // [추가] 진행 상태 업데이트 함수
@@ -1197,7 +1212,8 @@ async function streamChatResponse(userMessage, messageElement) {
             genderChanged: false,
             removedItems: [],
             customizationApplied: false,
-            customizationDetails: null
+            customizationDetails: null,
+            resetToDefault: false
         };
 
         // 6. 성별 변경 처리 (다른 의도보다 우선)
@@ -1207,7 +1223,7 @@ async function streamChatResponse(userMessage, messageElement) {
             
             messageElement.textContent = `${genderType === 'male' ? '남성' : '여성'} 캐릭터로 변경 중...`;
             updateProcessingStatus(messageElement, messageElement.textContent, 40);
-            //let isNotOnlyGenderChange = (hasIntent("remove_item") || hasIntent("full_customization") || hasIntent("partial_customization"));
+            let isNotOnlyGenderChange = (hasIntent("initial") || hasIntent("remove_item") || hasIntent("full_customization") || hasIntent("partial_customization"));
             
             try {
                 const genderChangeSuccess = await changeGender(genderType);//, !isNotOnlyGenderChange);
@@ -1230,7 +1246,36 @@ async function streamChatResponse(userMessage, messageElement) {
                 return;
             }
         }
-        
+        // 6.5 초기화 처리 (성별 변경 다음, 다른 처리 이전)
+        if (hasIntent("initial")) {
+            messageElement.textContent = "캐릭터를 초기 상태로 되돌리는 중...";
+            updateProcessingStatus(messageElement, messageElement.textContent, 50);
+            
+            try {
+                const resetSuccess = await resetCharacterToDefault();
+                
+                // 초기화만 있는 경우 즉시 응답
+                if (primaryIntent === "initial" && secondaryIntents.length === 0) {
+                    const resetResponse = resetSuccess ? 
+                        "캐릭터가 초기 상태로 되돌아갔습니다. 다른 요청이 있으신가요?" :
+                        "캐릭터 초기화 중 문제가 발생했습니다. 다시 시도해주세요.";
+                    
+                    messageElement.innerHTML = convertMarkdownToHtml(resetResponse);
+                    addToConversation("assistant", resetResponse);
+                    return;
+                }
+                
+                results.resetToDefault = resetSuccess;
+
+                // 다른 의도가 있으면 계속 진행
+                messageElement.textContent = "캐릭터를 초기화했습니다. 나머지 요청을 처리 중...";
+                updateProcessingStatus(messageElement, messageElement.textContent, 60);
+            } catch (error) {
+                console.error("캐릭터 초기화 중 오류:", error);
+                messageElement.textContent = "캐릭터 초기화 중 오류가 발생했습니다.";
+                return;
+            }
+        }        
         // 7. 아이템 제거 처리
         if (hasIntent("remove_item")) {
             const removeItems = intentAnalysis.details?.remove_items || [];
@@ -1333,6 +1378,10 @@ async function streamChatResponse(userMessage, messageElement) {
         if (results.genderChanged) {
             combinedResults.push("성별을 변경했습니다");
         }
+
+        if (results.resetToDefault) {
+            combinedResults.push("캐릭터를 초기 상태로 되돌렸습니다");
+        }
         
         if (results.removedItems.length > 0) {
             const itemNames = results.removedItems.map(item => {
@@ -1368,6 +1417,51 @@ async function streamChatResponse(userMessage, messageElement) {
     } catch (error) {
         console.error("AI 응답 처리 중 오류:", error);
         messageElement.textContent = "AI 응답을 표시하는 중 문제가 발생했습니다.";
+    }
+}
+
+// 캐릭터를 초기 상태로 되돌리는 함수
+async function resetCharacterToDefault() {
+    console.log("캐릭터 초기화 시작...");
+    
+    try {
+        // 1. 기본 에셋 준비
+        const defaultAssets = {};
+        
+        // 초기화할 파트 목록
+        const partsToReset = [
+            'hair', 'face', 'top', 'bottom', 'footwear', 'eyeColor', 'eyeShape',
+            'glasses', 'headwear', 'lipShape', 'noseShape', 'facewear', 'beard',
+            'beardColor', 'eyebrowStyle', 'skinColor', 'hairColor', 'eyebrowColor'
+        ];
+        
+        // 각 파트별로 기본값 설정
+        for (const part of partsToReset) {
+            // window.defaultCharacterJson에서 값을 가져오거나 기본값 사용
+            defaultAssets[part] = window.defaultCharacterJson && 
+                                 window.defaultCharacterJson.assets && 
+                                 window.defaultCharacterJson.assets[part] !== undefined ?
+                                 window.defaultCharacterJson.assets[part] : 
+                                 getFallbackAssetId(part);
+        }
+        
+        // 2. 성별이 다를 경우 먼저 성별 복원
+        if (window.characterGender !== window.defaultCharacterGender) {
+            const targetGender = window.defaultCharacterGender === 'M' ? 'male' : 'female';
+            console.log(`초기 성별(${targetGender})로 변경 중...`);
+            
+            // 성별 변경 시도
+            await changeGender(targetGender);
+        }
+        
+        // 3. 모든 에셋 적용
+        console.log("기본 에셋 적용 중...", defaultAssets);
+        await window.applyAssetChanges(defaultAssets);
+        
+        return true;
+    } catch (error) {
+        console.error("캐릭터 초기화 중 오류 발생:", error);
+        return false;
     }
 }
 
@@ -1413,6 +1507,7 @@ async function analyzeUserIntent(userInput) {
                 하나의 요청에 여러 의도가 포함될 수 있습니다(예: 성별 변경과 헤어스타일 변경).
                 
                 가능한 의도 유형:
+                - initial: 초기화 요청(캐릭터를 초기 상태로 되돌림)
                 - gender_change: 성별 변경 요청
                 - full_customization: 전체 스타일 변경
                 - partial_customization: 부분 변경
