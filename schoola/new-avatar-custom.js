@@ -25,23 +25,6 @@ const {
     animationFiles_F_Extend_Base64 
 } = animations;
 
-let avatarGLBUrl = '';
-let modalScene, modalCamera, modalRenderer, modalControls, modalMixer, modalClock;
-let avatarModalModel;
-let modelJSON = null;
-let animationClips = [];
-let validAnimations = [];
-let actions = {}; // 애니메이션 액션들을 저장할 객체
-let characterGender = 'F'; // 기본 성별 설정
-let selectedAvatarId = 'new';
-let avatarExported = false;
-// let previousAvatarId = null;
-let language = 'kr'; // or 'en'
-window.token = null;
-// 원하는 프리셋 인덱스 설정 (1~5)
-window.characterPresetIndex = 3; // 예: 1=아카데믹, 2=에너제틱, 3=단정캐주얼, 4=크리에이티브, 5=퓨처리스틱
-
-
 const subdomain = 'school-metaverse';        
 const apiKey = 'sk_live_nv5h5OeBk95WlymTeQsiebUAAxMvKgFf-a1c';
 const hashdefault = "DGEiAIc3F0A4IwWMrauDE1N0JJZlryt2MRWuZl1eJREmpGEaYJgbBGE1G3cvomMRZUqFI0g5F19jn1WZIGp2HHA0nT1cIQAhHzSXEzgvoRVmIQS1rRf0FyuWMT55YISiEmMkH3MBMy9aDIc3YKIMZxMMGF00E0MZGz5SGHWjMaEHH2y2LIE1ZR1gETIQF0D2AwMcHHLkAwR2ImW1YJcipaNgn3Z=";    
@@ -51,9 +34,32 @@ const frame = document.getElementById('frame');
 const frameOverlay = document.getElementById('frame-overlay');
 const avatarID = document.getElementById('avatarUrl');
 const closeButton = document.querySelector('.modal-content>.close-button');
-
 const modal = document.getElementById('avatarModal');        
 const swSwitch = document.getElementById('sw-switch');
+
+let avatarGLBUrl = '';
+let modalScene, modalCamera, modalRenderer, modalControls, modalMixer, modalClock;
+let avatarModalModel;
+let modelJSON = null;
+let animationClips = [];
+let validAnimations = [];
+let actions = {}; // 애니메이션 액션들을 저장할 객체
+let selectedAvatarId = 'new';
+let avatarExported = false;
+// let previousAvatarId = null;
+let language = 'kr'; // or 'en'
+window.token = null;
+window.strCode = hashdefault;
+window.fetchStr = fetchStr;
+// 원하는 프리셋 인덱스 설정 (1~5)
+window.characterPresetIndex = 3; // 예: 1=아카데믹, 2=에너제틱, 3=단정캐주얼, 4=크리에이티브, 5=퓨처리스틱
+window.start = start;
+window.setPreset = setPreset;
+window.applyAssetChanges = applyAssetChanges;
+window.characterJson = null;
+window.characterGender = null;
+window.defaultCharacterGender = null;
+window.defaultCharacterJson = null;
 
 swSwitch.addEventListener('click', function() {            
     console.log('Switch button clicked.');
@@ -108,14 +114,6 @@ closeButton.addEventListener('click', async function() {
 });
 
 window.addEventListener('message', subscribe);        
-
-window.start = start;
-window.setPreset = setPreset;
-window.characterJson = null;
-window.strCode = hashdefault;
-window.characterGender = characterGender;
-window.fetchStr = fetchStr;
-window.applyAssetChanges = applyAssetChanges;
 
 // 전역 스피너 관리 객체
 const SpinnerManager = {
@@ -196,7 +194,8 @@ async function start(forcedGender = null, avatarJson = null) {
         const randomTemplate = genderTemplates[Math.floor(Math.random() * genderTemplates.length)];
         console.log('Random template id:', randomTemplate.id);
         
-        characterGender = gender.toUpperCase().charAt(0); // Set 'M' or 'F'
+        window.characterGender = gender.toUpperCase().charAt(0); // Set 'M' or 'F'
+        window.defaultCharacterGender = window.characterGender;
         window.draftAvatar = null;
         draftAvatar = await createDraftAvatar(subdomain, 'fullbody-xr', window.token, randomTemplate.id);
         selectedAvatarId = window.draftAvatar.data.id;
@@ -212,6 +211,7 @@ async function start(forcedGender = null, avatarJson = null) {
         else
         {
             applyPresetToAvatar(window.draftAvatar.data, window.characterPresetIndex - 1);
+            window.defaultCharacterJson = JSON.parse(JSON.stringify(window.draftAvatar.data));
         }
                     
         await changeDraftAvatar(window.token, selectedAvatarId, window.draftAvatar.data);
@@ -223,7 +223,7 @@ async function start(forcedGender = null, avatarJson = null) {
         if (saveResult) {
             const femaleButton = document.getElementById('femaleButton');
             const maleButton = document.getElementById('maleButton');
-            if (characterGender === 'F') {
+            if (window.characterGender === 'F') {
                 femaleButton.classList.add('active');
                 maleButton.classList.remove('active');
             } else {
@@ -651,8 +651,8 @@ function processUpdatedAvatar(avatarData) {
     if (modal && modal.style.display === 'flex') return;
 
     // 필요한 데이터 설정
-    selectedAvatarId = avatarData.id;
-    characterGender = avatarData.outfitGender;
+    // selectedAvatarId = avatarData.id;
+    // window.characterGender = avatarData.outfitGender;
     modelJSON = avatarData;
     avatarGLBUrl = `https://models.readyplayer.me/${avatarData.id}.glb`;
 
@@ -785,11 +785,11 @@ function subscribe(event) {
             })
             .then(data => {
                 console.log(data);
-                selectedAvatarId = data.id;
-                //displayIframe();
-                characterGender = data.outfitGender; // JSON 구조에 따라 적절히 수정
-                modelJSON = data;
-                console.log('캐릭터 성별:', characterGender);
+                // selectedAvatarId = data.id;
+                // displayIframe();
+                // window.characterGender = data.outfitGender; // JSON 구조에 따라 적절히 수정
+                // console.log('캐릭터 성별:', window.characterGender);
+                modelJSON = data;                
                 openModal();
             })
             .catch(error => {
@@ -847,7 +847,7 @@ function openModal() {
     
     // 모델 로드 시도
     loadAvatarModal(avatarGLBUrl+'?lod=0')
-        .then(() => loadAllAnimations(characterGender, true))
+        .then(() => loadAllAnimations(window.characterGender, true))
         .then(() => {
             clearTimeout(loadingTimeout); // 타임아웃 취소
             document.getElementById('exportButton').style.display = 'inline-block';
