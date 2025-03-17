@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, user-scalable=no, target-densitydpi=device-dpi" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Character Customization</title>            
     <script type="importmap">
@@ -13,40 +13,10 @@
             }
         }
     </script>
-    <link rel="stylesheet" href="https://arms00.github.io/schoola/new-avatar-custom.css?v=1.0.1" />
-    <!-- <link rel="stylesheet" href="./new-avatar-custom.css?v=1.0.1" /> -->
-    <style>
-        /* 간단한 인라인 스타일 추가 */
-        .undo-button {
-            background: #f8f8f8;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 5px 10px;
-            font-size: 12px;
-            color: #444;
-            cursor: pointer;
-            margin-top: 10px;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .analyze-button {
-            background: #f0f0f0;
-            border: none;
-            border-radius: 20px;
-            padding: 5px 10px;
-            font-size: 12px;
-            color: #666;
-            margin-left: 5px;
-            cursor: pointer;
-        }
-    </style>
+    <link rel="stylesheet" href="https://arms00.github.io/schoola/new-avatar-custom.css?v=1.0.1" />    
 </head>
 <script type="module" src="https://arms00.github.io/schoola/new-avatar-custom.js" defer></script>
 <script type="module" src="https://arms00.github.io/schoola/ai-avatar-custom.js" defer></script>
-<!-- <script type="module" src="./new-avatar-custom.js" defer></script>
-<script type="module" src="./ai-avatar-custom.js" defer></script> -->
 <body>    
     <!-- AI 대화창 모달 추가 -->
     <div id="aiChatModal" class="ai-chat-modal">
@@ -90,10 +60,10 @@
     </div>
     <div id="avatarCustom-content">        
         <div id="avatarUrl"></div>
-        <div class="frame-container" style="position: relative;">
+        <div class="frame-container">
             <iframe id="frame" class="frame" allow="camera *; microphone *; clipboard-write" hidden></iframe>
             <div id="frame-overlay" class="overlay"></div>
-            <div class="settings-overlay" onclick="quitAvatarCustom()"><svg width="65%" height="65%" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 6.875V5.312a1.563 1.563 0 0 0-1.563-1.562h-7.5a1.562 1.562 0 0 0-1.562 1.562v9.375a1.562 1.562 0 0 0 1.563 1.563h7.5a1.562 1.562 0 0 0 1.562-1.563v-1.562" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M16 6.875 19.125 10 16 13.125" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M8.46 10h10.665" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+            <div class="settings-overlay" onclick="history.back()"><svg width="65%" height="65%" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 6.875V5.312a1.563 1.563 0 0 0-1.563-1.562h-7.5a1.562 1.562 0 0 0-1.562 1.562v9.375a1.562 1.562 0 0 0 1.563 1.563h7.5a1.562 1.562 0 0 0 1.562-1.563v-1.562" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M16 6.875 19.125 10 16 13.125" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M8.46 10h10.665" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>            
             <span id="sw-switch" class="block-overlay-1">
             </span> <span class="block-overlay-2"></span>            
             <div class="preset-overlay">                
@@ -119,24 +89,35 @@
     <data id="modelJSONData" value=""></data>
     <data id="avatarModalModelData" value=""></data>
     
-    <script>        
-        const avatarCustomWindow = document.getElementById('avatarCustom-content');
-        closeButton = document.querySelector('.close-button');        
-
-        function quitAvatarCustom() {
-            history.back();
-            // try {
-            //     window.close();                
-            // } catch (error) {
-            //     console.error('Avatar Customization window close error:', error);
-            // }
-            // try {
-            //     window.open('','_self').close();                
-            // } catch (error) {
-            //     console.error('Avatar Customization window close error:', error);
-            // }            
-            // avatarCustomWindow.style.display = 'none';            
-        }        
+    <script>
+        // 참고용 코드
+        // const avatarCustomWindow = document.getElementById('avatarCustom-content');        
+        // function quitAvatarCustom() {            
+        //     try {
+        //         window.close();                
+        //     } catch (error) {
+        //         console.error('Avatar Customization window close error:', error);
+        //     }
+        //     try {
+        //         window.open('','_self').close();                
+        //     } catch (error) {
+        //         console.error('Avatar Customization window close error:', error);
+        //     }            
+        //     avatarCustomWindow.style.display = 'none';            
+        // }      
+        //  
+        // window.addEventListener('exportGLBEvent', () => {
+        //     window.exportGLB();
+        // });
+        // window.addEventListener('getModelJSONEvent', () => {
+        //     window.GetModelJSON();
+        // });        
+        // window.addEventListener('getModelGLBEvent', () => {
+        //     window.GetModelGLB();
+        // });        
+        // window.addEventListener('getAvatarGLBUrlEvent', () => {
+        //     window.GetAvatarGLBUrl();
+        // });
 
         // 일반 스크립트에서 exportGLB 함수 호출 및 반환값 처리
         const exportButton = document.getElementById('exportButton');
@@ -170,7 +151,6 @@
             return serialized;
         }
 
-        // deserializeAvatarModalModel 함수 추가
         function deserializeAvatarModalModel(serializedModel) {
             const loader = new THREE.GLTFLoader();
             let model = null;
@@ -184,23 +164,6 @@
 
             return model;
         }
-
-
-        window.addEventListener('exportGLBEvent', () => {
-            exportGLB();
-        });
-
-        window.addEventListener('getModelJSONEvent', () => {
-            GetModelJSON();
-        });
-        
-        window.addEventListener('getModelGLBEvent', () => {
-            GetModelGLB();
-        });
-        
-        window.addEventListener('getAvatarGLBUrlEvent', () => {
-            GetAvatarGLBUrl();
-        });
 
         // AI 창 ON/OFF 토글
         const aiToggleBtn = document.getElementById('aiToggleBtn');
