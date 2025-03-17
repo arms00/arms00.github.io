@@ -1,7 +1,7 @@
 const frameContainer = document.querySelector('.frame-container');
 frameContainer.style.setProperty('--width-in-pixels', window.innerWidth);
 window.addEventListener('resize', function() {
-    frameContainer.style.setProperty('--width-in-pixels', window.innerWidth);           ;
+    frameContainer.style.setProperty('--width-in-pixels', window.innerWidth);
 });
 
 function setPreset(index) {
@@ -34,6 +34,7 @@ let validAnimations = [];
 let actions = {}; // 애니메이션 액션들을 저장할 객체
 let characterGender = 'F'; // 기본 성별 설정
 let selectedAvatarId = 'new';
+let avatarExported = false;
 // let previousAvatarId = null;
 let language = 'kr'; // or 'en'
 window.token = null;
@@ -51,6 +52,61 @@ const frameOverlay = document.getElementById('frame-overlay');
 const avatarID = document.getElementById('avatarUrl');
 const closeButton = document.querySelector('.modal-content>.close-button');
 
+const modal = document.getElementById('avatarModal');        
+const swSwitch = document.getElementById('sw-switch');
+
+swSwitch.addEventListener('click', function() {            
+    console.log('Switch button clicked.');
+    selectedAvatarId = 'new';
+    document.getElementById('avatarGLBUrlData').value = '';
+    document.getElementById('modelJSONData').value = '';
+    document.getElementById('avatarModalModelData').value = '';
+    console.log('Subscription created.');
+    const blockOverlay1 = document.querySelector('.block-overlay-1');
+    blockOverlay1.innerHTML = "";
+    //blockOverlay1.style.backgroundColor = "rgba(180, 180, 180, 0)";            
+    const blockOverlay2 = document.querySelector('.block-overlay-2');
+    setTimeout(() => {                
+        blockOverlay1.style.backgroundColor = "rgba(246, 246, 246, 0)";
+        blockOverlay2.style.backgroundColor = "rgba(246, 246, 246, 0)";            
+    }, 250);
+    //start();
+    location.reload();
+});
+
+closeButton.addEventListener('click', async function() {
+    console.log('Close button clicked.');
+    modal.style.display = 'none';
+    document.getElementById('exportButton').style.display = 'none';
+    document.getElementById('modalClose').style.display = 'none';
+    createLoadingSpinner();
+    document.getElementById('frame-overlay').style.display = 'none';
+    animationClips = [];
+    validAnimations = [];
+    actions = {};    
+    modelJSON = null;               
+    avatarGLBUrl = '';    
+    avatarExported = false;
+    stopMonitoringAvatarUpdates();        
+    document.getElementById('avatarGLBUrlData').value = '';
+    document.getElementById('modelJSONData').value = '';
+    document.getElementById('avatarModalModelData').value = '';        
+    if (avatarModalModel) {
+        modalScene.remove(avatarModalModel);
+        avatarModalModel = null;
+    }    
+    monitorAvatarUpdates();
+    if (modalMixer) {
+        try{
+            modalMixer.uncacheRoot(avatarModalModel);
+        }                
+        catch (error) {
+            console.log('모델 캐시 제거 중 오류 발생:', error);
+        }
+        modalMixer = null;
+    }                          
+});
+
 window.addEventListener('message', subscribe);        
 
 window.start = start;
@@ -61,76 +117,150 @@ window.characterGender = characterGender;
 window.fetchStr = fetchStr;
 window.applyAssetChanges = applyAssetChanges;
 
-async function start(forcedGender = null, avatarJson = null) {
-    console.log('Starting...: ', window.characterPresetIndex);
-    // Create and display the loading spinner
-
-    const frameContainer = document.querySelector('.frame-container');
-    const spinner = document.createElement('div');
-    spinner.className = 'loading-spinner';
-    frameContainer.appendChild(spinner);
+// 전역 스피너 관리 객체
+const SpinnerManager = {
+    activeSpinners: new Map(),
     
-    // Remove spinner when frame is ready
-    // const removeSpinner = () => {
-    //     if (spinner && spinner.parentNode) {
-    //         spinner.parentNode.removeChild(spinner);
-    //     }
-    // };
-    const userJson = await createUser();
-    window.token = userJson.data.token;
-    const avatarTemplates = await getAvatarTemplates(window.token);
-    const templates = avatarTemplates.data;
-    
-    // 성별 설정 - 강제 성별이 있으면 사용, 없으면 랜덤 또는 현재 성별 유지
-    const gender = forcedGender || (Math.random() < 0.5 ? 'male' : 'female');
-
-    // Filter templates by chosen gender
-    const genderTemplates = templates.filter(template => template.gender === gender);
-    // Randomly select one template from filtered list
-    const randomTemplate = genderTemplates[Math.floor(Math.random() * genderTemplates.length)];
-    // Use this template's ID
-    console.log('Random template id:', randomTemplate.id);
-    characterGender = gender.toUpperCase().charAt(0); // Set 'M' or 'F'
-    window.draftAvatar = null;
-    draftAvatar = await createDraftAvatar(subdomain, 'fullbody-xr', window.token, randomTemplate.id);
-    selectedAvatarId = window.draftAvatar.data.id;
-
-    // 프리셋 적용
-    applyPresetToAvatar(window.draftAvatar.data, window.characterPresetIndex - 1); // 배열은 0부터 시작하므로 -1
-    
-    await changeDraftAvatar(window.token, selectedAvatarId, window.draftAvatar.data);    
-    window.characterJson = window.draftAvatar.data;
-    console.log('Draft avatar patched:', window.draftAvatar.data);
-
-    setTimeout(async () => {
-        const ret = await saveDraftAvatar(window.token, selectedAvatarId);        
-        if (!ret) {
-            console.error('Draft avatar save failed.');
-            start(forcedGender, avatarJson);
-            return;
-        }
-        updateGenderButtons();
-        displayIframe();
-        spinner.remove();                
-    }, 1000);
-    createLoadingSpiiner();
-    
-    function updateGenderButtons() {
-        const femaleButton = document.getElementById('femaleButton');
-        const maleButton = document.getElementById('maleButton');
-        if (characterGender === 'F') {
-            femaleButton.classList.add('active');
-            maleButton.classList.remove('active');
+    create(containerId, spinnerId = null) {
+        // 이미 존재하는 스피너 제거
+        this.remove(containerId);
+        
+        const container = document.getElementById(containerId) || document.querySelector(containerId);
+        if (!container) return null;
+        
+        const spinner = document.createElement('div');
+        spinner.className = 'loading-spinner';
+        
+        if (spinnerId) {
+            spinner.id = spinnerId;
         } else {
-            femaleButton.classList.remove('active');
-            maleButton.classList.add('active');
+            spinner.id = `spinner-${Date.now()}`;
         }
+        
+        container.appendChild(spinner);
+        this.activeSpinners.set(containerId, spinner.id);
+        return spinner;
+    },
+    
+    remove(containerId) {
+        if (this.activeSpinners.has(containerId)) {
+            const spinnerId = this.activeSpinners.get(containerId);
+            const spinner = document.getElementById(spinnerId);
+            if (spinner && spinner.parentNode) {
+                spinner.parentNode.removeChild(spinner);
+            }
+            this.activeSpinners.delete(containerId);
+        } else {
+            // 컨테이너에 있는 모든 스피너 제거 (안전장치)
+            const container = document.getElementById(containerId) || document.querySelector(containerId);
+            if (container) {
+                const spinners = container.querySelectorAll('.loading-spinner');
+                spinners.forEach(spinner => spinner.remove());
+            }
+        }
+    },
+    
+    removeAll() {
+        // 모든 활성 스피너 제거
+        this.activeSpinners.forEach((spinnerId, containerId) => {
+            this.remove(containerId);
+        });
+        
+        // 추가 안전장치: 문서 전체에서 남은 스피너 검색 및 제거
+        document.querySelectorAll('.loading-spinner').forEach(spinner => {
+            spinner.remove();
+        });
+    }
+};
+
+async function start(forcedGender = null, avatarJson = null) {
+    console.log('Starting...:', window.characterPresetIndex);
+    avatarExported = false;
+    // 이전 스피너 정리
+    SpinnerManager.removeAll();
+    
+    // 새 스피너 추가
+    SpinnerManager.create('.frame-container', 'main-spinner');
+    
+    try {
+        const userJson = await createUser();
+        window.token = userJson.data.token;
+        const avatarTemplates = await getAvatarTemplates(window.token);
+        const templates = avatarTemplates.data;
+        
+        // 성별 설정 - 강제 성별이 있으면 사용, 없으면 랜덤 또는 현재 성별 유지
+        const gender = forcedGender || (Math.random() < 0.5 ? 'male' : 'female');
+        
+        // Filter templates by chosen gender
+        const genderTemplates = templates.filter(template => template.gender === gender);
+        const randomTemplate = genderTemplates[Math.floor(Math.random() * genderTemplates.length)];
+        console.log('Random template id:', randomTemplate.id);
+        
+        characterGender = gender.toUpperCase().charAt(0); // Set 'M' or 'F'
+        window.draftAvatar = null;
+        draftAvatar = await createDraftAvatar(subdomain, 'fullbody-xr', window.token, randomTemplate.id);
+        selectedAvatarId = window.draftAvatar.data.id;
+        
+        if (forcedGender && window.characterJson) {
+            await changeDraftAvatar(window.token, selectedAvatarId, window.characterJson);
+        }
+        else
+        {
+            // 프리셋 적용
+            applyPresetToAvatar(window.draftAvatar.data, window.characterPresetIndex - 1);
+            
+            await changeDraftAvatar(window.token, selectedAvatarId, window.draftAvatar.data);
+            window.characterJson = window.draftAvatar.data;            
+        }
+
+        // 저장 시도 (재시도 로직 포함)
+        const saveResult = await saveDraftAvatarWithRetry(window.token, selectedAvatarId);
+        
+        if (saveResult) {
+            const femaleButton = document.getElementById('femaleButton');
+            const maleButton = document.getElementById('maleButton');
+            if (characterGender === 'F') {
+                femaleButton.classList.add('active');
+                maleButton.classList.remove('active');
+            } else {
+                femaleButton.classList.remove('active');
+                maleButton.classList.add('active');
+            }
+            displayIframe();
+            stopMonitoringAvatarUpdates();
+            const modal = document.querySelector('#avatarModal');
+            if (modal && modal.style.display !== 'flex') monitorAvatarUpdates(selectedAvatarId);
+            // 성공 시 스피너 제거
+            SpinnerManager.remove('.frame-container');
+        } else {
+            throw new Error('Failed to save avatar after retries');
+        }
+        
+    } catch (error) {
+        console.error('Error in start process:', error);
+        
+        // 오류 알림 표시
+        const frameContainer = document.querySelector('.frame-container');
+        const errorMsg = document.createElement('div');
+        errorMsg.className = 'error-message';
+        errorMsg.textContent = '아바타 생성 중 오류가 발생했습니다. 다시 시도해주세요.';
+        frameContainer.appendChild(errorMsg);
+        
+        // 스피너 제거 (오류 상태에서도)
+        SpinnerManager.remove('.frame-container');
+        
+        // 3초 후 오류 메시지 제거 및 재시도
+        setTimeout(() => {
+            if (errorMsg.parentNode) {
+                errorMsg.parentNode.removeChild(errorMsg);
+            }
+            start(forcedGender, avatarJson);
+        }, 3000);
     }
 }
 
 start();
 
-// 변경사항 적용 함수 개선
 // 변경사항 적용 함수 개선
 async function applyAssetChanges(changes) {
     if (!window.characterJson) return;
@@ -168,16 +298,19 @@ async function applyAssetChanges(changes) {
     
     console.log("변경 후 characterJson:", JSON.stringify(window.characterJson.assets));
     
+    stopMonitoringAvatarUpdates();
+
     // 변경된 내용으로 아바타 업데이트
     await changeDraftAvatar(window.token, selectedAvatarId, window.characterJson);
 
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    await saveDraftAvatar(window.token, selectedAvatarId);
+    await saveDraftAvatarWithRetry(window.token, selectedAvatarId);
     
     // iframe 새로고침
     setTimeout(() => {            
         displayIframe();
+        monitorAvatarUpdates();
     }, 1000);
 }
 
@@ -339,31 +472,211 @@ async function changeDraftAvatar(bearer_token, draft_avatar_id, patched_data) {
     return json;
 }
 
-async function saveDraftAvatar(bearer_token, draft_avatar_id) {
-    try {
-        const response = await fetch(`https://api.readyplayer.me/v2/avatars/${draft_avatar_id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${bearer_token}`
-            },
-            body: JSON.stringify({})
-        });
+async function saveDraftAvatarWithRetry(bearer_token, draft_avatar_id, maxRetries = 3, delay = 1000) {
+    let attempts = 0;
+    
+    while (attempts < maxRetries) {
+        try {
+            attempts++;
+            console.log(`Attempt ${attempts} to save draft avatar...`);
+            
+            const response = await fetch(`https://api.readyplayer.me/v2/avatars/${draft_avatar_id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${bearer_token}`
+                },
+                body: JSON.stringify({})
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            
+            const json = await response.json();
+            console.log('Draft avatar saved:', json);
+            return json;
+        } 
+        catch (error) {
+            console.error(`Draft avatar save failed (attempt ${attempts}):`, error);
+            
+            if (attempts >= maxRetries) {
+                console.error('Maximum retry attempts reached');
+                return null;
+            }
+            
+            // 점진적 지연 시간 증가 (1초, 2초, 4초...)
+            const waitTime = delay * Math.pow(2, attempts - 1);
+            console.log(`Retrying in ${waitTime/1000} seconds...`);
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+        }
+    }
+    
+    return null; // 최대 재시도 횟수를 초과한 경우
+}
+
+// 전역 상태 관리
+const AvatarMonitor = {
+    currentInstanceId: 0, // 현재 활성 모니터링의 고유 ID
+    abortController: null, // 요청 취소용 컨트롤러
+    monitoringIntervalId: null,
+    
+    // 모니터링 시작
+    startMonitoring(avatar_id = null, checkInterval = 200) {
+        if (selectedAvatarId === 'new') {
+            console.error('모니터링할 아바타 ID가 필요합니다');
+            return;
+        }
+
+        if (!avatar_id) avatar_id = selectedAvatarId;
         
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-            return null;
+        // 진행 중인 모니터링 정리
+        this.stopMonitoring();
+        
+        // 새 인스턴스 ID 생성
+        this.currentInstanceId++;
+        const instanceId = this.currentInstanceId;
+        
+        // 새 AbortController 생성
+        this.abortController = new AbortController();
+        const signal = this.abortController.signal;
+        
+        console.log(`모니터링 #${instanceId} 시작: 아바타 ID ${avatar_id}`);
+        
+        // JSON URL 생성
+        const jsonUrl = `https://models.readyplayer.me/${avatar_id}.json`;
+        
+        // 초기 데이터 가져오기
+        fetch(jsonUrl, { signal })
+            .then(response => response.json())
+            .then(initialData => {
+                // 이미 취소되었거나 다른 인스턴스가 시작되었는지 확인
+                if (signal.aborted || instanceId !== this.currentInstanceId) {
+                    console.log(`모니터링 #${instanceId}: 이미 취소됨`);
+                    return;
+                }
+                
+                const initialUpdatedAt = initialData.updatedAt;
+                console.log(`모니터링 #${instanceId}: 초기 updatedAt: ${initialUpdatedAt}`);
+                
+                // 이전 인터벌 정리
+                if (this.monitoringIntervalId) {
+                    clearInterval(this.monitoringIntervalId);
+                }
+                
+                // 주기적 확인 시작
+                this.monitoringIntervalId = setInterval(() => {
+                    // 이 인스턴스가 아직 활성 상태인지 확인
+                    if (instanceId !== this.currentInstanceId) {
+                        console.log(`모니터링 #${instanceId}: 인스턴스 불일치`);
+                        clearInterval(this.monitoringIntervalId);
+                        return;
+                    }
+                    
+                    // 현재 상태 확인
+                    fetch(jsonUrl, { signal })
+                        .then(response => response.json())
+                        .then(currentData => {
+                            // 이 인스턴스가 아직 활성 상태인지 다시 확인
+                            if (signal.aborted || instanceId !== this.currentInstanceId) {
+                                console.log(`모니터링 #${instanceId}: 요청 후 취소됨`);
+                                return;
+                            }
+                            
+                            const currentUpdatedAt = currentData.updatedAt;
+                            
+                            if (currentUpdatedAt !== initialUpdatedAt) {
+                                console.log(`모니터링 #${instanceId}: 변경 감지! ${initialUpdatedAt} -> ${currentUpdatedAt}`);
+                                
+                                // 중요: 먼저 모니터링 중지
+                                this.stopMonitoring();
+                                
+                                // 그 후 처리 진행
+                                processUpdatedAvatar(currentData);
+                            }
+                        })
+                        .catch(error => {
+                            // AbortError는 정상적인 취소이므로 에러로 처리하지 않음
+                            if (error.name !== 'AbortError') {
+                                console.error(`모니터링 #${instanceId}: 데이터 로드 실패`, error);
+                            }
+                        });
+                }, checkInterval);
+            })
+            .catch(error => {
+                // AbortError는 정상적인 취소이므로 에러로 처리하지 않음
+                if (error.name !== 'AbortError') {
+                    console.error(`모니터링 #${instanceId}: 초기 데이터 로드 실패`, error);
+                }
+            });
+    },
+    
+    // 모니터링 중지
+    stopMonitoring() {
+        console.log(`모니터링 #${this.currentInstanceId} 중지`);
+        
+        // 인터벌 중지
+        if (this.monitoringIntervalId) {
+            clearInterval(this.monitoringIntervalId);
+            this.monitoringIntervalId = null;
         }
         
-        const json = await response.json();
-        console.log('Draft avatar saved:', json);
-        return json;
+        // 진행 중인 모든 fetch 요청 취소
+        if (this.abortController) {
+            this.abortController.abort();
+            this.abortController = null;
+        }
     }
-    catch (error) {
-        console.error('Draft avatar save failed:', error);
-        console.log('Retrying in 0.5 second...');        
-        return null;
-    }
+};
+
+function monitorAvatarUpdates(avatar_id = null, checkInterval = 200) {
+    AvatarMonitor.startMonitoring(avatar_id, checkInterval);
+}
+
+function stopMonitoringAvatarUpdates() {
+    AvatarMonitor.stopMonitoring();
+    return Promise.resolve(); // 기존 코드와의 호환성 유지
+}
+
+// 업데이트된 아바타 처리 함수
+function processUpdatedAvatar(avatarData) {
+    console.log('업데이트된 아바타 처리 시작:', avatarData);
+
+    // 모달이 이미 열려있는지 확인
+    const modal = document.querySelector('#avatarModal');
+    if (modal && modal.style.display === 'flex') return;
+
+    // 필요한 데이터 설정
+    selectedAvatarId = avatarData.id;
+    characterGender = avatarData.outfitGender;
+    modelJSON = avatarData;
+    avatarGLBUrl = `https://models.readyplayer.me/${avatarData.id}.glb`;
+
+    // 성공 알림 표시
+    const notification = document.createElement('div');
+    notification.className = 'success-notification';
+    notification.textContent = '캐릭터가 준비되었습니다!';
+    document.querySelector('.frame-container').appendChild(notification);
+
+    // iframe 갱신은 선택적으로
+    // displayIframe();
+
+    if (notification.parentNode) notification.remove();
+    if (modal && modal.style.display === 'flex') return;
+    openModal();
+}
+
+async function getPermanentAvatar(bearer_token = null, avatar_id = null) {    
+    const response = await fetch(getavatarGLBUrl(), {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${bearer_token}`
+        }
+    });
+    const json = await response.json();
+    console.log('Permanent avatar:', json);
+    return json;
 }
 
 function displayIframe() {
@@ -393,58 +706,6 @@ function displayIframe() {
     console.log('Frame URL:', frame.src);
     document.getElementById('frame').hidden = false;            
 }        
-        
-const modal = document.getElementById('avatarModal');        
-const swSwitch = document.getElementById('sw-switch');
-
-swSwitch.addEventListener('click', function(event) {            
-    console.log('Switch button clicked.');
-    selectedAvatarId = 'new';
-    document.getElementById('avatarGLBUrlData').value = '';
-    document.getElementById('modelJSONData').value = '';
-    document.getElementById('avatarModalModelData').value = '';
-    console.log('Subscription created.');
-    const blockOverlay1 = document.querySelector('.block-overlay-1');
-    blockOverlay1.innerHTML = "";
-    //blockOverlay1.style.backgroundColor = "rgba(180, 180, 180, 0)";            
-    const blockOverlay2 = document.querySelector('.block-overlay-2');
-    setTimeout(() => {                
-        blockOverlay1.style.backgroundColor = "rgba(246, 246, 246, 0)";
-        blockOverlay2.style.backgroundColor = "rgba(246, 246, 246, 0)";            
-    }, 250);
-    //start();
-    location.reload();
-});
-
-closeButton.addEventListener('click', function(event) {
-    console.log('Close button clicked.');
-    modal.style.display = 'none';
-    document.getElementById('exportButton').style.display = 'none';
-    document.getElementById('modalClose').style.display = 'none';
-    createLoadingSpiiner();
-    document.getElementById('frame-overlay').style.display = 'none';
-    animationClips = [];
-    validAnimations = [];
-    actions = {};    
-    modelJSON = null;               
-    avatarGLBUrl = '';            
-    document.getElementById('avatarGLBUrlData').value = '';
-    document.getElementById('modelJSONData').value = '';
-    document.getElementById('avatarModalModelData').value = '';
-    if (avatarModalModel) {
-        modalScene.remove(avatarModalModel);
-        avatarModalModel = null;
-    }
-    if (modalMixer) {
-        try{
-            modalMixer.uncacheRoot(avatarModalModel);
-        }                
-        catch (error) {
-            console.error('모델 캐시 제거 중 오류 발생:', error);
-        }
-        modalMixer = null;
-    }                          
-});
 
 function subscribe(event) {
     const json = parse(event);
@@ -454,6 +715,7 @@ function subscribe(event) {
 
     if (json.eventName === 'v1.frame.ready') {                                
         console.log('Frame is ready.');
+        const frame = document.getElementById('frame');
         frame.contentWindow.postMessage(
             JSON.stringify({
                 target: 'readyplayerme',
@@ -497,10 +759,10 @@ function subscribe(event) {
     
     console.log(json);            
 
-    if (json.eventName === 'v1.avatar.exported') {        
+    if (json.eventName === 'v1.avatar.exported') {
+        avatarExported = true;
         const aiChatModal = document.getElementById('aiChatModal');
         if (aiChatModal) aiChatModal.style.display = 'none';
-
         modal.style.display = 'flex';
         frameOverlay.style.display = 'flex';
         avatarGLBUrl = json.data.url;
@@ -520,7 +782,7 @@ function subscribe(event) {
             .then(data => {
                 console.log(data);
                 selectedAvatarId = data.id;
-                displayIframe();
+                //displayIframe();
                 characterGender = data.outfitGender; // JSON 구조에 따라 적절히 수정
                 modelJSON = data;
                 console.log('캐릭터 성별:', characterGender);
@@ -546,32 +808,63 @@ function parse(event) {
     }
 }
 
-function createLoadingSpiiner() {
-    // Create and display the loading spinner            
-    const spinner = document.createElement('div');
-    spinner.className = 'loading-spinner';
-    spinner.id = 'loadingSpinner';
-    modal.querySelector('.modal-content').appendChild(spinner);
+function createLoadingSpinner() {
+    // 기존 스피너가 있다면 제거
+    if (document.getElementById('loadingSpinner')) {
+        document.getElementById('loadingSpinner').remove();
+    }
+    
+    // 새 스피너 생성
+    return SpinnerManager.create('.modal-content', 'loadingSpinner');
 }
 
-function openModal() {            
+window.openModal = openModal;
+
+function openModal() {
+    displayIframe();    
+    const aiChatModal = document.getElementById('aiChatModal');
+    if (aiChatModal) aiChatModal.style.display = 'none';
     modal.style.display = 'flex';
-
-    loadAvatarModal(avatarGLBUrl+'?lod=0').then(() => {
-        loadAllAnimations(characterGender, true);
-    }).finally(() => {                
-        document.getElementById('exportButton').style.display = 'inline-block';
-        document.getElementById('modalClose').style.display = 'inline-block';
-        // Remove the loading spinner after loading is complete
-        if (document.getElementById('loadingSpinner')) 
-        {                    
-            document.getElementById('loadingSpinner').remove();
-        }
-        serializeAvatarModalModel(avatarModalModel);
-    });                      
+    stopMonitoringAvatarUpdates();
+    
+    // 모달 로딩 스피너 생성
+    createLoadingSpinner();
+    
+    // 타임아웃 설정 (로딩이 30초 이상 지속되면 오류 처리)
+    const loadingTimeout = setTimeout(() => {
+        console.error('Modal loading timeout');
+        SpinnerManager.remove('.modal-content');
+        
+        const errorMsg = document.createElement('div');
+        errorMsg.className = 'modal-error';
+        errorMsg.textContent = '모델을 불러오지 못했습니다. 다시 시도해주세요.';
+        modal.querySelector('.modal-content').appendChild(errorMsg);
+    }, 30000);
+    
+    // 모델 로드 시도
+    loadAvatarModal(avatarGLBUrl+'?lod=0')
+        .then(() => loadAllAnimations(characterGender, true))
+        .then(() => {
+            clearTimeout(loadingTimeout); // 타임아웃 취소
+            document.getElementById('exportButton').style.display = 'inline-block';
+            document.getElementById('modalClose').style.display = 'inline-block';
+            SpinnerManager.remove('.modal-content');
+            serializeAvatarModalModel(avatarModalModel);
+        })
+        .catch(error => {
+            clearTimeout(loadingTimeout); // 타임아웃 취소
+            console.error('Error loading avatar model:', error);
+            SpinnerManager.remove('.modal-content');
+            
+            const errorMsg = document.createElement('div');
+            errorMsg.className = 'modal-error';
+            errorMsg.textContent = '모델을 불러오지 못했습니다. 다시 시도해주세요.';
+            modal.querySelector('.modal-content').appendChild(errorMsg);
+        });
+    
+    // 나머지 설정 계속 진행    
     initModalScene();
-    animateModal();
-
+    animateModal();    
     // 데이터 태그에 값 설정
     document.getElementById('avatarGLBUrlData').setAttribute('value', avatarGLBUrl);
     document.getElementById('modelJSONData').setAttribute('value', JSON.stringify(modelJSON));
@@ -829,9 +1122,6 @@ function filterValidAnimations(animations, boneNames) {
     return filteredClips;
 }
 
-// 모듈 스크립트의 exportGLB 함수를 전역 객체에 할당
-window.exportGLB = exportGLB;
-
 export async function exportGLB() {
     if (!avatarModalModel) {
         alert('No avatar loaded to export.');
@@ -936,20 +1226,27 @@ function GetModelGLB() {
 
 // 모듈 스크립트의 exportGLB 함수를 전역 객체에 할당
 window.exportGLB = exportGLB;
+window.GetModelJSON = GetModelJSON;
+window.GetModelGLB = GetModelGLB;
+window.GetAvatarGLBUrl = GetAvatarGLBUrl;
 
-window.addEventListener('exportGLBEvent', () => {
-    exportGLB();
+// 전역 에러 핸들러 추가
+window.addEventListener('error', function(event) {
+    console.error('Global error caught:', event.error);
+    
+    // 어떤 오류가 발생하더라도 모든 스피너 제거
+    SpinnerManager.removeAll();
+    
+    // 사용자에게 알림
+    const errorToast = document.createElement('div');
+    errorToast.className = 'error-toast';
+    errorToast.innerHTML = '오류가 발생했습니다. 페이지를 새로고침해 주세요.';
+    document.body.appendChild(errorToast);
+    
+    // 5초 후 알림 제거
+    setTimeout(() => {
+        if (errorToast.parentNode) {
+            errorToast.parentNode.removeChild(errorToast);
+        }
+    }, 5000);
 });
-
-window.addEventListener('getModelJSONEvent', () => {
-    GetModelJSON();
-});
-
-window.addEventListener('getModelGLBEvent', () => {
-    GetModelGLB();
-});
-
-window.addEventListener('getAvatarGLBUrlEvent', () => {
-    GetAvatarGLBUrl();
-});
-
