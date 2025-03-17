@@ -272,6 +272,8 @@ start();
 async function applyAssetChanges(changes) {
     if (!window.characterJson) return;
     
+    stopMonitoringAvatarUpdates();
+
     console.log("변경 전 characterJson:", JSON.stringify(window.characterJson.assets));
     
     // 변경사항 적용
@@ -305,8 +307,6 @@ async function applyAssetChanges(changes) {
     
     console.log("변경 후 characterJson:", JSON.stringify(window.characterJson.assets));
     
-    stopMonitoringAvatarUpdates();
-
     // 변경된 내용으로 아바타 업데이트
     await changeDraftAvatar(window.token, selectedAvatarId, window.characterJson);
 
