@@ -201,17 +201,23 @@ async function start(forcedGender = null, avatarJson = null) {
         draftAvatar = await createDraftAvatar(subdomain, 'fullbody-xr', window.token, randomTemplate.id);
         selectedAvatarId = window.draftAvatar.data.id;
         
-        if (forcedGender && window.characterJson) {
-            await changeDraftAvatar(window.token, selectedAvatarId, window.characterJson);
-        }
-        else
-        {
-            // 프리셋 적용
-            applyPresetToAvatar(window.draftAvatar.data, window.characterPresetIndex - 1);
+        // 프리셋 적용
+        applyPresetToAvatar(window.draftAvatar.data, window.characterPresetIndex - 1);
+                    
+        await changeDraftAvatar(window.token, selectedAvatarId, window.draftAvatar.data);
+        window.characterJson = window.draftAvatar.data;            
+
+        // if (forcedGender && window.characterJson) {
+        //     await changeDraftAvatar(window.token, selectedAvatarId, window.characterJson);
+        // }
+        // else
+        // {
+        //     // 프리셋 적용
+        //     applyPresetToAvatar(window.draftAvatar.data, window.characterPresetIndex - 1);
             
-            await changeDraftAvatar(window.token, selectedAvatarId, window.draftAvatar.data);
-            window.characterJson = window.draftAvatar.data;            
-        }
+        //     await changeDraftAvatar(window.token, selectedAvatarId, window.draftAvatar.data);
+        //     window.characterJson = window.draftAvatar.data;            
+        // }
 
         // 저장 시도 (재시도 로직 포함)
         const saveResult = await saveDraftAvatarWithRetry(window.token, selectedAvatarId);
