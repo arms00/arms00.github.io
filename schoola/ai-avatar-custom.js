@@ -1,63 +1,15 @@
-// 모든 파트 데이터를 저장할 전역 객체
-const assetCatalog = {
-    hair: [],
-    face: [],
-    top: [],
-    bottom: [],
-    footwear: [],
-    eyeColor: [],
-    eyeShape: [],
-    glasses: [],
-    headwear: [],
-    lipShape: [],
-    noseShape: [],
-    facewear: [],
-    beard: [],
-    beardColor: [],
-    eyebrowStyle: [],
-    skinColor: [],
-    hairColor: [],
-    eyebrowColor: [],
-};
-  
-// 페이지 로드 시 모든 파트 데이터 미리 로드
-async function preloadAllAssetData() {
-    console.log('모든 에셋 데이터 사전 로드 중...');
-    
-    const partNames = Object.keys(assetCatalog);
-    const loadPromises = partNames.map(async (part) => {
-      try {
-        const response = await fetch(`https://arms00.github.io/schoola/asset_data/${part}.json`);
-        if (response.ok) {
-          const data = await response.json();
-          assetCatalog[part] = Array.isArray(data) ? data : [data];
-          console.log(`${part} 데이터 로드 완료: ${assetCatalog[part].length}개 항목`);
-          
-          // ID 속성 확인 및 추가
-          assetCatalog[part].forEach((item, index) => {
-            if (!item.id && item.assetId) {
-              item.id = item.assetId; // id 속성이 없고 assetId가 있으면 복사
-            }
-            
-            // 그래도 id가 없으면 로그 출력
-            if (!item.id) {
-              console.warn(`${part} 데이터의 ${index}번 항목에 id가 없습니다:`, item);
-            }
-          });
-        } else {
-          console.warn(`${part}.json 로드 실패: ${response.status}`);
-          assetCatalog[part] = []; // 빈 배열로 초기화
-        }
-      } catch (error) {
-        console.error(`${part} 데이터 로드 오류:`, error);
-        assetCatalog[part] = []; // 오류 발생 시 빈 배열로 초기화
-      }
-    });
-    
-    await Promise.all(loadPromises);
-    console.log('모든 에셋 데이터 로드 완료!');
-  }
+import { callRes, convertMarkdownToHtml, debugLog } from 'https://arms00.github.io/schoola/ai-utils.js';
 
+const assetCatalog = {
+    hair: [], face: [], top: [],
+    bottom: [], footwear: [], eyeColor: [],
+    eyeShape: [], glasses: [], headwear: [],
+    lipShape: [], noseShape: [], facewear: [],
+    beard: [], beardColor: [], eyebrowStyle: [],
+    skinColor: [], hairColor: [], eyebrowColor: [],
+};
+
+window.assetCatalog = assetCatalog;
 
 // 통합된 에셋 ID 찾기 함수
 async function findAssetId(part, description, options = {}) {
@@ -94,8 +46,7 @@ async function findAssetId(part, description, options = {}) {
                 break;
         }
         
-        const response = await callAI({
-            model: "gpt-4o",
+        const response = await callRes({            
             messages: [
                 {
                     role: "system",
@@ -154,8 +105,7 @@ async function findAssetId(part, description, options = {}) {
             } else {
                 console.log(`${part}에 대해 현재 에셋과 다른 대안 검색 중...`);
                 
-                const altResponse = await callAI({
-                    model: "gpt-4o",
+                const altResponse = await callRes({                    
                     messages: [
                         {
                             role: "system",
@@ -222,195 +172,6 @@ async function findAssetId(part, description, options = {}) {
     }
 }
 
-// 통합된 API 호출 함수 - 재시도 로직과 캐싱 기능 모두 포함
-async function callAI(params, options = {}) {
-    const { 
-        retryCount = 3, 
-        initialDelay = 1000,
-        cache = false,
-        cacheKey = null,
-        cacheTTL = CACHE_TTL
-    } = options;
-
-    // 캐싱 로직 - 요청한 경우만 적용
-    if (cache) {
-        const key = cacheKey || JSON.stringify(params);
-        const now = Date.now();
-        
-        // 캐시에 항목이 있고 만료되지 않았는지 확인
-        if (apiCache.has(key)) {
-            const { data, timestamp } = apiCache.get(key);
-            if (now - timestamp < cacheTTL) {
-                return data;
-            }
-        }
-    }
-
-    // API 호출 및 재시도 로직
-    let lastError = null;
-    let delay = initialDelay;
-    
-    for (let attempt = 0; attempt <= retryCount; attempt++) {
-        try {
-            // 재시도 중이라면 대기
-            if (attempt > 0) {
-                console.log(`API 호출 재시도 ${attempt}/${retryCount}, ${delay/1000}초 후...`);
-                // 상태 표시 업데이트
-                updateApiCallStatus(`API 호출 재시도 중 (${attempt}/${retryCount})`, true);
-                await new Promise(resolve => setTimeout(resolve, delay));
-                delay *= 2; // 지수 백오프: 대기 시간을 두 배로 증가
-            }
-            
-            // stream 파라미터가 있으면 스트리밍 응답 처리
-            if (params.stream === true) {
-                // 스트리밍의 경우 response 객체 자체를 반환
-                const response = await fetch(atob(window.fetchStr), {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${slpitString()}`
-                    },
-                    body: JSON.stringify(params)
-                });
-                
-                if (!response.ok) {
-                    // 429 에러면 재시도, 다른 에러면 즉시 실패
-                    if (response.status === 429 && attempt < retryCount) {
-                        lastError = new Error(`API 속도 제한 도달: ${response.status}, 재시도 중...`);
-                        continue; // 다음 재시도로 진행
-                    }
-                    
-                    throw new Error(`API 오류: ${response.status} ${response.statusText}`);
-                }
-                
-                const result = response; // 스트리밍의 경우 response 객체 자체를 반환
-                
-                // 캐싱하지 않음 (스트리밍 응답은 캐싱 불가)
-                return result;
-            } else {
-                // 일반 API 요청 처리
-                const response = await fetch(atob(window.fetchStr), {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${slpitString()}`
-                    },
-                    body: JSON.stringify(params)
-                });
-                
-                if (!response.ok) {
-                    // 429 에러면 재시도, 다른 에러면 즉시 실패
-                    if (response.status === 429 && attempt < retryCount) {
-                        lastError = new Error(`API 속도 제한 도달: ${response.status}, 재시도 중...`);
-                        continue; // 다음 재시도로 진행
-                    }
-                    
-                    throw new Error(`API 오류: ${response.status} ${response.statusText}`);
-                }
-                
-                const result = await response.json();
-                
-                // 결과 캐싱 - 요청한 경우만
-                if (cache) {
-                    const key = cacheKey || JSON.stringify(params);
-                    apiCache.set(key, { data: result, timestamp: Date.now() });
-                    
-                    // 캐시 크기 관리 (최대 50개 항목)
-                    if (apiCache.size > 50) {
-                        const oldestKey = [...apiCache.entries()]
-                        .sort(([, a], [, b]) => a.timestamp - b.timestamp)[0][0];
-                        apiCache.delete(oldestKey);
-                    }
-                }
-                
-                return result;
-            }
-        } catch (error) {
-            lastError = error;
-            console.error(`시도 ${attempt + 1}/${retryCount + 1} 실패:`, error);
-            
-            // 마지막 시도가 아니라면 계속 재시도
-            if (attempt < retryCount) {
-                continue;
-            }
-            
-            // 마지막 시도였다면 에러 발생
-            console.error('모든 재시도 실패:', error);
-            throw lastError || new Error('API 호출 중 알 수 없는 오류 발생');
-        }
-    }
-    
-    // 이 코드에 도달하면 모든 재시도가 실패한 것
-    throw lastError || new Error('모든 재시도가 실패했습니다');
-}
-
-// 재시도 상태를 표시할 함수 추가
-function updateApiCallStatus(message, isRetrying = false) {
-    const statusElement = document.getElementById('api-status');
-    if (!statusElement) return;
-    
-    statusElement.textContent = message;
-    statusElement.className = isRetrying ? 'api-status retrying' : 'api-status';
-    
-    // 상태 메시지 자동 소멸 (선택 사항)
-    if (!isRetrying) {
-        setTimeout(() => {
-            statusElement.textContent = '';
-            statusElement.className = 'api-status';
-        }, 5000);
-    }
-}
-
-// AI 대화창 기능 구현
-document.addEventListener('DOMContentLoaded', async () => {
-
-    // 모든 에셋 데이터 미리 로드
-    await preloadAllAssetData();    
-
-    const aiChatInput = document.getElementById('aiChatInput');
-    const aiChatSend = document.getElementById('aiChatSend');    
-  
-    // 메시지 전송 이벤트
-    aiChatSend.addEventListener('click', sendMessage);
-    aiChatInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') sendMessage();
-    });
-
-    let isStreaming = false; // 스트리밍 응답 진행 중 여부
-
-    // 메시지 전송 및 ChatGPT API 호출
-    async function sendMessage() {
-        const message = aiChatInput.value.trim();
-        if (!message || isStreaming) return;
-
-        // 사용자 메시지 표시
-        appendMessage(message, 'user');
-        aiChatInput.value = '';
-        
-        // 대화 횟수 업데이트
-        updateConversationCount();
-
-        // AI 응답 스트리밍 시작
-        const streamingMsgDiv = document.createElement('div');
-        streamingMsgDiv.className = 'ai-message streaming';
-        streamingMsgDiv.textContent = '';
-        aiChatMessages.appendChild(streamingMsgDiv);
-        aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
-
-        isStreaming = true;
-        
-        try {
-        await streamChatResponse(message, streamingMsgDiv);
-        } catch (error) {
-        streamingMsgDiv.textContent = '오류가 발생했습니다. 다시 시도해주세요.';
-        console.error('ChatGPT API 오류:', error);
-        } finally {
-        isStreaming = false;
-        streamingMsgDiv.classList.remove('streaming');
-        }
-    }    
-});
-
 // 폴백 에셋 ID 반환 함수 (확장)
 function getFallbackAssetId(part) {
     // 먼저 window.defaultCharacterJson에서 값을 확인
@@ -459,10 +220,6 @@ function updateProcessingStatus(element, status, progress = 0) {
   `;
 }
 
-// [추가] API 호출 결과 캐싱 함수
-const apiCache = new Map();
-const CACHE_TTL = 1000 * 60 * 30; // 30분
-
 // 성별 변경 함수 강화
 async function changeGender(newGender, isStart = true) {
     // 1. 명확한 로깅
@@ -473,7 +230,7 @@ async function changeGender(newGender, isStart = true) {
     const femaleKeywords = ['여자', '여성', '여', 'female', '우먼', 'woman', '여인', '아가씨', '여자로', '여성으로'];
 
     // 2. 정확한 성별 타입 결정 (강화된 자연어 분석)
-    let targetGender = newGender;
+    let targetGender = newGender.toLowerCase().trim();
     
     // newGender가 정확히 'male' 또는 'female'이 아닌 경우 처리
     if (targetGender !== 'male' && targetGender !== 'female') {
@@ -676,42 +433,20 @@ function saveCurrentStyle(name) {
 }
 
 // [추가] 에러 처리 통합 함수
-function handleError(error, element, fallbackMessage) {
-  console.error('Error:', error);
-  let message = fallbackMessage;
-  if (error.message.includes('API')) {
-    message = "API 서버 연결 중 문제가 발생했습니다.";
-  } else if (error.message.includes('avatar')) {
-    message = "아바타 생성 중 오류가 발생했습니다.";
-  }
-  if (element) {
-    element.textContent = message;
-  } else {
-    appendMessage(message, 'ai');
-  }
-}
-
-// 기존 메시지 표시 함수
-function appendMessage(text, sender) {
-    const messageDiv = document.createElement('div');
-    messageDiv.className = sender === 'user' ? 'user-message' : 'ai-message';
-    messageDiv.textContent = text;
-    aiChatMessages.appendChild(messageDiv);
-    aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
-
-    scrollToBottom(aiChatMessages, true);
-}
-
-function scrollToBottom(element, delayed = false) {
-    if (delayed) {
-      // 렌더링 후 약간의 지연을 두고 스크롤
-      setTimeout(() => {
-        element.scrollTop = element.scrollHeight;
-      }, 100);
-    } else {
-      element.scrollTop = element.scrollHeight;
-    }
-}
+// function handleError(error, element, fallbackMessage) {
+//   console.error('Error:', error);
+//   let message = fallbackMessage;
+//   if (error.message.includes('API')) {
+//     message = "API 서버 연결 중 문제가 발생했습니다.";
+//   } else if (error.message.includes('avatar')) {
+//     message = "아바타 생성 중 오류가 발생했습니다.";
+//   }
+//   if (element) {
+//     element.textContent = message;
+//   } else {
+//     appendMessage(message, 'ai');
+//   }
+// }
 
 function getPartDisplayName(part) {
     return {
@@ -736,25 +471,9 @@ function getPartDisplayName(part) {
     }[part] || part;
 }
 
-function slpitString() {    
-    try {        
-        const splitResult = atob(
-            window.strCode
-                .replace(/[a-zA-Z]/g, c =>
-                    String.fromCharCode((c <= 'Z' ? 90 : 122) >= (c = c.charCodeAt(0) + 13) ? c : c - 26)
-                )
-        ).split('').reverse().join('');
-        return splitResult;
-    } catch (error) {
-        console.error(error);
-        return null;
-    }
-}
-
 // 2. 문맥 기반으로 요청된 파트 분석 (키워드 매칭 대신)
 async function analyzeRequestedParts(userInput, previousContext = "") {
-    const response = await callAI({
-        model: "gpt-4o",
+    const response = await callRes({        
         messages: [
             {
                 role: "system",
@@ -783,8 +502,7 @@ async function analyzeRequestedParts(userInput, previousContext = "") {
 // 3. 정보 요청에 대한 응답 생성 (커스터마이징이 아닌 질문)
 async function generateInformationResponse(userInput, details = {}) {
     // 사용자가 질문한 내용에 대한 정보 제공
-    const response = await callAI({
-        model: "gpt-4o",
+    const response = await callRes({        
         messages: [
             {
                 role: "system",
@@ -802,14 +520,10 @@ async function generateInformationResponse(userInput, details = {}) {
     return response.choices[0].message.content;
 }
 
-// 대화 횟수 제한을 위한 변수
-const MAX_CONVERSATION_COUNT = 25;
-let conversationCount = 0;
 
 // 키워드 매칭이 아닌 문맥 이해 방식으로 개선된 성별 변경 감지
 async function analyzeGenderIntent(userInput, conversationContext) {
-    const response = await callAI({
-        model: "gpt-4o",
+    const response = await callRes({        
         messages: [
             {
                 role: "system",
@@ -847,20 +561,6 @@ async function handleUserMessage(userInput) {
     }
 }
 
-// 대화 횟수 제한 및 UI 표시
-function updateConversationCount() {
-    conversationCount++;
-    const remainingCount = MAX_CONVERSATION_COUNT - conversationCount;
-    const statusElement = document.getElementById('conversation-status');
-    if (remainingCount <= 10 && statusElement) {
-        statusElement.textContent = `남은 대화 횟수: ${remainingCount}`;
-    }
-    if (remainingCount <= 0) {
-        alert("대화 횟수가 초과되었습니다. 더 이상 대화를 진행할 수 없습니다.");
-        // 추가적인 제한 로직을 여기에 추가
-    }
-}
-
 // 향상된 폴백 함수
 function getFallbackWithDetails(part, description) {
     const fallbackId = getFallbackAssetId(part);
@@ -877,8 +577,7 @@ function getFallbackWithDetails(part, description) {
 
 // 기타 의도에 대한 자연스러운 대화형 응답
 async function generateConversationalResponse(userInput) {
-    const response = await callAI({
-        model: "gpt-4o",
+    const response = await callRes({        
         messages: [
             {
                 role: "system",
@@ -897,24 +596,12 @@ async function generateConversationalResponse(userInput) {
     return response.choices[0].message.content;
 }
 
-// 기존 함수들을 새로운 함수로 대체...
-// 디버깅 관련 설정
-const DEBUG_MODE = true;
-
-// 디버깅 전용 로그 함수
-function debugLog(...args) {
-    if (DEBUG_MODE) {
-        console.log("[DEBUG]", ...args);
-    }
-}
-
 // 참조 해석 함수 개선
 async function resolveReferences(userInput) {
     // 대화 히스토리가 충분하지 않으면 바로 입력 반환
     if (conversationHistory.length < 3) return userInput;
     
-    const response = await callAI({
-        model: "gpt-4o",
+    const response = await callRes({        
         messages: [
             {
                 role: "system",
@@ -971,8 +658,7 @@ async function generateStreamingResponse(messageElement, systemPrompt, userPromp
                 messageElement.innerHTML = `응답을 간소화하여 재시도 중... (${retryCount}/${maxRetries})`;
             }
 
-            const response = await callAI({
-                model: 'gpt-4o',
+            const response = await callRes({                
                 messages: [
                     { role: 'system', content: systemPrompt },
                     { role: 'user', content: effectivePrompt }
@@ -1019,7 +705,7 @@ async function generateStreamingResponse(messageElement, systemPrompt, userPromp
                                     }
                                     
                                     // 스크롤 조정
-                                    scrollToBottom(aiChatMessages, false);
+                                    window.scrollToBottom(aiChatMessages, false);
                                 }
                             }
                         } catch (e) {
@@ -1040,7 +726,7 @@ async function generateStreamingResponse(messageElement, systemPrompt, userPromp
             
             // 대화 내역에 추가
             addToConversation("assistant", fullText);
-            scrollToBottom(aiChatMessages, true);
+            window.scrollToBottom(aiChatMessages, true);
             return fullText;
             
         } catch (error) {
@@ -1072,20 +758,6 @@ async function generateStreamingResponse(messageElement, systemPrompt, userPromp
             }
         }
     }
-}
-
-// 마크다운을 HTML로 변환하는 함수
-function convertMarkdownToHtml(markdown) {
-    if (!markdown) return '';
-    
-    return markdown
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // 볼드 텍스트
-    .replace(/\*(.*?)\*/g, '<em>$1</em>')            // 이탤릭 텍스트
-    .replace(/\n\n/g, '<br><br>')                    // 단락 구분
-    .replace(/\n/g, '<br>')                          // 줄바꿈
-    .replace(/```(.*?)```/gs, '<pre><code>$1</code></pre>') // 코드 블록
-    .replace(/`(.*?)`/g, '<code>$1</code>')          // 인라인 코드
-    .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>'); // 링크
 }
 
 // 안전한 아이템 제거 함수 개선
@@ -1172,6 +844,7 @@ async function processRemoveItems(removeItems) {
     }
 }
 
+window.streamChatResponse = streamChatResponse;
 // 복합 의도를 처리하는 메인 함수 개선
 async function streamChatResponse(userMessage, messageElement) {
     try {
@@ -1181,7 +854,7 @@ async function streamChatResponse(userMessage, messageElement) {
         
         // 2. 로딩 상태 표시
         messageElement.textContent = "요청을 분석하고 있습니다...";
-        scrollToBottom(aiChatMessages, true);
+        window.scrollToBottom(aiChatMessages, true);
         
         // 3. 복합 의도 분석
         const intentAnalysis = await analyzeUserIntent(resolvedMessage);
@@ -1497,14 +1170,15 @@ async function analyzeUserIntent(userInput) {
     const previousContextText = conversationHistory.slice(-4)
         .filter(msg => msg.role === 'user' || msg.role === 'assistant')
         .map(msg => msg.content).join("\n");
+
+    const gender = window.characterGender === 'M' ? '남성' : '여성';
     
-    const response = await callAI({
-        model: "gpt-4o",
+    const response = await callRes({        
         messages: [
             {
                 role: "system",
                 content: `사용자의 요청을 심층 분석하여 주요 의도와 보조 의도를 모두 파악하세요. 
-                하나의 요청에 여러 의도가 포함될 수 있습니다(예: 성별 변경과 헤어스타일 변경).
+                하나의 요청에 여러 의도가 포함될 수 있습니다(예: 성별 변경과 헤어스타일 변경).                
                 
                 가능한 의도 유형:
                 - initial: 초기화 요청(캐릭터를 초기 상태로 되돌림)
@@ -1517,7 +1191,7 @@ async function analyzeUserIntent(userInput) {
                 - comparison: 이전 상태와 비교 요청
                 - other: 기타 요청
                 
-                다음 정보를 포함한 JSON으로 응답하세요.
+                ${gender}캐릭터에 어울리도록 다음 정보를 포함한 JSON으로 응답하세요.
                 parts 명은 반드시 다음과 같이 지정된 key 중 하나여야 합니다
                 ["hair", "face", "top", "bottom", "footwear", "eyeColor", "eyeShape", "glasses", "headwear","lipShape", "noseShape", "facewear", "beard", "beardColor", "eyebrowStyle", "skinColor", "hairColor", "eyebrowColor"]
                 :
