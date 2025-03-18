@@ -52,7 +52,6 @@ window.token = null;
 window.strCode = hashdefault;
 window.fetchStr = fetchStr;
 // 원하는 프리셋 인덱스 설정 (1~5)
-window.characterPresetIndex = 3; // 예: 1=아카데믹, 2=에너제틱, 3=단정캐주얼, 4=크리에이티브, 5=퓨처리스틱
 window.start = start;
 window.setPreset = setPreset;
 window.applyAssetChanges = applyAssetChanges;
@@ -60,6 +59,120 @@ window.characterJson = null;
 window.characterGender = null;
 window.defaultCharacterGender = null;
 window.defaultCharacterJson = null;
+
+// 전역 상태 관리
+const AvatarMonitor = {
+    currentInstanceId: 0, // 현재 활성 모니터링의 고유 ID
+    abortController: null, // 요청 취소용 컨트롤러
+    monitoringIntervalId: null,
+    
+    // 모니터링 시작
+    startMonitoring(avatar_id = null, checkInterval = 200) {
+        if (selectedAvatarId === 'new') {
+            console.error('모니터링할 아바타 ID가 필요합니다');
+            return;
+        }
+
+        if (!avatar_id) avatar_id = selectedAvatarId;
+        
+        // 진행 중인 모니터링 정리
+        this.stopMonitoring();
+        
+        // 새 인스턴스 ID 생성
+        this.currentInstanceId++;
+        const instanceId = this.currentInstanceId;
+        
+        // 새 AbortController 생성
+        this.abortController = new AbortController();
+        const signal = this.abortController.signal;
+        
+        console.log(`모니터링 #${instanceId} 시작: 아바타 ID ${avatar_id}`);
+        
+        // JSON URL 생성
+        const jsonUrl = `https://models.readyplayer.me/${avatar_id}.json`;
+        
+        // 초기 데이터 가져오기
+        fetch(jsonUrl, { signal })
+            .then(response => response.json())
+            .then(initialData => {
+                // 이미 취소되었거나 다른 인스턴스가 시작되었는지 확인
+                if (signal.aborted || instanceId !== this.currentInstanceId) {
+                    console.log(`모니터링 #${instanceId}: 이미 취소됨`);
+                    return;
+                }
+                
+                const initialUpdatedAt = initialData.updatedAt;
+                console.log(`모니터링 #${instanceId}: 초기 updatedAt: ${initialUpdatedAt}`);
+                
+                // 이전 인터벌 정리
+                if (this.monitoringIntervalId) {
+                    clearInterval(this.monitoringIntervalId);
+                }
+                
+                // 주기적 확인 시작
+                this.monitoringIntervalId = setInterval(() => {
+                    // 이 인스턴스가 아직 활성 상태인지 확인
+                    if (instanceId !== this.currentInstanceId) {
+                        console.log(`모니터링 #${instanceId}: 인스턴스 불일치`);
+                        clearInterval(this.monitoringIntervalId);
+                        return;
+                    }
+                    
+                    // 현재 상태 확인
+                    fetch(jsonUrl, { signal })
+                        .then(response => response.json())
+                        .then(currentData => {
+                            // 이 인스턴스가 아직 활성 상태인지 다시 확인
+                            if (signal.aborted || instanceId !== this.currentInstanceId) {
+                                console.log(`모니터링 #${instanceId}: 요청 후 취소됨`);
+                                return;
+                            }
+                            
+                            const currentUpdatedAt = currentData.updatedAt;
+                            
+                            if (currentUpdatedAt !== initialUpdatedAt) {
+                                console.log(`모니터링 #${instanceId}: 변경 감지! ${initialUpdatedAt} -> ${currentUpdatedAt}`);
+                                
+                                // 중요: 먼저 모니터링 중지
+                                this.stopMonitoring();
+                                
+                                // 그 후 처리 진행
+                                processUpdatedAvatar(currentData);
+                            }
+                        })
+                        .catch(error => {
+                            // AbortError는 정상적인 취소이므로 에러로 처리하지 않음
+                            if (error.name !== 'AbortError') {
+                                console.error(`모니터링 #${instanceId}: 데이터 로드 실패`, error);
+                            }
+                        });
+                }, checkInterval);
+            })
+            .catch(error => {
+                // AbortError는 정상적인 취소이므로 에러로 처리하지 않음
+                if (error.name !== 'AbortError') {
+                    console.error(`모니터링 #${instanceId}: 초기 데이터 로드 실패`, error);
+                }
+            });
+    },
+    
+    // 모니터링 중지
+    stopMonitoring() {
+        console.log(`모니터링 #${this.currentInstanceId} 중지`);
+        
+        // 인터벌 중지
+        if (this.monitoringIntervalId) {
+            clearInterval(this.monitoringIntervalId);
+            this.monitoringIntervalId = null;
+        }
+        
+        // 진행 중인 모든 fetch 요청 취소
+        if (this.abortController) {
+            this.abortController.abort();
+            this.abortController = null;
+        }
+    }
+};
 
 swSwitch.addEventListener('click', function() {            
     console.log('Switch button clicked.');
@@ -171,7 +284,7 @@ const SpinnerManager = {
     }
 };
 
-async function start(forcedGender = null, avatarJson = null) {
+async function start(forcedGender = null) {
     console.log('Starting...:', window.characterPresetIndex);
     avatarExported = false;
     // 이전 스피너 정리
@@ -181,13 +294,14 @@ async function start(forcedGender = null, avatarJson = null) {
     SpinnerManager.create('.frame-container', 'main-spinner');
     
     try {
+        stopMonitoringAvatarUpdates();
         const userJson = await createUser();
         window.token = userJson.data.token;
         const avatarTemplates = await getAvatarTemplates(window.token);
         const templates = avatarTemplates.data;
-        
+
         // 성별 설정 - 강제 성별이 있으면 사용, 없으면 랜덤 또는 현재 성별 유지
-        const gender = forcedGender || (Math.random() < 0.5 ? 'male' : 'female');
+        const gender = (forcedGender && forcedGender == 'male' ? 'male' : 'female') || (Math.random() < 0.5 ? 'male' : 'female');
         
         // Filter templates by chosen gender
         const genderTemplates = templates.filter(template => template.gender === gender);
@@ -197,28 +311,60 @@ async function start(forcedGender = null, avatarJson = null) {
         window.characterGender = gender.toUpperCase().charAt(0); // Set 'M' or 'F'
         window.defaultCharacterGender = window.characterGender;
         window.draftAvatar = null;
-        draftAvatar = await createDraftAvatar(subdomain, 'fullbody-xr', window.token, randomTemplate.id);
+        window.draftAvatar = await createDraftAvatar(subdomain, 'fullbody', window.token, randomTemplate.id); //'fullbody-xr'
         selectedAvatarId = window.draftAvatar.data.id;
         
         // 프리셋 적용
-        if (forcedGender && window.characterJson)
-        {   
-            window.draftAvatar.data = JSON.parse(JSON.stringify(window.characterJson));
-            if (gender == 'female') {
-                window.characterJson.assets.beardStyle = '';
-                window.characterJson.assets.beardColor = '';
-                window.draftAvatar.data.assets.beardStyle = '';
-                window.draftAvatar.data.assets.beardColor = '';
+        if (forcedGender) {
+            if (forcedGender !== 'male' && forcedGender !== 'female')
+            {                
+                window.draftAvatar.data.assets.beardColor = "0";
+                window.draftAvatar.data.assets.beardStyle = "";
+                window.draftAvatar.data.assets.bottom = "146120748";
+                window.draftAvatar.data.assets.eyeColor = "9781803";
+                window.draftAvatar.data.assets.eyeShape = "";
+                window.draftAvatar.data.assets.eyebrowColor = "0";
+                window.draftAvatar.data.assets.eyebrowStyle = "41303269";
+                window.draftAvatar.data.assets.faceMask = "";
+                window.draftAvatar.data.assets.faceShape = "";
+                window.draftAvatar.data.assets.footwear = "146120526"; //"XIzjukD6Tl-AIuznRKxLjg"
+                window.draftAvatar.data.assets.glasses = "9247553";
+                window.draftAvatar.data.assets.hairColor = "0";
+                window.draftAvatar.data.assets.hairStyle = "16845783";
+                window.draftAvatar.data.assets.headwear = "";
+                window.draftAvatar.data.assets.lipShape = "";
+                window.draftAvatar.data.assets.noseShape = "";
+                window.draftAvatar.data.assets.outfit = "";
+                window.draftAvatar.data.assets.shirt = "";
+                window.draftAvatar.data.assets.skinColor = "4";
+                window.draftAvatar.data.assets.skinColorHex = "#de8d6e"; //"#dea190"
+                window.draftAvatar.data.assets.top = "145857239"; //"tjfdXbNjQAubq1R8TNc6iw"
+                window.defaultCharacterJson = JSON.parse(JSON.stringify(window.draftAvatar.data));
             }
-        }
+            else if (window.characterJson && window.characterJson.length > 4)
+            {
+                if (gender == 'female') {                
+                    window.draftAvatar.data.assets.beardStyle = "";
+                    window.draftAvatar.data.assets.beardColor ="0";
+                    window.draftAvatar.data.assets.outfit = "";
+                    window.characterJson.assets.beardStyle = "";
+                    window.characterJson.assets.beardColor = "0";
+                    window.characterJson.assets.outfit = "";
+                }
+                window.draftAvatar.data = JSON.parse(JSON.stringify(window.characterJson));
+            }
+            else {
+                applyPresetToAvatar(window.draftAvatar.data, window.characterPresetIndex - 1);                
+            }
+        }        
         else
         {
-            applyPresetToAvatar(window.draftAvatar.data, window.characterPresetIndex - 1);
-            window.defaultCharacterJson = JSON.parse(JSON.stringify(window.draftAvatar.data));
+            applyPresetToAvatar(window.draftAvatar.data, window.characterPresetIndex - 1);            
         }
                     
         await changeDraftAvatar(window.token, selectedAvatarId, window.draftAvatar.data);
         window.characterJson = JSON.parse(JSON.stringify(window.draftAvatar.data));
+        window.defaultCharacterJson = JSON.parse(JSON.stringify(window.draftAvatar.data));
 
         // 저장 시도 (재시도 로직 포함)
         const saveResult = await saveDraftAvatarWithRetry(window.token, selectedAvatarId);
@@ -233,12 +379,13 @@ async function start(forcedGender = null, avatarJson = null) {
                 femaleButton.classList.remove('active');
                 maleButton.classList.add('active');
             }
-            displayIframe();
-            stopMonitoringAvatarUpdates();
-            const modal = document.querySelector('#avatarModal');
-            if (modal && modal.style.display !== 'flex') monitorAvatarUpdates(selectedAvatarId);
-            // 성공 시 스피너 제거
-            SpinnerManager.remove('.frame-container');
+            setTimeout(() => {
+                displayIframe();
+                const modal = document.querySelector('#avatarModal');
+                if (modal && modal.style.display !== 'flex') monitorAvatarUpdates(selectedAvatarId);
+                // 성공 시 스피너 제거
+                SpinnerManager.remove('.frame-container');
+            }, 1000);            
         } else {
             throw new Error('Failed to save avatar after retries');
         }
@@ -261,12 +408,10 @@ async function start(forcedGender = null, avatarJson = null) {
             if (errorMsg.parentNode) {
                 errorMsg.parentNode.removeChild(errorMsg);
             }
-            start(forcedGender, avatarJson);
+            start(forcedGender);
         }, 3000);
     }
 }
-
-start();
 
 // 변경사항 적용 함수 개선
 async function applyAssetChanges(changes) {
@@ -452,15 +597,15 @@ async function changeDraftAvatar(bearer_token, draft_avatar_id, patched_data) {
                     ...(patched_data.assets.skinColor && { "skinColor": patched_data.assets.skinColor }),
                     ...(patched_data.assets.eyeColor && { "eyeColor": patched_data.assets.eyeColor }),
                     ...(patched_data.assets.beardColor && { "beardColor": patched_data.assets.beardColor }),
-                    ...(patched_data.assets.beardStyle && { "beardStyle": patched_data.assets.beardStyle })||(patched_data.assets.beardStyle === '' && { "beardStyle": patched_data.assets.beardStyle }),
+                    ...(patched_data.assets.beardStyle === '' && { "beardStyle": patched_data.assets.beardStyle })||(patched_data.assets.beardStyle && { "beardStyle": patched_data.assets.beardStyle }),
                     ...(patched_data.assets.eyebrowStyle && { "eyebrowStyle": patched_data.assets.eyebrowStyle }),
                     ...(patched_data.assets.eyebrowColor && { "eyebrowColor": patched_data.assets.eyebrowColor }),
-                    ...(patched_data.assets.faceWear && { "facewear": patched_data.assets.faceWear })||(patched_data.assets.facewear === '' && { "facewear": patched_data.assets.facewear }),
-                    ...(patched_data.assets.faceMask && { "faceMask": patched_data.assets.faceMask })||(patched_data.assets.faceMask === '' && { "faceMask": patched_data.assets.faceMask }),
-                    ...(patched_data.assets.glasses && { "glasses": patched_data.assets.glasses })||(patched_data.assets.glasses === '' && { "glasses": patched_data.assets.glasses }),
+                    ...(patched_data.assets.facewear === '' && { "facewear": patched_data.assets.facewear })||(patched_data.assets.faceWear && { "facewear": patched_data.assets.faceWear }),
+                    ...(patched_data.assets.faceMask === '' && { "faceMask": patched_data.assets.faceMask })||(patched_data.assets.faceMask && { "faceMask": patched_data.assets.faceMask }),
+                    ...(patched_data.assets.glasses === '' && { "glasses": patched_data.assets.glasses })||(patched_data.assets.glasses && { "glasses": patched_data.assets.glasses }),
                     ...(patched_data.assets.hairStyle && { "hairStyle": patched_data.assets.hairStyle }),
                     ...(patched_data.assets.hairColor && { "hairColor": patched_data.assets.hairColor }),
-                    ...(patched_data.assets.headwear && { "headwear": patched_data.assets.headwear })||(patched_data.assets.headwear === '' && { "headwear": patched_data.assets.headwear }),
+                    ...(patched_data.assets.headwear === '' && { "headwear": patched_data.assets.headwear })||(patched_data.assets.headwear && { "headwear": patched_data.assets.headwear }),
                     ...(patched_data.assets.lipShape && { "lipShape": patched_data.assets.lipShape }),
                     ...(patched_data.assets.eyeShape && { "eyeShape": patched_data.assets.eyeShape }),
                     ...(patched_data.assets.noseShape && { "noseShape": patched_data.assets.noseShape }),
@@ -521,120 +666,6 @@ async function saveDraftAvatarWithRetry(bearer_token, draft_avatar_id, maxRetrie
     
     return null; // 최대 재시도 횟수를 초과한 경우
 }
-
-// 전역 상태 관리
-const AvatarMonitor = {
-    currentInstanceId: 0, // 현재 활성 모니터링의 고유 ID
-    abortController: null, // 요청 취소용 컨트롤러
-    monitoringIntervalId: null,
-    
-    // 모니터링 시작
-    startMonitoring(avatar_id = null, checkInterval = 200) {
-        if (selectedAvatarId === 'new') {
-            console.error('모니터링할 아바타 ID가 필요합니다');
-            return;
-        }
-
-        if (!avatar_id) avatar_id = selectedAvatarId;
-        
-        // 진행 중인 모니터링 정리
-        this.stopMonitoring();
-        
-        // 새 인스턴스 ID 생성
-        this.currentInstanceId++;
-        const instanceId = this.currentInstanceId;
-        
-        // 새 AbortController 생성
-        this.abortController = new AbortController();
-        const signal = this.abortController.signal;
-        
-        console.log(`모니터링 #${instanceId} 시작: 아바타 ID ${avatar_id}`);
-        
-        // JSON URL 생성
-        const jsonUrl = `https://models.readyplayer.me/${avatar_id}.json`;
-        
-        // 초기 데이터 가져오기
-        fetch(jsonUrl, { signal })
-            .then(response => response.json())
-            .then(initialData => {
-                // 이미 취소되었거나 다른 인스턴스가 시작되었는지 확인
-                if (signal.aborted || instanceId !== this.currentInstanceId) {
-                    console.log(`모니터링 #${instanceId}: 이미 취소됨`);
-                    return;
-                }
-                
-                const initialUpdatedAt = initialData.updatedAt;
-                console.log(`모니터링 #${instanceId}: 초기 updatedAt: ${initialUpdatedAt}`);
-                
-                // 이전 인터벌 정리
-                if (this.monitoringIntervalId) {
-                    clearInterval(this.monitoringIntervalId);
-                }
-                
-                // 주기적 확인 시작
-                this.monitoringIntervalId = setInterval(() => {
-                    // 이 인스턴스가 아직 활성 상태인지 확인
-                    if (instanceId !== this.currentInstanceId) {
-                        console.log(`모니터링 #${instanceId}: 인스턴스 불일치`);
-                        clearInterval(this.monitoringIntervalId);
-                        return;
-                    }
-                    
-                    // 현재 상태 확인
-                    fetch(jsonUrl, { signal })
-                        .then(response => response.json())
-                        .then(currentData => {
-                            // 이 인스턴스가 아직 활성 상태인지 다시 확인
-                            if (signal.aborted || instanceId !== this.currentInstanceId) {
-                                console.log(`모니터링 #${instanceId}: 요청 후 취소됨`);
-                                return;
-                            }
-                            
-                            const currentUpdatedAt = currentData.updatedAt;
-                            
-                            if (currentUpdatedAt !== initialUpdatedAt) {
-                                console.log(`모니터링 #${instanceId}: 변경 감지! ${initialUpdatedAt} -> ${currentUpdatedAt}`);
-                                
-                                // 중요: 먼저 모니터링 중지
-                                this.stopMonitoring();
-                                
-                                // 그 후 처리 진행
-                                processUpdatedAvatar(currentData);
-                            }
-                        })
-                        .catch(error => {
-                            // AbortError는 정상적인 취소이므로 에러로 처리하지 않음
-                            if (error.name !== 'AbortError') {
-                                console.error(`모니터링 #${instanceId}: 데이터 로드 실패`, error);
-                            }
-                        });
-                }, checkInterval);
-            })
-            .catch(error => {
-                // AbortError는 정상적인 취소이므로 에러로 처리하지 않음
-                if (error.name !== 'AbortError') {
-                    console.error(`모니터링 #${instanceId}: 초기 데이터 로드 실패`, error);
-                }
-            });
-    },
-    
-    // 모니터링 중지
-    stopMonitoring() {
-        console.log(`모니터링 #${this.currentInstanceId} 중지`);
-        
-        // 인터벌 중지
-        if (this.monitoringIntervalId) {
-            clearInterval(this.monitoringIntervalId);
-            this.monitoringIntervalId = null;
-        }
-        
-        // 진행 중인 모든 fetch 요청 취소
-        if (this.abortController) {
-            this.abortController.abort();
-            this.abortController = null;
-        }
-    }
-};
 
 function monitorAvatarUpdates(avatar_id = null, checkInterval = 200) {
     AvatarMonitor.startMonitoring(avatar_id, checkInterval);
