@@ -81,7 +81,7 @@ async function sendMessage() {
         await window.streamChatResponse(message, streamingMsgDiv);
     } catch (error) {
         streamingMsgDiv.textContent = '오류가 발생했습니다. 다시 시도해주세요.';
-        console.error('ChatGPT API 오류:', error);
+        console.error('API 오류:', error);
     } finally {
         isStreaming = false;
         streamingMsgDiv.classList.remove('streaming');
