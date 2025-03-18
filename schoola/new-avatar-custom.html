@@ -5,18 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Character Customization</title>            
-    <script type="importmap">
+    <script type="importmap">        
         {
             "imports": {
                 "three": "https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.module.js",
                 "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/jsm/"
             }
-        }
-    </script>
-    <link rel="stylesheet" href="https://arms00.github.io/schoola/new-avatar-custom.css?v=1.0.1" />    
+        }        
+    </script>        
+    <link rel="stylesheet" href="new-avatar-custom.css?v=1.0.1" />    
 </head>
-<script type="module" src="https://arms00.github.io/schoola/new-avatar-custom.js" defer></script>
-<script type="module" src="https://arms00.github.io/schoola/ai-avatar-custom.js" defer></script>
+<script type="module">
+    window.DEBUG_MODE = true;
+    window.characterPresetIndex = 3; // 예: 1=아카데믹, 2=에너제틱, 3=단정캐주얼, 4=크리에이티브, 5=퓨처리스틱    
+    import 'https://arms00.github.io/schoola/ai-utils.js';
+    import 'https://arms00.github.io/schoola/ai-avatar-custom.js';    
+    import 'https://arms00.github.io/schoola/new-avatar-custom.js';    
+</script>
 <body>    
     <!-- AI 대화창 모달 추가 -->
     <div id="aiChatModal" class="ai-chat-modal">
@@ -191,8 +196,12 @@
         // 초기 프리셋 버튼 상태 반영
         window.updatePresetButtons(window.characterPresetIndex || 3);
 
-        // AI 버튼 초기 상태 & 토글
-        document.addEventListener('DOMContentLoaded', () => {            
+        // AI 버튼 초기 상태 & 토글        
+        document.addEventListener('DOMContentLoaded', () => {
+
+            setTimeout(() => {
+                window.start();
+            }, 100);
 
             console.log('Window size:', window.innerWidth, 'x', window.innerHeight);
             console.log('Device pixel ratio:', window.devicePixelRatio);
