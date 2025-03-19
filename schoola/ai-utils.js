@@ -1,3 +1,4 @@
+const aiChatMessages = document.getElementById('aiChatMessages');
 
 // 페이지 로드 시 모든 파트 데이터 미리 로드
 async function preloadAllAssetData() {
