@@ -257,7 +257,7 @@ function getFallbackAssetId(part) {
     return fallbackId;
 }
 
-// [추가] 진행 상태 업데이트 함수
+// 진행 상태 업데이트 함수
 function updateProcessingStatus(element, status, progress = 0) {
   element.innerHTML = `
     <div class="processing-status">
@@ -904,8 +904,8 @@ async function handleCustomization(intentAnalysis, messageElement, results) {
                      ? "full" : "partial";
     
     messageElement.textContent = changeType === "full" ? 
-        "새로운 스타일의 캐릭터를 준비하고 있습니다..." : 
-        "요청하신 부분을 수정하고 있습니다...";
+        '새로운 스타일의 캐릭터를 준비하고 있습니다...' : 
+        '요청하신 부분을 수정하고 있습니다...';
     
     updateProcessingStatus(messageElement, messageElement.textContent, 80);
     
@@ -971,15 +971,15 @@ function generateResultSummary(results) {
 }
 
 // 리팩토링된 메인 스트리밍 응답 함수
-window.streamChatResponse = async function(userMessage, messageElement) {
+window.streamChatResponse = async function(userMessage, messageElement, loadingInterval = null) {
     try {
         // 1. 참조 해석 및 대화 히스토리 추가
         const resolvedMessage = await resolveReferences(userMessage);
         addToConversation("user", userMessage);
         
         // 2. 로딩 상태 표시
-        messageElement.textContent = "요청을 분석하고 있습니다...";
-        window.scrollToBottom(aiChatMessages, true);
+        // messageElement.textContent = "요청을 분석하고 있습니다...";
+        // window.scrollToBottom(aiChatMessages, true);
         
         // 3. 의도 분석
         const intentAnalysis = await analyzeUserIntent(resolvedMessage);
@@ -1082,12 +1082,15 @@ window.streamChatResponse = async function(userMessage, messageElement) {
                              "beardColor", "eyebrowStyle", "skinColor", "hairColor", "eyebrowColor"]`;
                              
         // 8. 최종 응답 스트리밍
-        await generateStreamingResponse(messageElement, systemPrompt, userPrompt);
+        await generateStreamingResponse(messageElement, systemPrompt, userPrompt);        
         
-    } catch (error) {
+    } catch (error) {        
         console.error("AI 응답 처리 중 오류:", error);
         messageElement.textContent = "AI 응답을 표시하는 중 문제가 발생했습니다.";
     }
+    if (loadingInterval){
+        clearInterval(loadingInterval);
+    }            
 };
 
 // 캐릭터를 초기 상태로 되돌리는 함수
