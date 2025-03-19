@@ -77,17 +77,25 @@ async function sendMessage() {
     aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
 
     isStreaming = true;
-    
+    let standing = null;
     try {
-        await window.streamChatResponse(message, streamingMsgDiv);
+        streamingMsgDiv.textContent = '요청을 분석하고 있습니다.';
+        standing = setInterval(() => {
+            streamingMsgDiv.textContent += '.';
+        }, 1000);
+        window.scrollToBottom(aiChatMessages, true);
+        await window.streamChatResponse(message, streamingMsgDiv, standing);
     } catch (error) {
         streamingMsgDiv.textContent = '오류가 발생했습니다. 다시 시도해주세요.';
         console.error('API 오류:', error);
     } finally {
         isStreaming = false;
         streamingMsgDiv.classList.remove('streaming');
+    }   
+    if (standing) {
+        clearInterval(standing);
     }
-}    
+}     
 
 // 대화 횟수 제한 및 UI 표시
 function updateConversationCount() {
