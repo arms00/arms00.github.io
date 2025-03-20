@@ -13,7 +13,7 @@
             }
         }        
     </script>        
-    <link rel="stylesheet" href="new-avatar-custom.css?v=1.0.1" />    
+    <link rel="stylesheet" href="https://arms00.github.io/schoola/new-avatar-custom.css?v=1.0.1" />
 </head>
 <script type="module">
     window.DEBUG_MODE = true;
@@ -58,10 +58,7 @@
         </div>
         <div id="api-status" class="api-status"></div>
         <div id="conversation-status"></div>
-        </div>   
-        <!-- <div class="resize-handle resize-handle-e"></div>
-        <div class="resize-handle resize-handle-s"></div>
-        <div class="resize-handle resize-handle-se"></div>      -->
+        </div>           
     </div>
     <div id="avatarCustom-content">        
         <div id="avatarUrl"></div>
@@ -72,8 +69,7 @@
             <span id="sw-switch" class="block-overlay-1">
             </span> <span class="block-overlay-2"></span>            
             <div class="preset-overlay">                
-                <button id="aiToggleBtn" class="preset-button ai-button active">✨AI</button>                
-                <button onclick="window.setPreset(1)" class="preset-button" id="presetBtn1">학구적</button>
+                <button id="aiToggleBtn" class="preset-button ai-button active">✨AI</button>                                
                 <button onclick="window.setPreset(2)" class="preset-button" id="presetBtn2">에너제틱</button>
                 <button onclick="window.setPreset(3)" class="preset-button" id="presetBtn3">단정캐주얼</button>
                 <button onclick="window.setPreset(4)" class="preset-button" id="presetBtn4">크리에이티브</button>
@@ -94,37 +90,7 @@
     <data id="modelJSONData" value=""></data>
     <data id="avatarModalModelData" value=""></data>
     
-    <script>
-        // 참고용 코드
-        // const avatarCustomWindow = document.getElementById('avatarCustom-content');        
-        // function quitAvatarCustom() {            
-        //     try {
-        //         window.close();                
-        //     } catch (error) {
-        //         console.error('Avatar Customization window close error:', error);
-        //     }
-        //     try {
-        //         window.open('','_self').close();                
-        //     } catch (error) {
-        //         console.error('Avatar Customization window close error:', error);
-        //     }            
-        //     avatarCustomWindow.style.display = 'none';            
-        // }      
-        //  
-        // window.addEventListener('exportGLBEvent', () => {
-        //     window.exportGLB();
-        // });
-        // window.addEventListener('getModelJSONEvent', () => {
-        //     window.GetModelJSON();
-        // });        
-        // window.addEventListener('getModelGLBEvent', () => {
-        //     window.GetModelGLB();
-        // });        
-        // window.addEventListener('getAvatarGLBUrlEvent', () => {
-        //     window.GetAvatarGLBUrl();
-        // });
-
-        // 일반 스크립트에서 exportGLB 함수 호출 및 반환값 처리
+    <script>                
         const exportButton = document.getElementById('exportButton');
         exportButton.addEventListener('click', async () => {
             if (window.exportGLB) {
@@ -138,10 +104,6 @@
                 console.error('exportGLB 함수가 정의되지 않았습니다.');
             }
         });
-
-        // avatarModalModel을 JSON 문자열로 변환하는 함수
-        // @param {THREE.Object3D} model - THREE.js Object3D 모델
-        // @returns {string} - JSON 문자열
 
         function serializeAvatarModalModel(model) {
             if (!model) return '';
