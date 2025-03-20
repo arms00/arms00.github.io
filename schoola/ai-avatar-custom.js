@@ -909,10 +909,10 @@ async function handleCustomization(intentAnalysis, messageElement, results) {
                      ? "full" : "partial";
     
     messageElement.textContent = changeType === "full" ? 
-        '새로운 스타일의 캐릭터를 준비하고 있습니다...' : 
-        '요청하신 부분을 수정하고 있습니다...';
+        '새로운 스타일의 캐릭터를 준비하고 있습니다.' : 
+        '요청하신 부분을 수정하고 있습니다.';
     
-    updateProcessingStatus(messageElement, messageElement.textContent, 80);
+    //updateProcessingStatus(messageElement, messageElement.textContent, 80);
     
     try {
         const customizationResult = await processAdvancedCustomization(
