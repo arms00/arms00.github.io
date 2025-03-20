@@ -67,12 +67,12 @@ const AvatarMonitor = {
     monitoringIntervalId: null,
     
     // 모니터링 시작
-    startMonitoring(SkipOnFirstCheck = false, avatar_id = null, checkInterval = 200) {
+    async startMonitoring(SkipOnFirstCheck = false, avatar_id = null, checkInterval = 200) {
         if (selectedAvatarId === 'new') {
             console.error('모니터링할 아바타 ID가 필요합니다');
             return;
         }
-
+    
         if (!avatar_id) avatar_id = selectedAvatarId;
         
         // 진행 중인 모니터링 정리
@@ -91,97 +91,99 @@ const AvatarMonitor = {
         // JSON URL 생성
         const jsonUrl = `https://models.readyplayer.me/${avatar_id}.json`;
         
-        // 초기 데이터 가져오기
-        fetch(jsonUrl, { signal })
-            .then(response => response.json())
-            .then(initialData => {
-                // 이미 취소되었거나 다른 인스턴스가 시작되었는지 확인
-                if (signal.aborted || instanceId !== this.currentInstanceId) {
-                    console.log(`모니터링 #${instanceId}: 이미 취소됨`);
-                    return;
-                }
-                
-                const initialUpdatedAt = initialData.updatedAt;
-                console.log(`모니터링 #${instanceId}: 초기 updatedAt: ${initialUpdatedAt}`);
-                
-                const aiChatInput = document.getElementById('aiChatInput');
-                if (aiChatInput) aiChatInput.disabled = false;
-
-                // 이전 인터벌 정리
-                if (this.monitoringIntervalId) {
-                    clearInterval(this.monitoringIntervalId);
-                }
-                
-                // 주기적 확인 시작
-                this.monitoringIntervalId = setInterval(() => {
-                    // 이 인스턴스가 아직 활성 상태인지 확인
-                    if (instanceId !== this.currentInstanceId) {
-                        console.log(`모니터링 #${instanceId}: 인스턴스 불일치`);
-                        clearInterval(this.monitoringIntervalId);
-                        return;
-                    }
-                    
-                    // 현재 상태 확인
-                    fetch(jsonUrl, { signal })
-                        .then(response => response.json())
-                        .then(currentData => {
-                            // 이 인스턴스가 아직 활성 상태인지 다시 확인
-                            if (signal.aborted || instanceId !== this.currentInstanceId) {
-                                console.log(`모니터링 #${instanceId}: 요청 후 취소됨`);
-                                return;
-                            }
-                            
-                            const currentUpdatedAt = currentData.updatedAt;
-                            
-                            if (currentUpdatedAt !== initialUpdatedAt) {
-                                console.log(`모니터링 #${instanceId}: 변경 감지! ${initialUpdatedAt} -> ${currentUpdatedAt}`);
-
-                                // 중요: 먼저 모니터링 중지
-                                this.stopMonitoring(); 
-                                
-                                if (SkipOnFirstCheck) {
-                                    // 최초 확인 시 변경이 감지되면 바로 처리하고 종료
-                                    console.log(`모니터링 #${instanceId}: 최초 확인에서 변경 감지됨`);
-                                    this.startMonitoring(false, avatar_id, checkInterval);
-                                }
-                                else
-                                {
-                                    // 그 후 처리 진행
-                                    processUpdatedAvatar(currentData);
-                                }
-                            }
-                        })
-                        .catch(error => {
-                            // AbortError는 정상적인 취소이므로 에러로 처리하지 않음
-                            if (error.name !== 'AbortError') {
-                                console.error(`모니터링 #${instanceId}: 데이터 로드 실패`, error);
-                            }
-                        });
-                }, checkInterval);
-            })
-            .catch(error => {
-                // AbortError는 정상적인 취소이므로 에러로 처리하지 않음
-                if (error.name !== 'AbortError') {
-                    console.error(`모니터링 #${instanceId}: 초기 데이터 로드 실패`, error);
-                }
-            });
+        try {
+            // 초기 데이터 가져오기
+            const initialResponse = await fetch(jsonUrl, { signal });
+            const initialData = await initialResponse.json();
+            
+            // 이미 취소되었거나 다른 인스턴스가 시작되었는지 확인
+            if (signal.aborted || instanceId !== this.currentInstanceId) {
+                console.log(`모니터링 #${instanceId}: 이미 취소됨`);
+                return;
+            }
+            
+            const initialUpdatedAt = initialData.updatedAt;
+            console.log(`모니터링 #${instanceId}: 초기 updatedAt: ${initialUpdatedAt}`);
+            
+            const aiChatInput = document.getElementById('aiChatInput');
+            if (aiChatInput) aiChatInput.disabled = false;
+            
+            // 최초 확인 처리
+            if (SkipOnFirstCheck) {
+                this.startMonitoring(false, avatar_id, checkInterval);
+                return;
+            }
+            
+            // 모니터링 루프 시작
+            this.monitoringLoop(instanceId, jsonUrl, initialUpdatedAt, signal, avatar_id, checkInterval);
+        } catch (error) {
+            if (error.name !== 'AbortError') {
+                console.error(`모니터링 #${instanceId}: 초기 데이터 로드 실패`, error);
+            }
+        }
     },
     
+    // 모니터링 루프 (별도 함수로 분리)
+    async monitoringLoop(instanceId, jsonUrl, initialUpdatedAt, signal, avatar_id, checkInterval) {
+        // while 루프로 모니터링 지속
+        while (!signal.aborted && instanceId === this.currentInstanceId) {
+            try {
+                // 지정된 간격만큼 대기
+                await new Promise(resolve => setTimeout(resolve, checkInterval));
+                
+                // 인스턴스가 여전히 유효한지 확인
+                if (signal.aborted || instanceId !== this.currentInstanceId) {
+                    console.log(`모니터링 #${instanceId}: 루프 중 취소됨`);
+                    break;
+                }
+                
+                // 현재 상태 확인
+                const response = await fetch(jsonUrl, { signal });
+                const currentData = await response.json();
+                
+                // 인스턴스가 여전히 유효한지 확인
+                if (signal.aborted || instanceId !== this.currentInstanceId) {
+                    console.log(`모니터링 #${instanceId}: 요청 후 취소됨`);
+                    break;
+                }
+                
+                const currentUpdatedAt = currentData.updatedAt;
+                
+                if (currentUpdatedAt !== initialUpdatedAt) {
+                    console.log(`모니터링 #${instanceId}: 변경 감지! ${initialUpdatedAt} -> ${currentUpdatedAt}`);
+                    
+                    // 중요: 먼저 모니터링 중지
+                    this.stopMonitoring(); 
+                    
+                    // 그 후 처리 진행
+                    processUpdatedAvatar(currentData);
+                    break; // 변경이 감지되었으므로 루프 종료
+                }
+            } catch (error) {
+                // AbortError는 정상적인 취소이므로 에러로 처리하지 않음
+                if (error.name !== 'AbortError') {
+                    console.error(`모니터링 #${instanceId}: 데이터 로드 실패`, error);
+                    
+                    // 오류 발생 시 약간 대기 후 계속 (완전히 종료하지 않음)
+                    await new Promise(resolve => setTimeout(resolve, checkInterval * 2));
+                } else {
+                    break; // AbortError면 루프 종료
+                }
+            }
+        }
+    },    
     // 모니터링 중지
     stopMonitoring() {
         console.log(`모니터링 #${this.currentInstanceId} 중지`);
         
-        // 인터벌 중지
-        if (this.monitoringIntervalId) {
-            clearInterval(this.monitoringIntervalId);
-            this.monitoringIntervalId = null;
-        }
-        
-        // 진행 중인 모든 fetch 요청 취소
+        // 진행 중인 모든 fetch 요청과 while 루프 즉시 중단
         if (this.abortController) {
             this.abortController.abort();
             this.abortController = null;
         }
+        
+        // 인스턴스 ID를 변경하여 이전 루프가 재개되지 않도록 함
+        this.currentInstanceId++;
     }
 };
 
