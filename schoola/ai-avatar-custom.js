@@ -46,6 +46,22 @@ function getApiKeyForPart(part) {
 // 통합된 에셋 ID 찾기 함수
 async function findAssetId(part, description, options = {}) {
     let { matchPriority = "similar", currentAssetId = null } = options;
+    
+    // "없음" 관련 표현 처리
+    const removeKeywords = ['없음', '제거', '벗기', '착용 안함', '착용하지 않음', 'remove', 'none', 'off'];
+    if (removeKeywords.some(keyword => description.toLowerCase().includes(keyword))) {
+        console.log(`${part} 제거 요청 감지: "${description}"`);
+        return { 
+            id: '', // 빈 문자열 = 아이템 없음
+            requestedDescription: description,
+            fallback: false,
+            actualDescription: "착용 안함",
+            confidence: 10,
+            reason: "아이템 제거 요청",
+            matchPriority: "exact"
+        };
+    }
+    
     const maxAttempts = 5; // 최대 반복 횟수 제한
     let attemptCount = 0;
     
@@ -1297,6 +1313,32 @@ async function processAdvancedCustomization(userInput, intentAnalysis, changeTyp
         }
     });
     
+    // 탈착 아이템 목록 정의
+    const optionalItems = ['glasses', 'headwear', 'facewear'];
+    
+    // 전신 변경일 경우 선택적 아이템 처리 로직 추가
+    if (changeType === "full") {
+        // 스타일 요청에 명시된 파트 목록 가져오기
+        const explicitlyMentionedParts = Object.keys(partsWithPriority).map(part => part);
+        
+        // 현재 착용 중인 선택적 아이템 확인
+        optionalItems.forEach(item => {
+            const hasItem = window.characterJson?.assets && 
+                          window.characterJson.assets[item] && 
+                          window.characterJson.assets[item] !== '';
+            
+            // 아이템을 착용 중이고, 변경 요청에 해당 파트가 없으면 제거
+            if (hasItem && !explicitlyMentionedParts.includes(item)) {
+                console.log(`전신 변경 시 선택적 아이템 ${item} 자동 제거`);
+                partsWithPriority[item] = { 
+                    description: "없음", 
+                    matchPriority: "exact", 
+                    importance: 10
+                };
+            }
+        });
+    }
+
     debugLog("처리할 파트 및 우선순위:", partsWithPriority);
     
     // 3. 각 파트별로 3단계 매칭 적용하여 에셋 ID 찾기 - 캐싱 적용
