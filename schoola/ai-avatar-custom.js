@@ -807,8 +807,8 @@ async function handleGenderChange(intentAnalysis, messageElement, results) {
     const genderType = intentAnalysis.details?.gender || 
                      (intentAnalysis.userInput.includes('남') ? 'male' : 'female');
     
-    messageElement.textContent = `${genderType === 'male' ? '남성' : '여성'} 캐릭터로 변경 중...`;
-    updateProcessingStatus(messageElement, messageElement.textContent, 40);
+    messageElement.textContent = `${genderType === 'male' ? '남성' : '여성'} 캐릭터로 변경 중.`;
+    //updateProcessingStatus(messageElement, messageElement.textContent, 40);
     
     try {
         const genderChangeSuccess = await changeGender(genderType);
@@ -820,8 +820,8 @@ async function handleGenderChange(intentAnalysis, messageElement, results) {
             return `${genderType === 'male' ? '남성' : '여성'} 캐릭터로 변경했습니다. 다른 요청이 있으신가요?`;
         }
         
-        messageElement.textContent = "성별을 변경했습니다. 나머지 요청을 처리 중...";
-        updateProcessingStatus(messageElement, messageElement.textContent, 60);
+        messageElement.textContent = "성별을 변경했습니다. 나머지 요청을 처리 중.";
+        //updateProcessingStatus(messageElement, messageElement.textContent, 60);
         return null; // 다른 처리가 필요함을 나타냄
     } catch (error) {
         console.error("성별 변경 중 오류:", error);
@@ -831,8 +831,8 @@ async function handleGenderChange(intentAnalysis, messageElement, results) {
 
 // 캐릭터 초기화 처리를 위한 헬퍼 함수
 async function handleReset(intentAnalysis, messageElement, results) {
-    messageElement.textContent = "캐릭터를 초기 상태로 되돌리는 중...";
-    updateProcessingStatus(messageElement, messageElement.textContent, 50);
+    messageElement.textContent = "캐릭터를 초기 상태로 되돌리는 중.";
+    //updateProcessingStatus(messageElement, messageElement.textContent, 50);
     
     try {
         const resetSuccess = await resetCharacterToDefault();
@@ -846,8 +846,8 @@ async function handleReset(intentAnalysis, messageElement, results) {
         }
         
         results.resetToDefault = resetSuccess;
-        messageElement.textContent = "캐릭터를 초기화했습니다. 나머지 요청을 처리 중...";
-        updateProcessingStatus(messageElement, messageElement.textContent, 60);
+        messageElement.textContent = "캐릭터를 초기화했습니다. 나머지 요청을 처리 중.";
+        //updateProcessingStatus(messageElement, messageElement.textContent, 60);
         return null; // 다른 처리가 필요함을 나타냄
     } catch (error) {
         console.error("캐릭터 초기화 중 오류:", error);
@@ -860,8 +860,8 @@ async function handleItemRemoval(intentAnalysis, messageElement, results) {
     const removeItems = intentAnalysis.details?.remove_items || [];
     if (removeItems.length === 0) return null;
     
-    messageElement.textContent = "아이템을 제거하는 중...";
-    updateProcessingStatus(messageElement, messageElement.textContent, 70);
+    messageElement.textContent = "아이템을 제거하는 중.";
+    //updateProcessingStatus(messageElement, messageElement.textContent, 70);
     
     try {
         const removalResponse = await processRemoveItems(removeItems);
