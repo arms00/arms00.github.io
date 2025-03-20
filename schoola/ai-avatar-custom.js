@@ -596,7 +596,7 @@ async function handleError(error, retryState, messageElement, retryDelay) {
 }
 
 // 스트리밍 응답 생성 함수 분리
-async function generateStreamingResponse(messageElement, systemPrompt, userPrompt, delay = 1.5) {
+async function generateStreamingResponse(messageElement, systemPrompt, userPrompt, loadingInterval = null, delay = 1.5) {
     let retryState = { count: 0, maxRetries: 3 };
     const retryDelay = 300; // ms
     let fullText = '';
@@ -637,6 +637,11 @@ async function generateStreamingResponse(messageElement, systemPrompt, userPromp
             fullText = '';
             let lineBuffer = '';
             
+            if (loadingInterval) {
+                clearInterval(loadingInterval);
+                loadingInterval = null;
+            }
+
             while (true) {
                 const { done, value } = await reader.read();
                 if (done) break;
@@ -1082,7 +1087,7 @@ window.streamChatResponse = async function(userMessage, messageElement, loadingI
                              "beardColor", "eyebrowStyle", "skinColor", "hairColor", "eyebrowColor"]`;
                              
         // 8. 최종 응답 스트리밍
-        await generateStreamingResponse(messageElement, systemPrompt, userPrompt);        
+        await generateStreamingResponse(messageElement, systemPrompt, userPrompt, loadingInterval);        
         
     } catch (error) {        
         console.error("AI 응답 처리 중 오류:", error);
