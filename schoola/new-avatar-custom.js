@@ -866,8 +866,8 @@ window.openModal = openModal;
 
 function openModal() {
     displayIframe();    
-    const aiChatModal = document.getElementById('aiChatModal');
-    if (aiChatModal) aiChatModal.style.display = 'none';
+    // const aiChatModal = document.getElementById('aiChatModal');
+    // if (aiChatModal) aiChatModal.style.display = 'none';
     modal.style.display = 'flex';
     stopMonitoringAvatarUpdates();
     
