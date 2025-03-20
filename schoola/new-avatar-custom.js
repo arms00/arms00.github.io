@@ -67,7 +67,7 @@ const AvatarMonitor = {
     monitoringIntervalId: null,
     
     // 모니터링 시작
-    startMonitoring(avatar_id = null, checkInterval = 200) {
+    startMonitoring(SkipOnFirstCheck = false, avatar_id = null, checkInterval = 200) {
         if (selectedAvatarId === 'new') {
             console.error('모니터링할 아바타 ID가 필요합니다');
             return;
@@ -132,12 +132,20 @@ const AvatarMonitor = {
                             
                             if (currentUpdatedAt !== initialUpdatedAt) {
                                 console.log(`모니터링 #${instanceId}: 변경 감지! ${initialUpdatedAt} -> ${currentUpdatedAt}`);
-                                
+
                                 // 중요: 먼저 모니터링 중지
-                                this.stopMonitoring();
+                                this.stopMonitoring(); 
                                 
-                                // 그 후 처리 진행
-                                processUpdatedAvatar(currentData);
+                                if (SkipOnFirstCheck) {
+                                    // 최초 확인 시 변경이 감지되면 바로 처리하고 종료
+                                    console.log(`모니터링 #${instanceId}: 최초 확인에서 변경 감지됨`);
+                                    this.startMonitoring(false, avatar_id, checkInterval);
+                                }
+                                else
+                                {
+                                    // 그 후 처리 진행
+                                    processUpdatedAvatar(currentData);
+                                }
                             }
                         })
                         .catch(error => {
@@ -382,7 +390,7 @@ async function start(forcedGender = null) {
             setTimeout(() => {
                 displayIframe();
                 const modal = document.querySelector('#avatarModal');
-                if (modal && modal.style.display !== 'flex') monitorAvatarUpdates(selectedAvatarId);
+                if (modal && modal.style.display !== 'flex') monitorAvatarUpdates();
                 // 성공 시 스피너 제거
                 SpinnerManager.remove('.frame-container');
             }, 1000);            
@@ -452,17 +460,15 @@ async function applyAssetChanges(changes) {
     
     console.log("변경 후 characterJson:", JSON.stringify(window.characterJson.assets));
     
+    monitorAvatarUpdates();    
     // 변경된 내용으로 아바타 업데이트
-    await changeDraftAvatar(window.token, selectedAvatarId, window.characterJson);
-
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
+    await changeDraftAvatar(window.token, selectedAvatarId, window.characterJson);    
+    await new Promise(resolve => setTimeout(resolve, 500));    
     await saveDraftAvatarWithRetry(window.token, selectedAvatarId);
     
     // iframe 새로고침
     setTimeout(() => {            
-        displayIframe();
-        monitorAvatarUpdates();
+        displayIframe();        
     }, 1000);
 }
 
@@ -667,8 +673,8 @@ async function saveDraftAvatarWithRetry(bearer_token, draft_avatar_id, maxRetrie
     return null; // 최대 재시도 횟수를 초과한 경우
 }
 
-function monitorAvatarUpdates(avatar_id = null, checkInterval = 200) {
-    AvatarMonitor.startMonitoring(avatar_id, checkInterval);
+function monitorAvatarUpdates(SkipOnFirstCheck = false, avatar_id = null, checkInterval = 200) {
+    AvatarMonitor.startMonitoring(SkipOnFirstCheck, avatar_id, checkInterval);
 }
 
 function stopMonitoringAvatarUpdates() {
