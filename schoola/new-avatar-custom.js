@@ -14,7 +14,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
-import { avatarPreset } from 'https://arms00.github.io/schoola/preset.js'; // 아바타 프리셋 데이터, 배포시 수정 필요
+import { avatarPreset } from 'https://arms00.github.io/schoola/preset.js';
 import animations from 'https://arms00.github.io/customAnimations.js';
 const { 
     animationFiles_M_Idle_Base64,
