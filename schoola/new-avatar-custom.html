@@ -352,9 +352,7 @@
                 }
 
                 const aiChatInput = document.getElementById('aiChatInput');
-                if (aiChatInput) {
-                    aiChatInput.setAttribute('onfocus', 'this.blur()');  // 처음 로드 시 포커스 방지
-                    // 사용자가 탭했을 때만 입력 가능하도록
+                if (aiChatInput) {                    
                     aiChatInput.addEventListener('click', function() {
                         this.removeAttribute('onfocus');
                     });
