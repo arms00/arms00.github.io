@@ -104,6 +104,9 @@ const AvatarMonitor = {
                 const initialUpdatedAt = initialData.updatedAt;
                 console.log(`모니터링 #${instanceId}: 초기 updatedAt: ${initialUpdatedAt}`);
                 
+                const aiChatInput = document.getElementById('aiChatInput');
+                if (aiChatInput) aiChatInput.disabled = false;
+
                 // 이전 인터벌 정리
                 if (this.monitoringIntervalId) {
                     clearInterval(this.monitoringIntervalId);
@@ -426,7 +429,6 @@ async function applyAssetChanges(changes) {
     if (!window.characterJson) return;
     
     stopMonitoringAvatarUpdates();
-
     console.log("변경 전 characterJson:", JSON.stringify(window.characterJson.assets));
     
     // 변경사항 적용
@@ -459,16 +461,16 @@ async function applyAssetChanges(changes) {
     });
     
     console.log("변경 후 characterJson:", JSON.stringify(window.characterJson.assets));
-    
-    monitorAvatarUpdates();    
+        
     // 변경된 내용으로 아바타 업데이트
     await changeDraftAvatar(window.token, selectedAvatarId, window.characterJson);    
     await new Promise(resolve => setTimeout(resolve, 500));    
     await saveDraftAvatarWithRetry(window.token, selectedAvatarId);
     
     // iframe 새로고침
-    setTimeout(() => {            
-        displayIframe();        
+    setTimeout(() => {        
+        displayIframe();
+        monitorAvatarUpdates();
     }, 1000);
 }
 
