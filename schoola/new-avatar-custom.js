@@ -564,40 +564,35 @@ async function applyAssetChanges(changes) {
     Object.keys(changes).forEach(part => {
         // API의 키 이름 규칙에 맞게 조정
         const apiKeyName = getApiKeyForPart(part);
+
+        // ID 값만 추출
+        let assetId = '';
         
-        if (window.characterJson.assets[apiKeyName] && changes[part] && window.characterJson.assets[apiKeyName] !== changes[part]) {
-            changedAssets[apiKeyName] = changes[part];
-            hasChanges = true;
+        if (changes[part] === '' || changes[part] === null || changes[part] === undefined) {
+            // 제거 요청
+            assetId = '';
+        } else if (typeof changes[part] === 'object' && changes[part] !== null) {
+            // 객체로 전달된 경우 (일반 에셋 변경) - ID만 추출
+            assetId = changes[part].id !== undefined ? changes[part].id : '';
         } else {
-            // 값 처리 로직 개선
-            let assetValue = '';
+            // 문자열이나 다른 값이 전달된 경우
+            assetId = String(changes[part]);
+        }
+        
+        // 현재 값과 비교하여 변경된 경우만 처리
+        const currentValue = window.characterJson.assets[apiKeyName] || '';
+        
+        if (currentValue !== assetId) {
+            // 실제 변경이 있는 경우만 처리 - ID 값만 저장
+            console.log(`${part} 변경: ${currentValue} → ${assetId}`);
+            changedAssets[apiKeyName] = assetId; // ID 값만 저장
+            hasChanges = true;
             
-            if (changes[part] === '' || changes[part] === null || changes[part] === undefined) {
-                // 제거 요청
-                assetValue = '';
-            } else if (typeof changes[part] === 'object' && changes[part] !== null) {
-                // 객체로 전달된 경우 (일반 에셋 변경)
-                assetValue = changes[part].id !== undefined ? changes[part].id : '';
-            } else {
-                // 그 외 문자열이나 다른 값이 전달된 경우
-                assetValue = String(changes[part]);
-            }
-            
-            // 현재 값과 비교하여 변경된 경우만 처리
-            const currentValue = window.characterJson.assets[apiKeyName] || '';
-            
-            if (currentValue !== assetValue) {
-                // 실제 변경이 있는 경우만 처리
-                console.log(`${part} 변경: ${currentValue} → ${assetValue}`);
-                changedAssets[apiKeyName] = assetValue;
-                hasChanges = true;
-                
-                // characterJson 업데이트
-                window.characterJson.assets[apiKeyName] = assetValue;
-            } else {
-                console.log(`${part} 변경 없음: ${currentValue}`);
-            }
-        }        
+            // characterJson 업데이트
+            window.characterJson.assets[apiKeyName] = assetId;
+        } else {
+            console.log(`${part} 변경 없음: ${currentValue}`);
+        }
     });
 
     // 변경 사항이 없으면 조기 종료
