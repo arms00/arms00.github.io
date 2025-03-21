@@ -4,6 +4,18 @@ window.addEventListener('resize', function() {
     frameContainer.style.setProperty('--width-in-pixels', window.innerWidth);
 });
 
+const aiChatInput = document.getElementById('aiChatInput');
+
+aiChatInput.addEventListener('focus', function() {
+    console.log('Focus event:', this.value);    
+    pauseMonitoringAvatarUpdates();
+});
+
+aiChatInput.addEventListener('blur', function() {
+    console.log('Blur event:', this.value);
+    resumeMonitoringAvatarUpdates();
+});
+
 function setPreset(index) {
     window.characterPresetIndex = index;
     start(); // 캐릭터 재생성
@@ -62,12 +74,17 @@ window.defaultCharacterJson = null;
 
 // 전역 상태 관리
 const AvatarMonitor = {
-    currentInstanceId: 0, // 현재 활성 모니터링의 고유 ID
-    abortController: null, // 요청 취소용 컨트롤러
-    monitoringIntervalId: null,
+    currentInstanceId: 0,
+    abortController: null,
+    isPaused: false,  // 일시 중지 상태 추적
+    pausedData: null, // 일시 중지 시점의 상태 저장
     
     // 모니터링 시작
     async startMonitoring(SkipOnFirstCheck = false, avatar_id = null, checkInterval = 200) {
+        // 일시 중지 상태 초기화
+        this.isPaused = false;
+        this.pausedData = null;
+        
         if (selectedAvatarId === 'new') {
             console.error('모니터링할 아바타 ID가 필요합니다');
             return;
@@ -123,11 +140,18 @@ const AvatarMonitor = {
         }
     },
     
-    // 모니터링 루프 (별도 함수로 분리)
+    // 모니터링 루프 (일시 중지 기능 추가)
     async monitoringLoop(instanceId, jsonUrl, initialUpdatedAt, signal, avatar_id, checkInterval) {
         // while 루프로 모니터링 지속
         while (!signal.aborted && instanceId === this.currentInstanceId) {
             try {
+                // 일시 중지 상태 확인
+                if (this.isPaused) {
+                    // 일시 중지 상태에서는 짧은 간격으로 상태 확인만 수행
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    continue; // 다음 루프로 건너뜀
+                }
+                
                 // 지정된 간격만큼 대기
                 await new Promise(resolve => setTimeout(resolve, checkInterval));
                 
@@ -146,6 +170,9 @@ const AvatarMonitor = {
                     console.log(`모니터링 #${instanceId}: 요청 후 취소됨`);
                     break;
                 }
+                
+                // 일시 중지 확인
+                if (this.isPaused) continue;
                 
                 const currentUpdatedAt = currentData.updatedAt;
                 
@@ -171,10 +198,65 @@ const AvatarMonitor = {
                 }
             }
         }
-    },    
-    // 모니터링 중지
+    },
+    
+    // 모니터링 일시 중지
+    pauseMonitoring() {
+        if (!this.isPaused && this.currentInstanceId > 0) {
+            console.log(`모니터링 #${this.currentInstanceId} 일시 중지`);
+            this.isPaused = true;
+            
+            // 현재 상태 저장 (재개 시 사용)
+            this.pausedData = {
+                instanceId: this.currentInstanceId,
+                timestamp: Date.now()
+            };
+            
+            return true;
+        }
+        return false; // 이미 일시 중지되었거나 모니터링 중이 아님
+    },
+    
+    // 모니터링 재개
+    resumeMonitoring() {
+        if (this.isPaused && this.pausedData) {
+            // 일시 중지 시간이 너무 오래 지났으면 모니터링 새로 시작
+            const pauseDuration = Date.now() - this.pausedData.timestamp;
+            const maxPauseDuration = 30000; // 30초
+            
+            if (pauseDuration > maxPauseDuration) {
+                console.log(`일시 중지 시간(${pauseDuration}ms)이 너무 길어 모니터링을 새로 시작합니다`);
+                this.isPaused = false;
+                this.pausedData = null;
+                this.startMonitoring();
+                return true;
+            }
+            
+            // 같은 인스턴스에서 재개
+            if (this.pausedData.instanceId === this.currentInstanceId) {
+                console.log(`모니터링 #${this.currentInstanceId} 재개 (일시 중지 기간: ${pauseDuration}ms)`);
+                this.isPaused = false;
+                this.pausedData = null;
+                return true;
+            } else {
+                // 인스턴스 ID가 변경됨 - 새로 시작
+                console.log('인스턴스 ID가 변경되어 모니터링을 새로 시작합니다');
+                this.isPaused = false;
+                this.pausedData = null;
+                this.startMonitoring();
+                return true;
+            }
+        }
+        return false; // 일시 중지 상태가 아님
+    },
+    
+    // 모니터링 중지 (일시 중지 상태도 초기화)
     stopMonitoring() {
         console.log(`모니터링 #${this.currentInstanceId} 중지`);
+        
+        // 일시 중지 상태 초기화
+        this.isPaused = false;
+        this.pausedData = null;
         
         // 진행 중인 모든 fetch 요청과 while 루프 즉시 중단
         if (this.abortController) {
@@ -186,6 +268,39 @@ const AvatarMonitor = {
         this.currentInstanceId++;
     }
 };
+
+// 모니터링 일시 중지 함수
+function pauseMonitoringAvatarUpdates() {
+    return AvatarMonitor.pauseMonitoring();
+}
+
+// 모니터링 재개 함수
+function resumeMonitoringAvatarUpdates() {
+    return AvatarMonitor.resumeMonitoring();
+}
+
+// 시간 제한 일시 중지 함수 (일정 시간 후 자동 재개)
+function pauseMonitoringAvatarUpdatesWithTimeout(timeoutMs = 5000) {
+    if (AvatarMonitor.pauseMonitoring()) {
+        console.log(`${timeoutMs}ms 후 모니터링 자동 재개 예약됨`);
+        setTimeout(() => {
+            if (AvatarMonitor.isPaused) {
+                AvatarMonitor.resumeMonitoring();
+            }
+        }, timeoutMs);
+        return true;
+    }
+    return false;
+}
+
+// 모니터링 상태 확인 함수
+function getMonitoringStatus() {
+    return {
+        isActive: AvatarMonitor.currentInstanceId > 0 && AvatarMonitor.abortController !== null,
+        isPaused: AvatarMonitor.isPaused,
+        instanceId: AvatarMonitor.currentInstanceId
+    };
+}
 
 swSwitch.addEventListener('click', function() {            
     console.log('Switch button clicked.');
