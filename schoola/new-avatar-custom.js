@@ -334,7 +334,8 @@ closeButton.addEventListener('click', async function() {
     modelJSON = null;               
     avatarGLBUrl = '';    
     avatarExported = false;
-    stopMonitoringAvatarUpdates();        
+    // stopMonitoringAvatarUpdates();
+    // pauseMonitoringAvatarUpdates();
     document.getElementById('avatarGLBUrlData').value = '';
     document.getElementById('modelJSONData').value = '';
     document.getElementById('avatarModalModelData').value = '';        
@@ -351,7 +352,14 @@ closeButton.addEventListener('click', async function() {
             console.log('모델 캐시 제거 중 오류 발생:', error);
         }
         modalMixer = null;
-    }                          
+    }
+    const aiModal = document.getElementById('aiChatModal');
+    if (aiModal.style.display !== 'none') {
+        aiChatInput.disabled = false;
+        setTimeout(() => {
+            aiChatInput.focus();
+        }, 300);
+    }
 });
 
 window.addEventListener('message', subscribe);        
@@ -897,7 +905,17 @@ function subscribe(event) {
             blockOverlay1.style.backgroundColor = "rgba(246, 246, 246, 1)";
             blockOverlay1.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="svg-icon" style="width: 70%;height: 70%;vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 1024 1024" version="1.1"> <path d="M921.6 585.728c0 226.304-184.32 409.6-409.6 409.6s-409.6-182.272-409.6-409.6c0-78.848 21.504-152.576 62.464-215.04l133.12 76.8c-25.6 39.936-39.936 87.04-39.936 138.24 0 142.336 114.688 254.976 254.976 254.976 142.336 0 257.024-114.688 257.024-254.976 0-118.784-79.872-219.136-189.44-247.808v131.072L196.608 248.832 577.536 28.672v151.552C772.096 214.016 921.6 381.952 921.6 585.728z" fill="#3ADAEA"/> </svg>`
             blockOverlay2.style.backgroundColor = "rgba(246, 246, 246, 1)";
-        }, 2000);                
+        }, 2000);
+
+        const modal = document.querySelector('#avatarModal');
+        if (!(modal && modal.style.display === 'flex')) {
+            if (aiChatInput) {
+                aiChatInput.disabled = false;
+                setTimeout(() => {
+                    aiChatInput.focus();
+                }, 300);
+            }
+        }
     }
 
     if (json.eventName === 'v1.subscription.deleted') {
