@@ -556,47 +556,81 @@ async function applyAssetChanges(changes) {
     stopMonitoringAvatarUpdates();
     console.log("변경 전 characterJson:", JSON.stringify(window.characterJson.assets));
     
+    // 변경된 값만 저장할 객체
+    const changedAssets = {};
+    let hasChanges = false;
+
     // 변경사항 적용
     Object.keys(changes).forEach(part => {
         // API의 키 이름 규칙에 맞게 조정
         const apiKeyName = getApiKeyForPart(part);
         
-        // 값 처리 로직 개선
-        let assetValue = '';
-        
-        if (changes[part] === '') {
-            // 직접 빈 문자열이 전달된 경우 (제거 요청)
-            assetValue = '';
-        } else if (changes[part] === null || changes[part] === undefined) {
-            // null 또는 undefined인 경우 빈 문자열로 처리 (제거 요청)
-            assetValue = '';
-        } else if (typeof changes[part] === 'object' && changes[part] !== null) {
-            // 객체로 전달된 경우 (일반 에셋 변경)
-            assetValue = changes[part].id !== undefined ? changes[part].id : '';
+        if (window.characterJson.assets[apiKeyName] && changes[part] && window.characterJson.assets[apiKeyName] !== changes[part]) {
+            changedAssets[apiKeyName] = changes[part];
+            hasChanges = true;
         } else {
-            // 그 외 문자열이나 다른 값이 전달된 경우
-            assetValue = String(changes[part]);
-        }
-        
-        // characterJson에 값 설정
-        window.characterJson.assets[apiKeyName] = assetValue;
-        
-        // 디버깅 로그 추가
-        console.log(`${part} 변경: ${assetValue} (API 키: ${apiKeyName})`);
+            // 값 처리 로직 개선
+            let assetValue = '';
+            
+            if (changes[part] === '' || changes[part] === null || changes[part] === undefined) {
+                // 제거 요청
+                assetValue = '';
+            } else if (typeof changes[part] === 'object' && changes[part] !== null) {
+                // 객체로 전달된 경우 (일반 에셋 변경)
+                assetValue = changes[part].id !== undefined ? changes[part].id : '';
+            } else {
+                // 그 외 문자열이나 다른 값이 전달된 경우
+                assetValue = String(changes[part]);
+            }
+            
+            // 현재 값과 비교하여 변경된 경우만 처리
+            const currentValue = window.characterJson.assets[apiKeyName] || '';
+            
+            if (currentValue !== assetValue) {
+                // 실제 변경이 있는 경우만 처리
+                console.log(`${part} 변경: ${currentValue} → ${assetValue}`);
+                changedAssets[apiKeyName] = assetValue;
+                hasChanges = true;
+                
+                // characterJson 업데이트
+                window.characterJson.assets[apiKeyName] = assetValue;
+            } else {
+                console.log(`${part} 변경 없음: ${currentValue}`);
+            }
+        }        
     });
-    
-    console.log("변경 후 characterJson:", JSON.stringify(window.characterJson.assets));
-        
-    // 변경된 내용으로 아바타 업데이트
-    await changeDraftAvatar(window.token, selectedAvatarId, window.characterJson);    
-    await new Promise(resolve => setTimeout(resolve, 500));    
-    await saveDraftAvatarWithRetry(window.token, selectedAvatarId);
-    
-    // iframe 새로고침
-    setTimeout(() => {        
-        displayIframe();
+
+    // 변경 사항이 없으면 조기 종료
+    if (!hasChanges) {
+        console.log("변경된 에셋이 없습니다. API 호출 생략");
         monitorAvatarUpdates();
-    }, 1000);
+        return;
+    }
+    
+    console.log("변경된 에셋만 API 호출:", changedAssets);
+        
+    try {
+        // 변경된 값만 포함하는 부분 데이터 생성
+        const partialData = {
+            data: {
+                assets: changedAssets
+            }
+        };
+        
+        // 변경된 에셋만 업데이트
+        await changeDraftAvatarPartial(window.token, selectedAvatarId, partialData);
+        await new Promise(resolve => setTimeout(resolve, 500));
+        await saveDraftAvatarWithRetry(window.token, selectedAvatarId);
+        
+        // iframe 새로고침
+        setTimeout(() => {
+            displayIframe();
+            monitorAvatarUpdates();
+        }, 1000);
+    } catch (error) {
+        console.error("에셋 변경 중 오류 발생:", error);
+        monitorAvatarUpdates();
+    }
 }
 
 // API 호출용 파트 이름 변환
@@ -754,6 +788,24 @@ async function changeDraftAvatar(bearer_token, draft_avatar_id, patched_data) {
     });
     const json = await response.json();
     console.log('Draft avatar changed:', json);
+    return json;
+}
+
+// 부분 변경만 처리하는 함수
+async function changeDraftAvatarPartial(bearer_token, draft_avatar_id, partialData) {
+    console.log('부분 변경 데이터:', partialData);
+    
+    const response = await fetch(`https://api.readyplayer.me/v2/avatars/${draft_avatar_id}`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${bearer_token}`
+        },
+        body: JSON.stringify(partialData)
+    });
+    
+    const json = await response.json();
+    console.log('부분 변경 결과:', json);
     return json;
 }
 
